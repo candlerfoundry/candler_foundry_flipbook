@@ -18,6 +18,59 @@ The editor writes drafts to the browser's `localStorage`, so typing into `admin.
 
 A `Download content.js` button is kept as a manual fallback &mdash; useful if the Netlify function is ever misconfigured.
 
+## Working with the repo
+
+There are **two paths** for changes to land on the live site, and they can both update the same files. Keeping them in sync is a small discipline that saves a lot of grief.
+
+**Path A &mdash; Web editor (for copy).** Staff open `https://<netlify-site>/admin`, edit text, click **Publish to live site**. The Netlify function commits `content.js` to `main`. No local clone needed; nothing is written to anyone's computer.
+
+**Path B &mdash; Local clone (for code, CSS, assets).** Developers clone the repo, edit `index.html`, `admin.html`, images, etc. locally, and push.
+
+### Golden rules
+
+1. **Always `git pull` before you start local work.** The web editor may have committed new copy since your last pull, and your local clone won't know. If you edit on stale files and push, you'll hit "rejected: fetch first" and need to resolve a merge.
+2. **Only edit `content.js` through the web editor, not by hand.** The editor is the source of truth for copy. Hand-edits to `content.js` can collide with a concurrent Publish and get clobbered. (Structural changes to the `content.js` schema &mdash; adding or removing fields &mdash; are the exception; those need a code change anyway.)
+3. **After pulling a `content.js` that was changed while you had the editor open, click "Discard saved draft".** The editor's draft lives in your browser's `localStorage` and takes precedence over the bundled file. If the two diverge (e.g. a teammate published while you were drafting), your draft will shadow the freshly deployed `content.js` until you discard it. **Hard refresh does not clear `localStorage`** &mdash; only the **Discard saved draft** button does (or an incognito window, or DevTools &rarr; Application &rarr; Storage &rarr; Clear site data).
+4. **Netlify redeploys automatically** on every push to `main` &mdash; whether the push came from you or from the web editor. The live site is typically updated within 30&ndash;60 seconds of the commit landing.
+
+### Typical developer loop
+
+```sh
+cd C:\Scripts\Flipbook
+git pull origin main              # always first
+# ...edit index.html, admin.html, assets, etc...
+git add -A
+git commit -m "Concise message describing the change"
+git push origin main
+```
+
+Open the Netlify URL, hard refresh (Ctrl+Shift+R / Cmd+Shift+R) to bypass the HTTP cache and see the new version.
+
+### If a push is rejected
+
+Means the remote has commits you don't have &mdash; almost always a Publish from the web editor that you didn't pull. Fix:
+
+```sh
+git pull origin main --no-edit
+# If a merge conflict is reported in content.js, keep your local version
+# only if you know your content.js is the newer intent. Otherwise, keep
+# theirs (the web editor is usually the authoritative source of copy):
+git checkout --ours content.js        # keep your local version
+#   — or —
+git checkout --theirs content.js      # keep the web editor's version
+git add content.js
+git commit --no-edit
+git push origin main
+```
+
+For code files (`index.html`, `admin.html`, CSS, JS, assets) conflicts are rare because only local clones touch them. If one occurs, open the file in an editor, look for the `<<<<<<<`, `=======`, `>>>>>>>` markers, decide which side to keep (or combine), save, and `git add` + `git commit --no-edit`.
+
+### Quick sanity checks before pushing
+
+- `git diff --cached` to see exactly what will land in the commit.
+- Open `index.html` and `admin.html` locally and confirm they end with `</html>` &mdash; truncated files in the past have caused silent JavaScript failures.
+- If you touched rendering code, spot-check in a browser before pushing.
+
 ## One-time setup
 
 ### 1. Connect this repo to Netlify
