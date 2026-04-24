@@ -1,0 +1,31 @@
+# Dependencies (regenerable from package.json)
+node_modules/
+
+# Playwright test screenshots (debug output, large)
+playwright-*.png
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+
+# LibreOffice / Office lock files (appear next to open spreadsheets and docs)
+.~lock.*#
+~$*
+
+# Non-production leftovers (kept locally, not shipped to the live site)
+# The root-level "Friendly Students 2.png" is an unused duplicate;
+# the version the flipbook actually uses is at assets/branding/friendly-students-2.png
+Friendly Students 2.png
+pauls-vision-carousel-mockup.html
+assets/Instructors Linking Preview.xlsx
+
+# Netlify local CLI
+.netlify/

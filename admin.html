@@ -1,0 +1,2032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flipbook Live Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+@font-face {
+  font-family: "Louize";
+  src: local("Louize");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Louize Italic";
+  src: local("Louize Italic"), local("Louize-Italic");
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Louize Bold";
+  src: local("Louize Bold"), local("Louize-Bold");
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --navy: #1e2530;
+  --orange-red: #c84826;
+  --amber: #f6a85d;
+  --cream: #f0ead8;
+  --ivory: #fafaf2;
+  --ink: #2c2c2c;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "DM Sans", sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top, rgba(246, 168, 93, 0.12), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(200, 72, 38, 0.16), transparent 30%),
+    linear-gradient(180deg, #2b3442 0%, #151b24 100%);
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+.shell {
+  width: min(1600px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 18px 0 28px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  color: var(--ivory);
+}
+
+.topbar h1 {
+  margin: 0 0 6px;
+  font-family: "DM Serif Display", serif;
+  font-size: clamp(2rem, 3vw, 2.8rem);
+  font-weight: 400;
+}
+
+.topbar p {
+  margin: 0;
+  max-width: 54rem;
+  color: rgba(240, 234, 216, 0.82);
+  line-height: 1.55;
+}
+
+.chip-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.chip,
+.action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(240, 234, 216, 0.16);
+  background: rgba(240, 234, 216, 0.09);
+  color: var(--ivory);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(420px, 560px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.panel {
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(30, 37, 48, 0.08);
+  border-radius: 24px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.editor-panel {
+  max-height: calc(100vh - 64px);
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+}
+
+.panel-head {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid rgba(30, 37, 48, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(246, 242, 235, 0.82));
+}
+
+.panel-head strong,
+.section-label {
+  font-family: "DM Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--orange-red);
+}
+
+.panel-head p {
+  margin: 6px 0 0;
+  color: rgba(30, 37, 48, 0.72);
+  line-height: 1.55;
+}
+
+.toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(30, 37, 48, 0.08);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.toolbar .action {
+  min-height: 42px;
+  border-radius: 14px;
+  border: 0;
+  background: var(--navy);
+  color: var(--ivory);
+}
+
+.toolbar .action.secondary {
+  background: rgba(30, 37, 48, 0.08);
+  color: var(--navy);
+}
+
+.stack {
+  overflow: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.page-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  height: 320px;
+  max-height: 320px;
+  overflow: auto;
+  padding-right: 6px;
+  align-content: start;
+}
+
+.page-picker {
+  width: 100%;
+  border: 0;
+  padding: 10px 12px;
+  border-radius: 20px;
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 242, 235, 0.9));
+  cursor: pointer;
+  text-align: left;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.05);
+}
+
+.page-picker:hover {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(242, 236, 226, 0.94));
+}
+
+.page-picker.is-active {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(241, 232, 220, 0.98));
+  box-shadow: 0 14px 28px rgba(200, 72, 38, 0.12);
+}
+
+.page-index-pill {
+  min-height: 38px;
+  padding: 0 10px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, rgba(200, 72, 38, 0.98), rgba(160, 50, 23, 0.96));
+  color: var(--ivory);
+  font-family: "DM Mono", monospace;
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.page-title-pill {
+  min-height: 38px;
+  padding: 0 16px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  background: rgba(242, 244, 247, 0.96);
+  color: var(--navy);
+  font-family: "DM Serif Display", serif;
+  font-size: 0.9rem;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.active-page-editor {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(30, 37, 48, 0.08);
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.08);
+}
+
+.active-page-header {
+  display: grid;
+  gap: 8px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(30, 37, 48, 0.08);
+}
+
+.active-page-header strong {
+  font-family: "DM Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--orange-red);
+}
+
+.active-page-header h2 {
+  margin: 0;
+  font-family: "DM Serif Display", serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+.node {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(30, 37, 48, 0.08);
+}
+
+.node h2,
+.node h3,
+.node h4 {
+  margin: 0;
+}
+
+.node h2 {
+  font-family: "DM Serif Display", serif;
+  font-size: 1.45rem;
+  font-weight: 400;
+}
+
+.node h3 {
+  font-size: 1rem;
+}
+
+.node-toolbar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.node-toolbar button {
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: rgba(30, 37, 48, 0.08);
+  color: var(--navy);
+  cursor: pointer;
+}
+
+.node-toolbar button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.field label,
+.array-label {
+  font-family: "DM Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(122, 107, 90, 0.92);
+}
+
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+  width: 100%;
+  border: 1px solid rgba(30, 37, 48, 0.14);
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: #fffdf8;
+  color: var(--navy);
+}
+
+textarea {
+  min-height: 110px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--orange-red);
+}
+
+.range-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px;
+  gap: 10px;
+  align-items: center;
+}
+
+.range-value {
+  min-height: 42px;
+  border: 1px solid rgba(30, 37, 48, 0.14);
+  border-radius: 12px;
+  padding: 0 12px;
+  background: #fffdf8;
+}
+
+.editor-section {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(246, 242, 235, 0.78);
+  border: 1px solid rgba(30, 37, 48, 0.08);
+}
+
+.editor-section.editor-section-left {
+  background: linear-gradient(180deg, rgba(246, 242, 235, 0.92), rgba(241, 233, 221, 0.84));
+  border-color: rgba(122, 107, 90, 0.14);
+}
+
+.editor-section.editor-section-right {
+  background: linear-gradient(180deg, rgba(236, 243, 250, 0.94), rgba(226, 236, 246, 0.86));
+  border-color: rgba(62, 88, 116, 0.14);
+}
+
+.editor-section.editor-section-left input[type="text"],
+.editor-section.editor-section-left input[type="number"],
+.editor-section.editor-section-left select,
+.editor-section.editor-section-left textarea,
+.editor-section.editor-section-left .range-value {
+  background: #fffdf8;
+}
+
+.editor-section.editor-section-right input[type="text"],
+.editor-section.editor-section-right input[type="number"],
+.editor-section.editor-section-right select,
+.editor-section.editor-section-right textarea,
+.editor-section.editor-section-right .range-value {
+  background: #f7fbff;
+}
+
+.editor-section.editor-section-right .block-card {
+  background: rgba(248, 251, 255, 0.9);
+  border-color: rgba(62, 88, 116, 0.12);
+}
+
+.editor-section.editor-section-right .pill-note {
+  background: rgba(62, 88, 116, 0.1);
+  color: #37526c;
+}
+
+.editor-section h3,
+.editor-section h4 {
+  margin: 0;
+}
+
+.editor-section h3 {
+  font-family: "DM Serif Display", serif;
+  font-size: 1.2rem;
+  font-weight: 400;
+}
+
+.editor-section h4 {
+  font-size: 0.98rem;
+}
+
+.section-copy {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: rgba(30, 37, 48, 0.72);
+}
+
+.block-card {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(30, 37, 48, 0.08);
+}
+
+.pill-note {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(200, 72, 38, 0.08);
+  color: var(--orange-red);
+  font-family: "DM Mono", monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.array-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.preview-panel {
+  min-height: calc(100vh - 64px);
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.preview-shell {
+  position: relative;
+  background: linear-gradient(180deg, rgba(18, 23, 31, 0.6), rgba(18, 23, 31, 0.86));
+}
+
+.preview-shell iframe {
+  width: 100%;
+  height: calc(100vh - 168px);
+  border: 0;
+  display: block;
+  background: #10151d;
+}
+
+.asset-tools {
+  display: grid;
+  gap: 10px;
+}
+
+.asset-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.asset-row input[type="file"] {
+  max-width: 100%;
+}
+
+.asset-preview {
+  width: 100%;
+  max-width: 260px;
+  border-radius: 14px;
+  border: 1px solid rgba(30, 37, 48, 0.12);
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.helper {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: rgba(30, 37, 48, 0.72);
+}
+
+@media (max-width: 1220px) {
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .editor-panel,
+  .preview-panel {
+    min-height: auto;
+    max-height: none;
+  }
+
+  .preview-shell iframe {
+    height: 72vh;
+  }
+}
+
+@media (max-width: 720px) {
+  .page-list {
+    grid-template-columns: 1fr;
+  }
+
+  .field-grid,
+  .range-row {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div>
+      <h1>Flipbook Live Editor</h1>
+      <p>Edit the copy while looking at the actual page. Changes are saved in this browser for preview and can be exported as a replacement <code>content.js</code> when you are ready to publish.</p>
+    </div>
+    <div class="chip-row">
+      <a class="chip" href="index.html" target="_blank" rel="noopener noreferrer">Open viewer</a>
+      <button class="chip" id="jump-cover" type="button">Preview cover</button>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <section class="panel editor-panel">
+      <div class="panel-head">
+        <strong id="save-state">Local editor ready</strong>
+        <p>Typing updates the live preview immediately. Draft saves stay in this browser. Click <strong>Publish to live site</strong> to commit <code>content.js</code> to GitHub &mdash; Netlify will redeploy the flipbook within a minute. The <code>Download content.js</code> button is kept as a manual fallback.</p>
+      </div>
+      <div class="toolbar">
+        <button class="action" id="save-button" type="button">Save draft</button>
+        <button class="action secondary" id="undo-button" type="button">Undo change</button>
+        <button class="action secondary" id="clear-button" type="button">Discard saved draft</button>
+        <button class="action secondary" id="reset-button" type="button">Reset editor</button>
+        <button class="action" id="add-spread-button" type="button">Add category page</button>
+        <button class="action" id="publish-button" type="button">Publish to live site</button>
+        <button class="action secondary" id="export-button" type="button">Download content.js</button>
+      </div>
+      <div class="stack" id="editor-root"></div>
+    </section>
+
+    <section class="panel preview-panel">
+      <div class="panel-head">
+        <strong>Live Preview</strong>
+        <p>Use the page buttons inside the editor to jump the preview to the exact spread you are changing.</p>
+      </div>
+      <div class="preview-shell">
+        <iframe id="preview-frame" src="index.html?preview=1#page=1" title="Flipbook live preview"></iframe>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script src="content.js"></script>
+<script>
+const STORAGE_KEY = "flipbook-content-v1";
+const previewFrame = document.getElementById("preview-frame");
+const editorRoot = document.getElementById("editor-root");
+const saveState = document.getElementById("save-state");
+const saveButton = document.getElementById("save-button");
+const undoButton = document.getElementById("undo-button");
+const clearButton = document.getElementById("clear-button");
+const resetButton = document.getElementById("reset-button");
+const addSpreadButton = document.getElementById("add-spread-button");
+const exportButton = document.getElementById("export-button");
+const jumpCoverButton = document.getElementById("jump-cover");
+let activePageIndex = 0;
+
+function prepareWorkingData(data) {
+  return ensureSevenCategories(applyMasterSpreadTemplate(normalizeContent(deepClone(data || []))));
+}
+
+const bundledData = prepareWorkingData(window.FLIPBOOK_CONTENT || []);
+let workingData = prepareWorkingData(loadSavedData() || bundledData);
+let undoStack = [];
+let isUndoing = false;
+let lastSerializedState = JSON.stringify(workingData);
+
+function deepClone(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function loadSavedData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : null;
+  } catch (error) {
+    return null;
+  }
+}
+
+function titleCase(value) {
+  return String(value)
+    .replace(/([A-Z])/g, " $1")
+    .replace(/[_-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/^./, (match) => match.toUpperCase());
+}
+
+function createSpreadTemplate(number) {
+  return {
+    type: "spread",
+    label: `Category ${number}`,
+    genre: `Category ${number}`,
+    intro: `Replace this placeholder category with the copy for category ${number}.`,
+    feature: {
+      title: "Feature this category",
+      instructor: "Add faculty name",
+      image: "assets/branding/foundry-vignette-standing-notebook.png",
+      headshot: "",
+      facultyBlurb: "Add a short faculty blurb here.",
+      courseLabel: "Featured Course",
+      lede: "Add the lead description for the featured course or theme on this spread.",
+      quote: "Add a short pull quote or positioning line here."
+    },
+    supporting: [
+      {
+        title: "Supporting course 1",
+        instructor: "Add faculty name",
+        meta: "Term",
+        summary: "Add the summary for the first supporting course in this category."
+      },
+      {
+        title: "Supporting course 2",
+        instructor: "Add faculty name",
+        meta: "Term",
+        summary: "Add the summary for the second supporting course in this category."
+      }
+    ],
+    layout: createDefaultSpreadLayout(),
+    supportTitle: "Also in this theme",
+    templateVersion: 2,
+    leftBlocks: createDefaultLeftBlocks({
+      feature: {
+        title: "Feature this category",
+        lede: "Add the lead description for the featured course or theme on this spread.",
+        quote: "Add a short pull quote or positioning line here."
+      }
+    })
+  };
+}
+
+function createSupportingTemplate(number) {
+  return {
+    title: `Supporting course ${number}`,
+    instructor: "Add faculty name",
+    meta: "Term",
+    summary: "Add the summary for this supporting course."
+  };
+}
+
+function getSpreadTemplateVersion() {
+  return 2;
+}
+
+const FONT_OPTIONS = [
+  { value: "louize", label: "Louize" },
+  { value: "louize-italic", label: "Louize Italic" },
+  { value: "louize-bold", label: "Louize Bold" },
+  { value: "montserrat", label: "Montserrat" },
+  { value: "serif", label: "DM Serif Display" },
+  { value: "sans", label: "DM Sans" },
+  { value: "mono", label: "DM Mono" }
+];
+
+function createDefaultSpreadLayout() {
+  return {
+    imageY: 10,
+    imageScalePercent: 84,
+    imageShadow: "soft",
+    genreY: 4,
+    genreFontSize: 24,
+    genreFontFamily: "montserrat",
+    genreWidthPercent: 72,
+    courseLabelY: 61,
+    courseLabelFontSize: 12,
+    courseLabelFontFamily: "mono",
+    courseLabelWidthPercent: 52,
+    facultyY: 82,
+    facultyScalePercent: 100,
+    facultyWidthPercent: 84,
+    rightHeadingFontSize: 44,
+    rightHeadingWidthPercent: 82,
+    rightIntroFontSize: 16,
+    rightIntroWidthPercent: 84,
+    rightCardTitleFontSize: 16,
+    rightCardMetaFontSize: 11,
+    rightCardSummaryFontSize: 14,
+    rightListWidthPercent: 100
+  };
+}
+
+function getDefaultHeadshot(instructor = "") {
+  const normalized = instructor.toLowerCase();
+  if (normalized.includes("elizabeth arnold")) return "assets/headshots/elizabeth-arnold.jpg";
+  if (normalized.includes("ryan bonfiglio")) return "assets/headshots/ryan-bonfiglio.jpg";
+  if (normalized.includes("teresa fry brown")) return "assets/headshots/teresa-fry-brown.jpg";
+  return "";
+}
+
+function getDefaultFacultyBlurb(instructor = "") {
+  const normalized = instructor.toLowerCase();
+  if (normalized.includes("elizabeth arnold")) {
+    return "New Testament scholar and teacher of Pauline literature, helping learners hear Scripture with greater historical and theological clarity.";
+  }
+  if (normalized.includes("ryan bonfiglio")) {
+    return "Old Testament professor bringing Hebrew language, theological imagination, and close textual reading into lively public-facing teaching.";
+  }
+  if (normalized.includes("teresa fry brown")) {
+    return "Preaching professor and homiletician known for voice, embodiment, and the living tradition of proclamation in ministry.";
+  }
+  return "Add a short faculty blurb here.";
+}
+
+function getLeftBlockDefaults(kind, order = 0) {
+  const defaults = {
+    header: {
+      xPercent: 0,
+      yPercent: 63,
+      widthPercent: 84,
+      textAlign: "left",
+      fontFamily: "louize-bold",
+      fontSize: 28,
+      lineHeight: 1.02
+    },
+    text: {
+      xPercent: 0,
+      yPercent: 73,
+      widthPercent: 82,
+      textAlign: "left",
+      fontFamily: "montserrat",
+      fontSize: 15,
+      lineHeight: 1.58
+    },
+    quote: {
+      xPercent: 0,
+      yPercent: 93,
+      widthPercent: 96,
+      textAlign: "left",
+      fontFamily: "louize-italic",
+      fontSize: 16,
+      lineHeight: 1.24
+    }
+  };
+  const base = defaults[kind] || defaults.text;
+  return {
+    ...base,
+    yPercent: Math.min(base.yPercent + Math.max(0, order - 2) * 3, 95)
+  };
+}
+
+function normalizeLeftBlock(block, order = 0) {
+  const nextBlock = block && typeof block === "object" ? { ...block } : {};
+  const kind = nextBlock.kind || "text";
+  const defaults = getLeftBlockDefaults(kind, order);
+  return {
+    kind,
+    text: typeof nextBlock.text === "string" ? nextBlock.text : "",
+    widthPercent: Math.max(20, Math.min(Number(nextBlock.widthPercent) || defaults.widthPercent, 100)),
+    xPercent: Math.max(0, Math.min(Number(nextBlock.xPercent) || defaults.xPercent, 80)),
+    yPercent: Math.max(0, Math.min(Number(nextBlock.yPercent) || defaults.yPercent, 95)),
+    textAlign: nextBlock.textAlign || nextBlock.align || defaults.textAlign,
+    align: nextBlock.align || nextBlock.textAlign || defaults.textAlign,
+    fontFamily: nextBlock.fontFamily || defaults.fontFamily,
+    fontSize: Math.max(8, Math.min(Number(nextBlock.fontSize) || defaults.fontSize, 72)),
+    lineHeight: Math.max(0.8, Math.min(Number(nextBlock.lineHeight) || defaults.lineHeight, 2.4))
+  };
+}
+
+function createDefaultLeftBlocks(entry) {
+  const feature = entry && entry.feature ? entry.feature : {};
+  return [
+    normalizeLeftBlock({ kind: "header", text: feature.title || "" }, 0),
+    normalizeLeftBlock({ kind: "text", text: feature.lede || "" }, 1),
+    normalizeLeftBlock({ kind: "quote", text: feature.quote || "" }, 2)
+  ].filter((block) => block.text.trim());
+}
+
+function createLeftBlockTemplate(kind, order = 0) {
+  return normalizeLeftBlock({
+    kind,
+    text: ""
+  }, order);
+}
+
+function inferEntryType(entry, index, total) {
+  if (!entry || typeof entry !== "object") return "spread";
+  if (entry.type === "cover" || entry.type === "note" || entry.type === "spread" || entry.type === "close") {
+    return entry.type;
+  }
+  if (index === 0 || "tocEyebrow" in entry || ("subtitle" in entry && !("feature" in entry))) {
+    return "cover";
+  }
+  if (index === total - 1 || "cardEyebrow" in entry || "aboutCopy" in entry) {
+    return "close";
+  }
+  if ("themes" in entry || "leftEyebrow" in entry || "points" in entry) {
+    return "note";
+  }
+  if ("feature" in entry || "supporting" in entry || "genre" in entry) {
+    return "spread";
+  }
+  return "spread";
+}
+
+function normalizeContent(data) {
+  return deepClone(data).map((entry, index, all) => {
+    const nextEntry = entry && typeof entry === "object" ? entry : {};
+    nextEntry.type = inferEntryType(nextEntry, index, all.length);
+    if (nextEntry.type === "spread") {
+      const templateVersion = Number(nextEntry.templateVersion) || 0;
+      nextEntry.feature = {
+        courseLabel: "Featured Course",
+        headshot: getDefaultHeadshot(nextEntry.feature?.instructor || ""),
+        facultyBlurb: getDefaultFacultyBlurb(nextEntry.feature?.instructor || ""),
+        ...(nextEntry.feature || {})
+      };
+      nextEntry.supportTitle = nextEntry.supportTitle || "Also in this theme";
+      nextEntry.layout = {
+        ...createDefaultSpreadLayout(),
+        ...(nextEntry.layout || {})
+      };
+      nextEntry.layout.imageScalePercent = Math.max(40, Math.min(Number(nextEntry.layout.imageScalePercent ?? nextEntry.layout.imageWidthPercent) || 84, 140));
+      nextEntry.layout.imageY = Math.max(0, Math.min(Number(nextEntry.layout.imageY) || 10, 40));
+      nextEntry.layout.genreY = Math.max(0, Math.min(Number(nextEntry.layout.genreY) || 4, 25));
+      nextEntry.layout.genreFontSize = Math.max(10, Math.min(Number(nextEntry.layout.genreFontSize) || 24, 42));
+      nextEntry.layout.genreWidthPercent = Math.max(24, Math.min(Number(nextEntry.layout.genreWidthPercent) || 72, 100));
+      nextEntry.layout.courseLabelWidthPercent = Math.max(24, Math.min(Number(nextEntry.layout.courseLabelWidthPercent) || 52, 100));
+      nextEntry.layout.facultyY = Math.max(60, Math.min(Number(nextEntry.layout.facultyY) || 82, 92));
+      nextEntry.layout.facultyWidthPercent = Math.max(34, Math.min(Number(nextEntry.layout.facultyWidthPercent) || 84, 120));
+      nextEntry.layout.rightHeadingWidthPercent = Math.max(35, Math.min(Number(nextEntry.layout.rightHeadingWidthPercent) || 82, 100));
+      nextEntry.layout.rightIntroWidthPercent = Math.max(35, Math.min(Number(nextEntry.layout.rightIntroWidthPercent) || 84, 100));
+      nextEntry.layout.rightListWidthPercent = Math.max(50, Math.min(Number(nextEntry.layout.rightListWidthPercent) || 100, 100));
+      nextEntry.leftBlocks = templateVersion >= getSpreadTemplateVersion() && Array.isArray(nextEntry.leftBlocks) && nextEntry.leftBlocks.length
+        ? nextEntry.leftBlocks
+            .map((block, blockIndex) => normalizeLeftBlock(block, blockIndex))
+            .filter((block) => block.kind !== "meta" && block.text.trim())
+        : createDefaultLeftBlocks(nextEntry);
+      nextEntry.templateVersion = getSpreadTemplateVersion();
+    }
+    return nextEntry;
+  });
+}
+
+function buildBlockTextPool(entry) {
+  const pool = { header: [], text: [], quote: [] };
+  (Array.isArray(entry.leftBlocks) ? entry.leftBlocks : []).forEach((block) => {
+    if (pool[block.kind]) {
+      pool[block.kind].push(block.text || "");
+    }
+  });
+  if (!pool.header.length && entry.feature?.title) pool.header.push(entry.feature.title);
+  if (!pool.text.length && entry.feature?.lede) pool.text.push(entry.feature.lede);
+  if (!pool.quote.length && entry.feature?.quote) pool.quote.push(entry.feature.quote);
+  return pool;
+}
+
+function takeTemplateText(kind, pool, entry) {
+  if (pool[kind] && pool[kind].length) {
+    return pool[kind].shift() || "";
+  }
+  if (kind === "header") return entry.feature?.title || "";
+  if (kind === "text") return entry.feature?.lede || "";
+  if (kind === "quote") return entry.feature?.quote || "";
+  return "";
+}
+
+function applyMasterSpreadTemplate(data) {
+  const spreadEntries = data
+    .map((entry, index) => ({ entry, index }))
+    .filter(({ entry }) => entry.type === "spread");
+
+  if (!spreadEntries.length) return data;
+  const masterEntry = spreadEntries[0].entry;
+  const masterLayout = {
+    ...createDefaultSpreadLayout(),
+    ...(masterEntry.layout || {})
+  };
+  const masterBlocks = Array.isArray(masterEntry.leftBlocks) && masterEntry.leftBlocks.length
+    ? masterEntry.leftBlocks.map((block, index) => normalizeLeftBlock(block, index))
+    : createDefaultLeftBlocks(masterEntry);
+
+  spreadEntries.forEach(({ entry }, spreadOrder) => {
+    entry.supportTitle = masterEntry.supportTitle || entry.supportTitle || "Also in this theme";
+    entry.layout = {
+      ...(entry.layout || {}),
+      ...masterLayout
+    };
+    entry.feature = {
+      ...(entry.feature || {}),
+      courseLabel: masterEntry.feature?.courseLabel || entry.feature?.courseLabel || "Featured Course"
+    };
+    if (spreadOrder > 0) {
+      const pool = buildBlockTextPool(entry);
+      entry.leftBlocks = masterBlocks.map((templateBlock, blockIndex) => normalizeLeftBlock({
+        ...templateBlock,
+        text: takeTemplateText(templateBlock.kind, pool, entry)
+      }, blockIndex));
+    } else {
+      entry.leftBlocks = masterBlocks.map((block, blockIndex) => normalizeLeftBlock(block, blockIndex));
+    }
+  });
+
+  return data;
+}
+
+function ensureSevenCategories(data) {
+  const nextData = normalizeContent(data);
+  const closeIndex = nextData.findIndex((entry) => entry.type === "close");
+  let spreads = nextData.filter((entry) => entry.type === "spread");
+  while (spreads.length < 7) {
+    spreads.push(createSpreadTemplate(spreads.length + 1));
+  }
+  if (spreads.length === nextData.filter((entry) => entry.type === "spread").length) {
+    return nextData;
+  }
+  const rebuilt = [];
+  nextData.forEach((entry) => {
+    if (entry.type !== "spread") {
+      rebuilt.push(entry);
+      if (entry.type === "note") {
+        spreads.forEach((spread) => rebuilt.push(spread));
+      }
+    }
+  });
+  if (closeIndex === -1) {
+    return rebuilt;
+  }
+  return rebuilt;
+}
+
+function persistWorkingData(message = "Saved in browser") {
+  workingData = prepareWorkingData(workingData);
+  const serialized = JSON.stringify(workingData);
+  if (!isUndoing && serialized !== lastSerializedState) {
+    undoStack.push(lastSerializedState);
+    if (undoStack.length > 50) {
+      undoStack.shift();
+    }
+  }
+  localStorage.setItem(STORAGE_KEY, serialized);
+  lastSerializedState = serialized;
+  saveState.textContent = message;
+  updateUndoButtonState();
+  pushPreviewUpdate();
+}
+
+function updateUndoButtonState() {
+  undoButton.disabled = undoStack.length === 0;
+}
+
+function setByPath(root, path, value) {
+  const container = path.slice(0, -1).reduce((acc, key) => acc[key], root);
+  container[path[path.length - 1]] = value;
+}
+
+function getByPath(root, path) {
+  return path.reduce((acc, key) => acc[key], root);
+}
+
+function moveArrayItem(path, fromIndex, toIndex) {
+  const array = getByPath(workingData, path);
+  if (!Array.isArray(array)) return;
+  if (toIndex < 0 || toIndex >= array.length) return;
+  const [item] = array.splice(fromIndex, 1);
+  array.splice(toIndex, 0, item);
+}
+
+function navigatePreview(index) {
+  previewFrame.contentWindow?.postMessage({ type: "flipbook:navigate", index }, "*");
+}
+
+function pushPreviewUpdate() {
+  previewFrame.contentWindow?.postMessage({ type: "flipbook:update", content: workingData }, "*");
+}
+
+function getPageIndexFromPath(path) {
+  return typeof path[0] === "number" ? path[0] : null;
+}
+
+function activatePage(index, shouldNavigate = true) {
+  activePageIndex = Math.max(0, Math.min(index, workingData.length - 1));
+  renderEditor();
+  requestAnimationFrame(() => {
+    const activeEditor = editorRoot.querySelector(".active-page-editor");
+    if (activeEditor) {
+      activeEditor.scrollIntoView({ block: "start", behavior: "smooth" });
+    }
+  });
+  if (shouldNavigate) {
+    navigatePreview(activePageIndex);
+  }
+}
+
+function focusPageForPath(path) {
+  const pageIndex = getPageIndexFromPath(path);
+  if (pageIndex !== null) {
+    activePageIndex = pageIndex;
+    navigatePreview(pageIndex);
+  }
+}
+
+function createSection(title, copy = "", side = "left") {
+  const section = document.createElement("section");
+  section.className = `editor-section editor-section-${side}`;
+
+  const heading = document.createElement("h3");
+  heading.textContent = title;
+  section.appendChild(heading);
+
+  if (copy) {
+    const paragraph = document.createElement("p");
+    paragraph.className = "section-copy";
+    paragraph.textContent = copy;
+    section.appendChild(paragraph);
+  }
+
+  return section;
+}
+
+function createSelectField(labelText, value, path, options, onInput) {
+  const field = document.createElement("div");
+  field.className = "field";
+
+  const label = document.createElement("label");
+  label.textContent = labelText;
+  field.appendChild(label);
+
+  const select = document.createElement("select");
+  options.forEach((option) => {
+    const optionNode = document.createElement("option");
+    optionNode.value = option.value;
+    optionNode.textContent = option.label;
+    if (option.value === value) {
+      optionNode.selected = true;
+    }
+    select.appendChild(optionNode);
+  });
+
+  select.addEventListener("focus", () => focusPageForPath(path));
+  select.addEventListener("input", () => onInput(select.value));
+  field.appendChild(select);
+  return field;
+}
+
+function createRangeField(labelText, value, path, options = {}) {
+  const {
+    min = 0,
+    max = 100,
+    step = 1,
+    suffix = "",
+    decimals = step < 1 ? 2 : 0,
+    message = "Updated layout"
+  } = options;
+
+  const field = document.createElement("div");
+  field.className = "field";
+
+  const label = document.createElement("label");
+  label.textContent = labelText;
+  field.appendChild(label);
+
+  const row = document.createElement("div");
+  row.className = "range-row";
+
+  const slider = document.createElement("input");
+  slider.type = "range";
+  slider.min = String(min);
+  slider.max = String(max);
+  slider.step = String(step);
+  slider.value = String(value);
+
+  const number = document.createElement("input");
+  number.type = "number";
+  number.className = "range-value";
+  number.min = String(min);
+  number.max = String(max);
+  number.step = String(step);
+  number.value = String(value);
+
+  const commit = (nextValue) => {
+    const numeric = Number(nextValue);
+    if (!Number.isFinite(numeric)) return;
+    const clamped = Math.max(min, Math.min(max, numeric));
+    const normalized = decimals > 0 ? Number(clamped.toFixed(decimals)) : Math.round(clamped);
+    slider.value = String(normalized);
+    number.value = String(normalized);
+    setByPath(workingData, path, normalized);
+    persistWorkingData(message);
+  };
+
+  slider.addEventListener("focus", () => focusPageForPath(path));
+  number.addEventListener("focus", () => focusPageForPath(path));
+  slider.addEventListener("input", () => commit(slider.value));
+  number.addEventListener("input", () => commit(number.value));
+
+  row.appendChild(slider);
+  row.appendChild(number);
+  field.appendChild(row);
+
+  if (suffix) {
+    const helper = document.createElement("p");
+    helper.className = "helper";
+    helper.textContent = `Value shown in ${suffix}.`;
+    field.appendChild(helper);
+  }
+
+  return field;
+}
+
+function createField(labelText, value, path, onInput) {
+  const field = document.createElement("div");
+  field.className = "field";
+
+  const label = document.createElement("label");
+  label.textContent = labelText;
+  field.appendChild(label);
+
+  const control = value.length > 100 || value.includes("\n")
+    ? document.createElement("textarea")
+    : document.createElement("input");
+
+  if (control.tagName === "INPUT") {
+    control.type = "text";
+  }
+
+  control.value = value;
+  const pageIndex = getPageIndexFromPath(path);
+  control.addEventListener("focus", () => focusPageForPath(path));
+  control.addEventListener("input", () => onInput(control.value));
+  field.appendChild(control);
+  return field;
+}
+
+function createImageField(labelText, value, path) {
+  const field = document.createElement("div");
+  field.className = "field asset-tools";
+
+  const label = document.createElement("label");
+  label.textContent = labelText;
+  field.appendChild(label);
+
+  const pathInput = document.createElement("input");
+  pathInput.type = "text";
+  pathInput.value = value;
+  const pageIndex = getPageIndexFromPath(path);
+  pathInput.addEventListener("focus", () => focusPageForPath(path));
+  pathInput.addEventListener("input", () => {
+    setByPath(workingData, path, pathInput.value);
+    persistWorkingData("Image updated");
+  });
+  field.appendChild(pathInput);
+
+  const assetRow = document.createElement("div");
+  assetRow.className = "asset-row";
+
+  const fileInput = document.createElement("input");
+  fileInput.type = "file";
+  fileInput.accept = "image/*";
+  fileInput.addEventListener("change", () => {
+    const file = fileInput.files && fileInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = typeof reader.result === "string" ? reader.result : "";
+      setByPath(workingData, path, dataUrl);
+      pathInput.value = dataUrl;
+      if (previewImage) {
+        previewImage.src = dataUrl;
+      }
+      persistWorkingData(`Loaded ${file.name} into browser state`);
+    };
+    reader.readAsDataURL(file);
+  });
+  assetRow.appendChild(fileInput);
+
+  const clearButton = document.createElement("button");
+  clearButton.type = "button";
+  clearButton.textContent = "Clear image";
+  clearButton.addEventListener("click", () => {
+    setByPath(workingData, path, "");
+    pathInput.value = "";
+    if (previewImage) {
+      previewImage.src = "";
+      previewImage.style.display = "none";
+    }
+    persistWorkingData("Image cleared");
+  });
+  assetRow.appendChild(clearButton);
+  field.appendChild(assetRow);
+
+  const previewImage = document.createElement("img");
+  previewImage.className = "asset-preview";
+  previewImage.alt = "";
+  previewImage.src = value || "";
+  previewImage.style.display = value ? "block" : "none";
+  previewImage.addEventListener("load", () => {
+    previewImage.style.display = previewImage.src ? "block" : "none";
+  });
+  field.appendChild(previewImage);
+
+  const helper = document.createElement("p");
+  helper.className = "helper";
+  helper.textContent = "You can paste a path/URL or upload a local image for browser-only preview. We can replace embedded data images with real asset files before pushing to Git.";
+  field.appendChild(helper);
+
+  return field;
+}
+
+function renderLeftBlockEditor(block, path, index, total, displayOrder = index) {
+  const normalized = normalizeLeftBlock(block, index);
+  const wrap = document.createElement("section");
+  wrap.className = "block-card";
+
+  const headerRow = document.createElement("div");
+  headerRow.className = "node-toolbar";
+
+  const blockLabel = document.createElement("span");
+  blockLabel.className = "pill-note";
+  blockLabel.textContent = `Block ${displayOrder + 1} · ${titleCase(normalized.kind)}`;
+  headerRow.appendChild(blockLabel);
+
+  const moveUp = document.createElement("button");
+  moveUp.type = "button";
+  moveUp.textContent = "Move up";
+  moveUp.disabled = index === 0;
+  moveUp.addEventListener("click", () => {
+    moveArrayItem(path.slice(0, -1), index, index - 1);
+    renderEditor();
+    persistWorkingData("Moved block");
+  });
+  headerRow.appendChild(moveUp);
+
+  const moveDown = document.createElement("button");
+  moveDown.type = "button";
+  moveDown.textContent = "Move down";
+  moveDown.disabled = index === total - 1;
+  moveDown.addEventListener("click", () => {
+    moveArrayItem(path.slice(0, -1), index, index + 1);
+    renderEditor();
+    persistWorkingData("Moved block");
+  });
+  headerRow.appendChild(moveDown);
+
+  const removeButton = document.createElement("button");
+  removeButton.type = "button";
+  removeButton.textContent = "Delete block";
+  removeButton.addEventListener("click", () => {
+    const blocks = getByPath(workingData, path.slice(0, -1));
+    blocks.splice(index, 1);
+    renderEditor();
+    persistWorkingData("Deleted block");
+  });
+  headerRow.appendChild(removeButton);
+  wrap.appendChild(headerRow);
+
+  wrap.appendChild(createSelectField("Block type", normalized.kind, path.concat("kind"), [
+    { value: "header", label: "Header" },
+    { value: "text", label: "Text" },
+    { value: "quote", label: "Quote" }
+  ], (nextValue) => {
+    setByPath(workingData, path.concat("kind"), nextValue);
+    renderEditor();
+    persistWorkingData("Updated block type");
+  }));
+
+  wrap.appendChild(createField("Text", normalized.text, path.concat("text"), (nextValue) => {
+    setByPath(workingData, path.concat("text"), nextValue);
+    persistWorkingData("Updated block copy");
+  }));
+
+  const styleGrid = document.createElement("div");
+  styleGrid.className = "field-grid";
+  styleGrid.appendChild(createSelectField("Font family", normalized.fontFamily, path.concat("fontFamily"), FONT_OPTIONS, (nextValue) => {
+    setByPath(workingData, path.concat("fontFamily"), nextValue);
+    persistWorkingData("Updated font family");
+  }));
+  styleGrid.appendChild(createSelectField("Text align", normalized.textAlign, path.concat("textAlign"), [
+    { value: "left", label: "Left" },
+    { value: "center", label: "Center" },
+    { value: "right", label: "Right" }
+  ], (nextValue) => {
+    setByPath(workingData, path.concat("textAlign"), nextValue);
+    setByPath(workingData, path.concat("align"), nextValue);
+    persistWorkingData("Updated text alignment");
+  }));
+  wrap.appendChild(styleGrid);
+
+  const geometryGrid = document.createElement("div");
+  geometryGrid.className = "field-grid";
+  geometryGrid.appendChild(createRangeField("Horizontal position", normalized.xPercent, path.concat("xPercent"), { min: 0, max: 80, step: 1, suffix: "%", message: "Moved text box" }));
+  geometryGrid.appendChild(createRangeField("Vertical position", normalized.yPercent, path.concat("yPercent"), { min: 0, max: 92, step: 1, suffix: "%", message: "Moved text box" }));
+  geometryGrid.appendChild(createRangeField("Box width", normalized.widthPercent, path.concat("widthPercent"), { min: 20, max: 100, step: 1, suffix: "%", message: "Resized text box" }));
+  geometryGrid.appendChild(createRangeField("Font size", normalized.fontSize, path.concat("fontSize"), { min: 8, max: 72, step: 1, suffix: "px", message: "Updated font size" }));
+  geometryGrid.appendChild(createRangeField("Line height", normalized.lineHeight, path.concat("lineHeight"), { min: 0.8, max: 2.4, step: 0.01, decimals: 2, message: "Updated line height" }));
+  wrap.appendChild(geometryGrid);
+
+  return wrap;
+}
+
+function renderSupportingCourseEditor(item, path, index, total) {
+  const wrap = document.createElement("section");
+  wrap.className = "block-card";
+
+  const headerRow = document.createElement("div");
+  headerRow.className = "node-toolbar";
+
+  const label = document.createElement("span");
+  label.className = "pill-note";
+  label.textContent = `Supporting course ${index + 1}`;
+  headerRow.appendChild(label);
+
+  const moveUp = document.createElement("button");
+  moveUp.type = "button";
+  moveUp.textContent = "Move up";
+  moveUp.disabled = index === 0;
+  moveUp.addEventListener("click", () => {
+    moveArrayItem(path.slice(0, -1), index, index - 1);
+    renderEditor();
+    persistWorkingData("Moved supporting course");
+  });
+  headerRow.appendChild(moveUp);
+
+  const moveDown = document.createElement("button");
+  moveDown.type = "button";
+  moveDown.textContent = "Move down";
+  moveDown.disabled = index === total - 1;
+  moveDown.addEventListener("click", () => {
+    moveArrayItem(path.slice(0, -1), index, index + 1);
+    renderEditor();
+    persistWorkingData("Moved supporting course");
+  });
+  headerRow.appendChild(moveDown);
+
+  const removeButton = document.createElement("button");
+  removeButton.type = "button";
+  removeButton.textContent = "Delete course";
+  removeButton.addEventListener("click", () => {
+    const courses = getByPath(workingData, path.slice(0, -1));
+    courses.splice(index, 1);
+    renderEditor();
+    persistWorkingData("Deleted supporting course");
+  });
+  headerRow.appendChild(removeButton);
+  wrap.appendChild(headerRow);
+
+  const fieldGrid = document.createElement("div");
+  fieldGrid.className = "field-grid";
+  fieldGrid.appendChild(createField("Course title", item.title || "", path.concat("title"), (nextValue) => {
+    setByPath(workingData, path.concat("title"), nextValue);
+    persistWorkingData("Updated supporting course title");
+  }));
+  fieldGrid.appendChild(createField("Instructor", item.instructor || "", path.concat("instructor"), (nextValue) => {
+    setByPath(workingData, path.concat("instructor"), nextValue);
+    persistWorkingData("Updated supporting course instructor");
+  }));
+  fieldGrid.appendChild(createField("Term / meta", item.meta || "", path.concat("meta"), (nextValue) => {
+    setByPath(workingData, path.concat("meta"), nextValue);
+    persistWorkingData("Updated supporting course meta");
+  }));
+  wrap.appendChild(fieldGrid);
+
+  wrap.appendChild(createField("Summary", item.summary || "", path.concat("summary"), (nextValue) => {
+    setByPath(workingData, path.concat("summary"), nextValue);
+    persistWorkingData("Updated supporting course summary");
+  }));
+
+  return wrap;
+}
+
+function renderSupportingCoursesSection(entry, path) {
+  const section = createSection("Supporting courses", "Edit each supporting course’s copy here. Use the shared type controls below to keep every supporting card visually consistent.", "right");
+
+  const toolbar = document.createElement("div");
+  toolbar.className = "node-toolbar";
+
+  const addButton = document.createElement("button");
+  addButton.type = "button";
+  addButton.textContent = entry.supporting.length >= 12 ? "12-course limit reached" : "Add supporting course";
+  addButton.disabled = entry.supporting.length >= 12;
+  addButton.addEventListener("click", () => {
+    const courses = getByPath(workingData, path.concat("supporting"));
+    courses.push(createSupportingTemplate(courses.length + 1));
+    renderEditor();
+    persistWorkingData("Added supporting course");
+  });
+  toolbar.appendChild(addButton);
+
+  if (entry.supporting.length > 0) {
+    const removeButton = document.createElement("button");
+    removeButton.type = "button";
+    removeButton.textContent = "Remove last course";
+    removeButton.addEventListener("click", () => {
+      const courses = getByPath(workingData, path.concat("supporting"));
+      courses.pop();
+      renderEditor();
+      persistWorkingData("Removed supporting course");
+    });
+    toolbar.appendChild(removeButton);
+  }
+
+  section.appendChild(toolbar);
+
+  const styleGrid = document.createElement("div");
+  styleGrid.className = "field-grid";
+  styleGrid.appendChild(createRangeField("Course title size", entry.layout.rightCardTitleFontSize, path.concat("layout", "rightCardTitleFontSize"), { min: 12, max: 30, step: 1, suffix: "px", message: "Updated supporting course title size" }));
+  styleGrid.appendChild(createRangeField("Course meta size", entry.layout.rightCardMetaFontSize, path.concat("layout", "rightCardMetaFontSize"), { min: 9, max: 18, step: 1, suffix: "px", message: "Updated supporting course meta size" }));
+  styleGrid.appendChild(createRangeField("Course summary size", entry.layout.rightCardSummaryFontSize, path.concat("layout", "rightCardSummaryFontSize"), { min: 11, max: 22, step: 1, suffix: "px", message: "Updated supporting course summary size" }));
+  styleGrid.appendChild(createRangeField("Course stack width", entry.layout.rightListWidthPercent, path.concat("layout", "rightListWidthPercent"), { min: 50, max: 100, step: 1, suffix: "%", message: "Updated supporting course width" }));
+  section.appendChild(styleGrid);
+
+  entry.supporting.forEach((item, index) => {
+    section.appendChild(renderSupportingCourseEditor(item, path.concat("supporting", index), index, entry.supporting.length));
+  });
+
+  return section;
+}
+
+function renderSpreadEditor(entry, path, label) {
+  const wrap = document.createElement("section");
+  wrap.className = "node";
+
+  const heading = document.createElement("h2");
+  heading.textContent = label;
+  wrap.appendChild(heading);
+
+  const nodeToolbar = document.createElement("div");
+  nodeToolbar.className = "node-toolbar";
+  const jumpButton = document.createElement("button");
+  jumpButton.type = "button";
+  jumpButton.textContent = "Preview this page";
+  jumpButton.addEventListener("click", () => navigatePreview(path[0]));
+  nodeToolbar.appendChild(jumpButton);
+  wrap.appendChild(nodeToolbar);
+
+  const categorySection = createSection("Category label", "This controls the orange category heading above the graphic and keeps the page label aligned with the table of contents.", "left");
+  const categoryGrid = document.createElement("div");
+  categoryGrid.className = "field-grid";
+  categoryGrid.appendChild(createField("Category text", entry.genre || "", path.concat("genre"), (nextValue) => {
+    setByPath(workingData, path.concat("genre"), nextValue);
+    setByPath(workingData, path.concat("label"), nextValue);
+    persistWorkingData("Updated category label");
+  }));
+  categoryGrid.appendChild(createSelectField("Category font", entry.layout.genreFontFamily || "montserrat", path.concat("layout", "genreFontFamily"), FONT_OPTIONS, (nextValue) => {
+    setByPath(workingData, path.concat("layout", "genreFontFamily"), nextValue);
+    persistWorkingData("Updated category font");
+  }));
+  categoryGrid.appendChild(createRangeField("Category size", entry.layout.genreFontSize, path.concat("layout", "genreFontSize"), { min: 10, max: 42, step: 1, suffix: "px", message: "Updated category size" }));
+  categoryGrid.appendChild(createRangeField("Category vertical position", entry.layout.genreY, path.concat("layout", "genreY"), { min: 0, max: 25, step: 1, suffix: "%", message: "Moved category label" }));
+  categoryGrid.appendChild(createRangeField("Category box width", entry.layout.genreWidthPercent, path.concat("layout", "genreWidthPercent"), { min: 24, max: 100, step: 1, suffix: "%", message: "Resized category width" }));
+  categorySection.appendChild(categoryGrid);
+  wrap.appendChild(categorySection);
+
+  const graphicSection = createSection("Graphic", "The image is always centered on the page. Use these controls only for vertical placement and overall scale.", "left");
+  graphicSection.appendChild(createImageField("Graphic image", entry.feature?.image || "", path.concat("feature", "image")));
+  const graphicGrid = document.createElement("div");
+  graphicGrid.className = "field-grid";
+  graphicGrid.appendChild(createRangeField("Graphic vertical position", entry.layout.imageY, path.concat("layout", "imageY"), { min: 0, max: 40, step: 1, suffix: "%", message: "Moved graphic" }));
+  graphicGrid.appendChild(createRangeField("Graphic scale", entry.layout.imageScalePercent, path.concat("layout", "imageScalePercent"), { min: 40, max: 140, step: 1, suffix: "%", message: "Updated graphic scale" }));
+  graphicGrid.appendChild(createSelectField("Graphic shadow", entry.layout.imageShadow || "soft", path.concat("layout", "imageShadow"), [
+    { value: "none", label: "None" },
+    { value: "soft", label: "Soft" },
+    { value: "strong", label: "Strong" }
+  ], (nextValue) => {
+    setByPath(workingData, path.concat("layout", "imageShadow"), nextValue);
+    persistWorkingData("Updated graphic shadow");
+  }));
+  graphicSection.appendChild(graphicGrid);
+  wrap.appendChild(graphicSection);
+
+  const courseLabelSection = createSection("Featured course label", "This is its own left-page text box beneath the graphic.", "left");
+  const courseLabelGrid = document.createElement("div");
+  courseLabelGrid.className = "field-grid";
+  courseLabelGrid.appendChild(createField("Label text", entry.feature?.courseLabel || "", path.concat("feature", "courseLabel"), (nextValue) => {
+    setByPath(workingData, path.concat("feature", "courseLabel"), nextValue);
+    persistWorkingData("Updated featured course label");
+  }));
+  courseLabelGrid.appendChild(createSelectField("Label font", entry.layout.courseLabelFontFamily || "mono", path.concat("layout", "courseLabelFontFamily"), FONT_OPTIONS, (nextValue) => {
+    setByPath(workingData, path.concat("layout", "courseLabelFontFamily"), nextValue);
+    persistWorkingData("Updated course label font");
+  }));
+  courseLabelGrid.appendChild(createRangeField("Label size", entry.layout.courseLabelFontSize, path.concat("layout", "courseLabelFontSize"), { min: 10, max: 28, step: 1, suffix: "px", message: "Updated course label size" }));
+  courseLabelGrid.appendChild(createRangeField("Label vertical position", entry.layout.courseLabelY, path.concat("layout", "courseLabelY"), { min: 42, max: 78, step: 1, suffix: "%", message: "Moved course label" }));
+  courseLabelGrid.appendChild(createRangeField("Label box width", entry.layout.courseLabelWidthPercent, path.concat("layout", "courseLabelWidthPercent"), { min: 24, max: 100, step: 1, suffix: "%", message: "Resized course label width" }));
+  courseLabelSection.appendChild(courseLabelGrid);
+  wrap.appendChild(courseLabelSection);
+
+  const blocksSection = createSection("Left-page text boxes", "These are ordered from top to bottom based on where they currently sit on the page.", "left");
+  const blockToolbar = document.createElement("div");
+  blockToolbar.className = "node-toolbar";
+  ["header", "text", "quote"].forEach((kind) => {
+    const addButton = document.createElement("button");
+    addButton.type = "button";
+    addButton.textContent = `Add ${kind}`;
+    addButton.addEventListener("click", () => {
+      const blocks = getByPath(workingData, path.concat("leftBlocks"));
+      blocks.push(createLeftBlockTemplate(kind, blocks.length));
+      renderEditor();
+      persistWorkingData(`Added ${kind} block`);
+    });
+    blockToolbar.appendChild(addButton);
+  });
+  blocksSection.appendChild(blockToolbar);
+
+  entry.leftBlocks
+    .map((block, index) => ({ block, index, yPercent: normalizeLeftBlock(block, index).yPercent }))
+    .sort((left, right) => left.yPercent - right.yPercent)
+    .forEach(({ block, index }, displayOrder) => {
+      blocksSection.appendChild(renderLeftBlockEditor(block, path.concat("leftBlocks", index), index, entry.leftBlocks.length, displayOrder));
+    });
+  wrap.appendChild(blocksSection);
+
+  const facultySection = createSection("Faculty card", "This replaces the old meta footer with a circular headshot and a short faculty blurb.", "left");
+  const facultyGrid = document.createElement("div");
+  facultyGrid.className = "field-grid";
+  facultyGrid.appendChild(createField("Instructor name", entry.feature?.instructor || "", path.concat("feature", "instructor"), (nextValue) => {
+    setByPath(workingData, path.concat("feature", "instructor"), nextValue);
+    persistWorkingData("Updated instructor name");
+  }));
+  facultyGrid.appendChild(createRangeField("Faculty card vertical position", entry.layout.facultyY, path.concat("layout", "facultyY"), { min: 60, max: 92, step: 1, suffix: "%", message: "Moved faculty card" }));
+  facultyGrid.appendChild(createRangeField("Faculty card scale", entry.layout.facultyScalePercent, path.concat("layout", "facultyScalePercent"), { min: 60, max: 140, step: 1, suffix: "%", message: "Resized faculty card" }));
+  facultyGrid.appendChild(createRangeField("Faculty box width", entry.layout.facultyWidthPercent, path.concat("layout", "facultyWidthPercent"), { min: 34, max: 120, step: 1, suffix: "%", message: "Resized faculty width" }));
+  facultySection.appendChild(facultyGrid);
+  facultySection.appendChild(createImageField("Instructor headshot", entry.feature?.headshot || "", path.concat("feature", "headshot")));
+  facultySection.appendChild(createField("Faculty blurb", entry.feature?.facultyBlurb || "", path.concat("feature", "facultyBlurb"), (nextValue) => {
+    setByPath(workingData, path.concat("feature", "facultyBlurb"), nextValue);
+    persistWorkingData("Updated faculty blurb");
+  }));
+  wrap.appendChild(facultySection);
+
+  const rightPageSection = createSection("Right-page copy", "Keep the right-page heading and intro together here. The orange category header above it follows the left-page category label.", "right");
+  const rightGrid = document.createElement("div");
+  rightGrid.className = "field-grid";
+  rightGrid.appendChild(createField("Right-page heading", entry.supportTitle || "", path.concat("supportTitle"), (nextValue) => {
+    setByPath(workingData, path.concat("supportTitle"), nextValue);
+    persistWorkingData("Updated right-page heading");
+  }));
+  rightGrid.appendChild(createRangeField("Heading size", entry.layout.rightHeadingFontSize, path.concat("layout", "rightHeadingFontSize"), { min: 24, max: 58, step: 1, suffix: "px", message: "Updated right-page heading size" }));
+  rightGrid.appendChild(createRangeField("Heading box width", entry.layout.rightHeadingWidthPercent, path.concat("layout", "rightHeadingWidthPercent"), { min: 35, max: 100, step: 1, suffix: "%", message: "Resized right-page heading width" }));
+  rightGrid.appendChild(createRangeField("Intro size", entry.layout.rightIntroFontSize, path.concat("layout", "rightIntroFontSize"), { min: 12, max: 24, step: 1, suffix: "px", message: "Updated right-page intro size" }));
+  rightGrid.appendChild(createRangeField("Intro box width", entry.layout.rightIntroWidthPercent, path.concat("layout", "rightIntroWidthPercent"), { min: 35, max: 100, step: 1, suffix: "%", message: "Resized right-page intro width" }));
+  rightPageSection.appendChild(rightGrid);
+  rightPageSection.appendChild(createField("Right-page intro", entry.intro || "", path.concat("intro"), (nextValue) => {
+    setByPath(workingData, path.concat("intro"), nextValue);
+    persistWorkingData("Updated right-page intro");
+  }));
+  wrap.appendChild(rightPageSection);
+  wrap.appendChild(renderSupportingCoursesSection(entry, path));
+  return wrap;
+}
+
+function renderNode(value, path, label, depth) {
+  if (value && typeof value === "object" && !Array.isArray(value) && depth === 0 && value.type === "spread") {
+    return renderSpreadEditor(value, path, label);
+  }
+
+  if (typeof value === "string") {
+    const lastKey = path[path.length - 1];
+    if (lastKey === "type") {
+      const readOnlyField = createField(label, value, path, () => {});
+      const control = readOnlyField.querySelector("input, textarea");
+      if (control) {
+        control.setAttribute("readonly", "readonly");
+      }
+      const helper = document.createElement("p");
+      helper.className = "helper";
+      helper.textContent = "Page type is structural. We should change it intentionally in code rather than while editing copy.";
+      readOnlyField.appendChild(helper);
+      return readOnlyField;
+    }
+    if (lastKey === "image") {
+      return createImageField(label, value, path);
+    }
+    return createField(label, value, path, (nextValue) => {
+      setByPath(workingData, path, nextValue);
+      persistWorkingData("Saved live preview change");
+    });
+  }
+
+  if (Array.isArray(value)) {
+    const wrap = document.createElement("section");
+    wrap.className = "node";
+
+    const heading = document.createElement(depth === 0 ? "h2" : "h3");
+    heading.textContent = label;
+    wrap.appendChild(heading);
+
+    const subLabel = document.createElement("div");
+    subLabel.className = "array-label";
+    subLabel.textContent = value.length ? `${value.length} items` : "No items";
+    wrap.appendChild(subLabel);
+
+    const lastKey = path[path.length - 1];
+    if (lastKey === "supporting") {
+      const controls = document.createElement("div");
+      controls.className = "node-toolbar";
+
+      const addButton = document.createElement("button");
+      addButton.type = "button";
+      addButton.textContent = value.length >= 12 ? "12-course limit reached" : "Add supporting course";
+      addButton.disabled = value.length >= 12;
+      addButton.addEventListener("click", () => {
+        const nextValue = getByPath(workingData, path);
+        nextValue.push(createSupportingTemplate(nextValue.length + 1));
+        renderEditor();
+        persistWorkingData("Added supporting course");
+      });
+      controls.appendChild(addButton);
+
+      if (value.length > 0) {
+        const removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.textContent = "Remove last supporting course";
+        removeButton.addEventListener("click", () => {
+          const nextValue = getByPath(workingData, path);
+          nextValue.pop();
+          renderEditor();
+          persistWorkingData("Removed supporting course");
+        });
+        controls.appendChild(removeButton);
+      }
+
+      wrap.appendChild(controls);
+    }
+
+    if (lastKey === "leftBlocks") {
+      const controls = document.createElement("div");
+      controls.className = "node-toolbar";
+
+      ["header", "text", "quote"].forEach((kind) => {
+        const addButton = document.createElement("button");
+        addButton.type = "button";
+        addButton.textContent = `Add ${kind}`;
+        addButton.addEventListener("click", () => {
+          const nextValue = getByPath(workingData, path);
+          nextValue.push(createLeftBlockTemplate(kind, nextValue.length));
+          renderEditor();
+          persistWorkingData(`Added ${kind} block`);
+        });
+        controls.appendChild(addButton);
+      });
+
+      wrap.appendChild(controls);
+    }
+
+    const grid = document.createElement("div");
+    grid.className = "array-grid";
+    value.forEach((item, index) => {
+      const itemLabel = typeof item === "string" ? `${label} ${index + 1}` : `${label} item ${index + 1}`;
+      grid.appendChild(renderNode(item, path.concat(index), itemLabel, depth + 1));
+    });
+    wrap.appendChild(grid);
+    return wrap;
+  }
+
+  const wrap = document.createElement("section");
+  wrap.className = "node";
+
+  const heading = document.createElement(depth === 0 ? "h2" : "h3");
+  heading.textContent = label;
+  wrap.appendChild(heading);
+
+  if (depth === 0 && typeof path[0] === "number") {
+    const nodeToolbar = document.createElement("div");
+    nodeToolbar.className = "node-toolbar";
+
+    const jumpButton = document.createElement("button");
+    jumpButton.type = "button";
+    jumpButton.textContent = "Preview this page";
+    jumpButton.addEventListener("click", () => navigatePreview(path[0]));
+    nodeToolbar.appendChild(jumpButton);
+
+    wrap.appendChild(nodeToolbar);
+  }
+
+  if (path[path.length - 2] === "leftBlocks" && typeof path[path.length - 1] === "number") {
+    const blockToolbar = document.createElement("div");
+    blockToolbar.className = "node-toolbar";
+    const arrayPath = path.slice(0, -1);
+    const blockIndex = path[path.length - 1];
+    const blocks = getByPath(workingData, arrayPath);
+
+    const moveUp = document.createElement("button");
+    moveUp.type = "button";
+    moveUp.textContent = "Move up";
+    moveUp.disabled = blockIndex === 0;
+    moveUp.addEventListener("click", () => {
+      moveArrayItem(arrayPath, blockIndex, blockIndex - 1);
+      renderEditor();
+      persistWorkingData("Moved block");
+    });
+    blockToolbar.appendChild(moveUp);
+
+    const moveDown = document.createElement("button");
+    moveDown.type = "button";
+    moveDown.textContent = "Move down";
+    moveDown.disabled = blockIndex === blocks.length - 1;
+    moveDown.addEventListener("click", () => {
+      moveArrayItem(arrayPath, blockIndex, blockIndex + 1);
+      renderEditor();
+      persistWorkingData("Moved block");
+    });
+    blockToolbar.appendChild(moveDown);
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.textContent = "Delete block";
+    remove.addEventListener("click", () => {
+      blocks.splice(blockIndex, 1);
+      renderEditor();
+      persistWorkingData("Deleted block");
+    });
+    blockToolbar.appendChild(remove);
+
+    wrap.appendChild(blockToolbar);
+  }
+
+  Object.entries(value).forEach(([key, child]) => {
+    wrap.appendChild(renderNode(child, path.concat(key), titleCase(key), depth + 1));
+  });
+
+  return wrap;
+}
+
+function renderEditor() {
+  editorRoot.innerHTML = "";
+  workingData.forEach((entry, index) => {
+    const label = entry.label ? `${index + 1}. ${entry.label}` : `Page ${index + 1}`;
+    const shell = document.createElement("section");
+    shell.className = "page-shell";
+    shell.setAttribute("data-page-index", String(index));
+
+    const toggle = document.createElement("div");
+    toggle.className = `page-toggle${index === activePageIndex ? " is-active" : ""}`;
+    const navButton = document.createElement("button");
+    navButton.type = "button";
+    navButton.className = "page-nav";
+
+    const indexPill = document.createElement("span");
+    indexPill.className = "page-index-pill";
+    indexPill.textContent = String(index + 1).padStart(2, "0");
+    navButton.appendChild(indexPill);
+
+    const titlePill = document.createElement("span");
+    titlePill.className = "page-title-pill";
+    titlePill.textContent = entry.label || entry.type || "Page";
+    navButton.appendChild(titlePill);
+
+    const expandButton = document.createElement("button");
+    expandButton.type = "button";
+    expandButton.className = "page-toggle-icon";
+    expandButton.setAttribute("aria-label", index === activePageIndex ? "Collapse page editor" : "Expand page editor");
+    expandButton.textContent = index === activePageIndex ? "−" : "+";
+
+    toggle.appendChild(indexPill);
+    toggle.appendChild(titlePill);
+    toggle.appendChild(expandButton);
+    shell.appendChild(toggle);
+
+    indexPill.addEventListener("click", () => activatePage(index, true));
+    titlePill.addEventListener("click", () => activatePage(index, true));
+    expandButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      togglePage(index);
+    });
+
+    if (index === activePageIndex) {
+      const body = document.createElement("div");
+      body.className = "page-body";
+      body.appendChild(renderNode(entry, [index], label, 0));
+      shell.appendChild(body);
+    }
+
+    editorRoot.appendChild(shell);
+  });
+}
+
+function renderEditor() {
+  editorRoot.innerHTML = "";
+  if (!workingData.length) {
+    return;
+  }
+
+  activePageIndex = Math.max(0, Math.min(activePageIndex, workingData.length - 1));
+  const activeEntry = workingData[activePageIndex];
+  const activeLabel = activeEntry.label ? `${activePageIndex + 1}. ${activeEntry.label}` : `Page ${activePageIndex + 1}`;
+  const fragment = document.createDocumentFragment();
+
+  const pageList = document.createElement("div");
+  pageList.className = "page-list";
+  pageList.style.height = "320px";
+  pageList.style.minHeight = "320px";
+  pageList.style.flex = "0 0 320px";
+  workingData.forEach((entry, index) => {
+    const picker = document.createElement("button");
+    picker.type = "button";
+    picker.className = `page-picker${index === activePageIndex ? " is-active" : ""}`;
+    picker.setAttribute("aria-current", index === activePageIndex ? "page" : "false");
+    picker.setAttribute("data-page-index", String(index));
+
+    const indexPill = document.createElement("span");
+    indexPill.className = "page-index-pill";
+    indexPill.textContent = String(index + 1).padStart(2, "0");
+    picker.appendChild(indexPill);
+
+    const titlePill = document.createElement("span");
+    titlePill.className = "page-title-pill";
+    titlePill.textContent = entry.label || entry.type || `Page ${index + 1}`;
+    picker.appendChild(titlePill);
+
+    picker.addEventListener("click", () => activatePage(index, true));
+    pageList.appendChild(picker);
+  });
+  fragment.appendChild(pageList);
+
+  const activeEditor = document.createElement("section");
+  activeEditor.className = "active-page-editor";
+  activeEditor.setAttribute("data-page-index", String(activePageIndex));
+
+  const header = document.createElement("div");
+  header.className = "active-page-header";
+
+  const eyebrow = document.createElement("strong");
+  eyebrow.textContent = `Editing Page ${String(activePageIndex + 1).padStart(2, "0")}`;
+  header.appendChild(eyebrow);
+
+  const heading = document.createElement("h2");
+  heading.textContent = activeEntry.label || activeEntry.type || `Page ${activePageIndex + 1}`;
+  header.appendChild(heading);
+
+  if (activeEntry.type) {
+    const meta = document.createElement("p");
+    meta.textContent = `Page type: ${activeEntry.type}`;
+    meta.style.margin = "0";
+    meta.style.color = "rgba(30, 37, 48, 0.7)";
+    header.appendChild(meta);
+  }
+
+  activeEditor.appendChild(header);
+  activeEditor.appendChild(renderNode(activeEntry, [activePageIndex], activeLabel, 0));
+  fragment.appendChild(activeEditor);
+
+  editorRoot.appendChild(fragment);
+}
+
+saveButton.addEventListener("click", () => {
+  persistWorkingData("Draft saved in browser");
+});
+
+undoButton.addEventListener("click", () => {
+  if (!undoStack.length) return;
+  const previousState = undoStack.pop();
+  if (!previousState) {
+    updateUndoButtonState();
+    return;
+  }
+  isUndoing = true;
+  workingData = prepareWorkingData(JSON.parse(previousState));
+  lastSerializedState = previousState;
+  renderEditor();
+  persistWorkingData("Undo applied");
+  isUndoing = false;
+});
+
+clearButton.addEventListener("click", () => {
+  localStorage.removeItem(STORAGE_KEY);
+  workingData = prepareWorkingData(bundledData);
+  undoStack = [];
+  lastSerializedState = JSON.stringify(workingData);
+  renderEditor();
+  pushPreviewUpdate();
+  saveState.textContent = "Saved draft discarded";
+  updateUndoButtonState();
+});
+
+resetButton.addEventListener("click", () => {
+  workingData = prepareWorkingData(bundledData);
+  renderEditor();
+  persistWorkingData("Editor reset to bundled content");
+});
+
+addSpreadButton.addEventListener("click", () => {
+  const closeIndex = workingData.findIndex((entry) => entry.type === "close");
+  const insertIndex = closeIndex === -1 ? workingData.length : closeIndex;
+  const spreadCount = workingData.filter((entry) => entry.type === "spread").length + 1;
+  workingData.splice(insertIndex, 0, createSpreadTemplate(spreadCount));
+  activePageIndex = insertIndex;
+  renderEditor();
+  persistWorkingData(`Added category page ${spreadCount}`);
+});
+
+exportButton.addEventListener("click", () => {
+  workingData = prepareWorkingData(workingData);
+  const payload = "window.FLIPBOOK_CONTENT = " + JSON.stringify(workingData, null, 2) + ";\n";
+  const blob = new Blob([payload], { type: "text/javascript;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "content.js";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  saveState.textContent = "Downloaded content.js";
+});
+
+const publishButton = document.getElementById("publish-button");
+publishButton.addEventListener("click", async () => {
+  // Commit the working draft back to GitHub via the Netlify function.
+  // Netlify watches the repo and will redeploy automatically once the commit lands.
+  workingData = prepareWorkingData(workingData);
+
+  const confirmed = window.confirm(
+    "Publish the current draft to the live site?\n\n" +
+      "This commits content.js to GitHub on the main branch. " +
+      "Netlify will redeploy the flipbook within about a minute."
+  );
+  if (!confirmed) return;
+
+  const originalLabel = publishButton.textContent;
+  publishButton.disabled = true;
+  publishButton.textContent = "Publishing...";
+  saveState.textContent = "Publishing to live site...";
+
+  try {
+    const res = await fetch("/.netlify/functions/save-content", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        content: workingData,
+        message: "Update content.js via flipbook editor",
+      }),
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      const detail = data.error ? ` (${data.error})` : "";
+      saveState.textContent = `Publish failed: HTTP ${res.status}${detail}`;
+      window.alert(
+        "Publish failed.\n\n" +
+          (data.error || `HTTP ${res.status}`) +
+          "\n\nYou can still click Download content.js and commit the file manually."
+      );
+      return;
+    }
+
+    if (data.unchanged) {
+      saveState.textContent = "Already up to date on GitHub";
+    } else {
+      const sha = data.commit && data.commit.sha ? data.commit.sha.slice(0, 7) : "";
+      saveState.textContent = sha
+        ? `Published (commit ${sha}). Netlify is rebuilding.`
+        : "Published. Netlify is rebuilding.";
+    }
+  } catch (err) {
+    saveState.textContent = `Publish failed: ${err.message}`;
+    window.alert(
+      "Publish failed: " +
+        err.message +
+        "\n\nYou can still click Download content.js and commit the file manually."
+    );
+  } finally {
+    publishButton.disabled = false;
+    publishButton.textContent = originalLabel;
+  }
+});
+
+jumpCoverButton.addEventListener("click", () => activatePage(0, true));
+previewFrame.addEventListener("load", pushPreviewUpdate);
+
+renderEditor();
+updateUndoButtonState();
+persistWorkingData(loadSavedData() ? "Saved draft loaded" : "Bundled content loaded");
+</script>
+</body>
+</html>

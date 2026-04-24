@@ -1,0 +1,28 @@
+# Netlify build/runtime config for the Candler Foundry Flipbook.
+# Static site — no build step — served straight from the repo root.
+
+[build]
+  # Publish everything at the repo root (index.html lives there).
+  publish = "."
+  # No build command; files are already production-ready.
+  command = ""
+  # Serverless functions live here.
+  functions = "netlify/functions"
+
+[functions]
+  # Use a modern Node runtime so native fetch() is available inside functions.
+  node_bundler = "esbuild"
+
+# Sensible defaults for a static site.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# The editor lives at /admin.html. Make the friendlier /admin path work too.
+[[redirects]]
+  from = "/admin"
+  to = "/admin.html"
+  status = 200

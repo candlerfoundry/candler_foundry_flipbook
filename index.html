@@ -1,0 +1,2074 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Foundry Field Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+@font-face {
+  font-family: "Louize";
+  src: local("Louize");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Louize Italic";
+  src: local("Louize Italic"), local("Louize-Italic");
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Louize Bold";
+  src: local("Louize Bold"), local("Louize-Bold");
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --navy: #1e2530;
+  --orange-red: #c84826;
+  --amber: #f6a85d;
+  --cream: #f0ead8;
+  --ivory: #fafaf2;
+  --taupe: #7a6b5a;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: "DM Sans", sans-serif;
+  color: var(--navy);
+  background:
+    radial-gradient(circle at top, rgba(246, 168, 93, 0.1), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(200, 72, 38, 0.12), transparent 30%),
+    linear-gradient(180deg, #2b3442 0%, #151b24 100%);
+}
+
+body.preview-embed {
+  overflow: hidden;
+  background: linear-gradient(180deg, #1f2733 0%, #151b24 100%);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+.narrow-message {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  padding: 48px 32px;
+  background: var(--navy);
+  color: var(--cream);
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.narrow-message strong {
+  display: block;
+  margin-bottom: 14px;
+  font-family: "DM Serif Display", serif;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  color: var(--ivory);
+}
+
+.narrow-message p {
+  max-width: 30rem;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+.app-shell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 2.2vh 2vw 2.8vh;
+}
+
+body.preview-embed .narrow-message {
+  display: none !important;
+}
+
+body.preview-embed .app-shell {
+  width: 1540px;
+  height: 980px;
+  padding: 22px 26px 26px;
+  transform-origin: top left;
+  transform: scale(var(--preview-scale, 0.6));
+}
+
+body.preview-embed .book-frame,
+body.preview-embed .controls {
+  width: 1480px;
+}
+
+body.preview-embed .book-frame {
+  height: 860px;
+}
+
+body.preview-embed .hint {
+  font-size: 0.68rem;
+}
+
+body.preview-embed .nav-button {
+  width: 46px;
+  height: 46px;
+}
+
+.ambient-glow,
+.ambient-glow::before,
+.ambient-glow::after {
+  position: absolute;
+  inset: auto;
+  content: "";
+  pointer-events: none;
+  border-radius: 999px;
+  filter: blur(36px);
+}
+
+.ambient-glow {
+  top: 2%;
+  left: 7%;
+  width: 26vw;
+  height: 16vw;
+  background: rgba(246, 168, 93, 0.08);
+}
+
+.ambient-glow::before {
+  top: 36vh;
+  left: 59vw;
+  width: 22vw;
+  height: 18vw;
+  background: rgba(200, 72, 38, 0.07);
+}
+
+.ambient-glow::after {
+  top: 60vh;
+  left: 18vw;
+  width: 20vw;
+  height: 14vw;
+  background: rgba(240, 234, 216, 0.05);
+}
+
+.topbar {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 2vh;
+}
+
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: rgba(250, 250, 242, 0.86);
+}
+
+.brand-lockup img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+
+.brand-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.brand-copy span {
+  font-family: "DM Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(240, 234, 216, 0.62);
+}
+
+.brand-copy strong {
+  font-family: "DM Serif Display", serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--ivory);
+}
+
+.topbar-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: rgba(240, 234, 216, 0.74);
+}
+
+.meta-chip {
+  border: 1px solid rgba(240, 234, 216, 0.12);
+  background: rgba(240, 234, 216, 0.07);
+  backdrop-filter: blur(16px);
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-family: "DM Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+a.meta-chip,
+button.meta-chip {
+  color: inherit;
+  text-decoration: none;
+}
+
+button.meta-chip {
+  cursor: pointer;
+}
+
+.book-frame {
+  position: relative;
+  z-index: 2;
+  width: min(1480px, 96vw);
+  height: min(860px, 83vh);
+  margin: 0 auto;
+  perspective: 2800px;
+}
+
+.book-surface {
+  position: absolute;
+  inset: 0;
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(8, 10, 15, 0.7), rgba(13, 17, 23, 0.9));
+  box-shadow:
+    0 28px 80px rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(250, 250, 242, 0.06);
+}
+
+.book-surface::before,
+.book-surface::after {
+  content: "";
+  position: absolute;
+  top: 22px;
+  bottom: 22px;
+  width: 18px;
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(250, 250, 242, 0.24), rgba(250, 250, 242, 0.02)),
+    repeating-linear-gradient(
+      180deg,
+      rgba(30, 37, 48, 0.08) 0,
+      rgba(30, 37, 48, 0.08) 2px,
+      rgba(250, 250, 242, 0.35) 2px,
+      rgba(250, 250, 242, 0.35) 4px
+    );
+  opacity: 0.4;
+}
+
+.book-surface::before {
+  left: 20px;
+}
+
+.book-surface::after {
+  right: 20px;
+}
+
+.hinge {
+  position: absolute;
+  left: 50%;
+  top: 2.5%;
+  bottom: 2.5%;
+  width: 34px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at center, rgba(28, 33, 42, 0.16) 0, rgba(28, 33, 42, 0.08) 38%, rgba(255, 255, 255, 0) 72%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.06) 20%, rgba(20, 24, 31, 0.18) 50%, rgba(255, 255, 255, 0.06) 80%, rgba(255, 255, 255, 0.24) 100%);
+  box-shadow:
+    0 0 30px rgba(0, 0, 0, 0.16),
+    inset 0 0 24px rgba(0, 0, 0, 0.12),
+    inset 16px 0 22px rgba(255, 255, 255, 0.42),
+    inset -16px 0 22px rgba(0, 0, 0, 0.1);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.hinge::before,
+.hinge::after {
+  content: "";
+  position: absolute;
+  top: 2%;
+  bottom: 2%;
+  width: 64px;
+  pointer-events: none;
+}
+
+.hinge::before {
+  right: 50%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.18) 46%, rgba(0, 0, 0, 0.06) 100%);
+  filter: blur(8px);
+}
+
+.hinge::after {
+  left: 50%;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.06), rgba(255, 255, 255, 0.16) 54%, rgba(255, 255, 255, 0) 100%);
+  filter: blur(8px);
+}
+
+.book-stage {
+  position: absolute;
+  inset: 2.3%;
+  overflow: hidden;
+  border-radius: 20px;
+  perspective: 3400px;
+  transform-style: preserve-3d;
+}
+
+.book-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at center, transparent 58%, rgba(0, 0, 0, 0.12) 100%),
+    linear-gradient(90deg, rgba(15, 19, 25, 0.2), transparent 10%, transparent 90%, rgba(15, 19, 25, 0.2));
+  pointer-events: none;
+  z-index: 6;
+}
+
+.spread {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-radius: 18px;
+  background: var(--ivory);
+  overflow: hidden;
+  transform-origin: center center;
+  transform-style: preserve-3d;
+  opacity: 0;
+  pointer-events: none;
+  transition: none;
+  box-shadow:
+    0 16px 42px rgba(0, 0, 0, 0.24),
+    inset 0 0 0 1px rgba(30, 37, 48, 0.06);
+}
+
+.spread::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.12), transparent 11%, transparent 89%, rgba(0, 0, 0, 0.12));
+}
+
+.spread.current {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 5;
+  transform: translateX(0) rotateY(0deg) scale(1);
+  filter: saturate(1);
+}
+
+.spread.next {
+  opacity: 0;
+  z-index: 4;
+}
+
+.spread.prev {
+  opacity: 0;
+  z-index: 3;
+}
+
+.spread.after {
+  opacity: 0;
+  z-index: 1;
+}
+
+.spread.before {
+  opacity: 0;
+  z-index: 1;
+}
+
+.page {
+  position: relative;
+  overflow: hidden;
+}
+
+.page-left {
+  background:
+    linear-gradient(180deg, rgba(250, 250, 242, 0.12), transparent 24%),
+    linear-gradient(120deg, rgba(30, 37, 48, 0.06), transparent 18%);
+}
+
+.page-right {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.54), transparent 30%),
+    linear-gradient(180deg, rgba(30, 37, 48, 0.02), transparent 100%);
+  border-left: 1px solid rgba(30, 37, 48, 0.08);
+}
+
+.paper-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(transparent 93%, rgba(122, 107, 90, 0.06)),
+    radial-gradient(circle at 20% 20%, rgba(122, 107, 90, 0.05) 0 1px, transparent 1px);
+  background-size: auto, 18px 18px;
+  mix-blend-mode: multiply;
+  opacity: 0.34;
+}
+
+
+.cover-left {
+  padding: 56px 54px 44px;
+  color: var(--ivory);
+  background:
+    linear-gradient(180deg, rgba(13, 18, 26, 0.18), rgba(13, 18, 26, 0.62)),
+    url("assets/branding/friendly-students-2.png") center/cover;
+}
+
+.cover-left::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(145deg, rgba(30, 37, 48, 0.24), rgba(30, 37, 48, 0.82)),
+    radial-gradient(circle at top right, rgba(246, 168, 93, 0.15), transparent 30%);
+}
+
+.cover-left > *,
+.cover-right > * {
+  position: relative;
+  z-index: 1;
+}
+
+.cover-logo {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  margin-bottom: 28px;
+}
+
+.eyebrow {
+  font-family: "DM Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.cover-left .eyebrow {
+  color: rgba(240, 234, 216, 0.82);
+}
+
+.cover-title {
+  max-width: 10ch;
+  margin: 28px 0 18px;
+  font-family: "DM Serif Display", serif;
+  font-size: clamp(3rem, 4vw, 4.8rem);
+  line-height: 0.94;
+}
+
+.cover-subtitle {
+  max-width: 23rem;
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: rgba(240, 234, 216, 0.84);
+}
+
+.cover-right {
+  padding: 50px 44px 38px;
+  background: linear-gradient(180deg, rgba(240, 234, 216, 0.84), rgba(250, 250, 242, 0.98));
+}
+
+.closing-card {
+  display: grid;
+  gap: 18px;
+  padding: 26px 26px 22px;
+  border-radius: 22px;
+}
+
+.feature-title,
+.section-title,
+.close-title,
+.note-title {
+  margin: 0;
+  font-family: "DM Serif Display", serif;
+  font-weight: 400;
+}
+
+.note-copy,
+.support-intro,
+.close-copy,
+.support-panel p {
+  margin: 0;
+  line-height: 1.7;
+}
+
+.note-left,
+.close-left {
+  padding: 54px 52px 40px;
+}
+
+.note-right,
+.close-right {
+  padding: 54px 48px 36px;
+}
+
+.note-left {
+  background:
+    linear-gradient(180deg, rgba(250, 250, 242, 0.18), transparent 20%),
+    url("assets/branding/foundry-vignette-reader-presenter.png") right -38px bottom 40px / 44% auto no-repeat,
+    linear-gradient(180deg, #efe5cf, #fbf8ef 86%);
+}
+
+.note-kicker,
+.support-kicker,
+.close-kicker {
+  color: var(--orange-red);
+}
+
+.note-title {
+  margin-top: 20px;
+  font-size: clamp(2rem, 3vw, 3rem);
+  line-height: 1;
+}
+
+.note-copy {
+  margin-top: 18px;
+  max-width: 32rem;
+  color: rgba(30, 37, 48, 0.84);
+}
+
+.note-points,
+.closing-list,
+.editorial-rules,
+.support-list {
+  display: grid;
+  gap: 12px;
+}
+
+.note-points {
+  margin-top: 28px;
+  gap: 16px;
+}
+
+.note-point,
+.editorial-rules article,
+.closing-list article {
+  padding: 16px 18px;
+  border-radius: 18px;
+}
+
+.note-point,
+.editorial-rules article {
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(30, 37, 48, 0.08);
+}
+
+.note-point strong,
+.editorial-rules strong,
+.closing-list strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.note-right {
+  background: linear-gradient(180deg, rgba(250, 250, 242, 0.92), rgba(240, 234, 216, 0.92));
+}
+
+.editorial-rules {
+  margin-top: 20px;
+}
+
+.feature-left {
+  position: relative;
+  padding: 34px 34px 30px;
+  color: var(--navy);
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(244, 237, 224, 0.96)),
+    linear-gradient(180deg, rgba(250, 250, 242, 0.55), rgba(240, 234, 216, 0.45));
+}
+
+.feature-canvas {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+}
+
+.feature-image-card {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--image-y, 10) * 1%);
+  width: min(calc(var(--image-scale, 88) * 1%), 94%);
+  transform: translateX(-50%);
+}
+
+.feature-image-card img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
+  filter: var(--image-shadow, drop-shadow(0 12px 18px rgba(30, 37, 48, 0.16)));
+}
+
+.feature-genre {
+  position: absolute;
+  left: 0;
+  top: calc(var(--genre-y, 4) * 1%);
+  width: min(calc(var(--genre-width, 72) * 1%), 100%);
+  font-family: var(--genre-font-family, "DM Mono", monospace);
+  font-size: var(--genre-font-size, 24px);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--orange-red);
+  line-height: 1;
+}
+
+.feature-course-label {
+  position: absolute;
+  left: 0;
+  top: calc(var(--course-label-y, 61) * 1%);
+  width: min(calc(var(--course-label-width, 52) * 1%), 100%);
+  font-family: var(--course-label-font-family, "DM Mono", monospace);
+  font-size: var(--course-label-font-size, 12px);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(122, 107, 90, 0.92);
+  line-height: 1;
+}
+
+.feature-block {
+  position: absolute;
+  left: calc(var(--block-x, 0) * 1%);
+  top: calc(var(--block-y, 50) * 1%);
+  width: min(calc(var(--block-width, 100) * 1%), 100%);
+  margin: 0;
+  text-align: var(--block-text-align, left);
+  font-family: var(--block-font-family, "DM Sans", sans-serif);
+  font-size: var(--block-font-size, 16px);
+  line-height: var(--block-line-height, 1.5);
+  white-space: pre-wrap;
+}
+
+.feature-block-header {
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.feature-block-header,
+.feature-block-quote {
+  font-weight: 400;
+}
+
+.feature-block-text {
+  color: rgba(30, 37, 48, 0.8);
+}
+
+.feature-block-quote {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid rgba(30, 37, 48, 0.08);
+  color: rgba(30, 37, 48, 0.72);
+}
+
+.faculty-card {
+  position: absolute;
+  left: 0;
+  top: calc(var(--faculty-y, 82) * 1%);
+  width: min(var(--faculty-width, 84%), 100%);
+  max-width: none;
+  display: grid;
+  grid-template-columns: calc(var(--faculty-avatar-size, 54) * 1px) minmax(0, 1fr);
+  gap: calc(var(--faculty-gap, 14) * 1px);
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(247, 233, 222, 0.95), rgba(239, 221, 205, 0.92));
+  border: 1px solid rgba(200, 72, 38, 0.12);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.06);
+}
+
+.faculty-card img,
+.faculty-card-mark {
+  width: calc(var(--faculty-avatar-size, 54) * 1px);
+  height: calc(var(--faculty-avatar-size, 54) * 1px);
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.faculty-card img {
+  object-fit: cover;
+  border: 1px solid rgba(30, 37, 48, 0.08);
+}
+
+.faculty-card-mark {
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.faculty-card-mark img {
+  width: 28px;
+  height: 28px;
+  border: 0;
+}
+
+.faculty-card-copy strong {
+  display: block;
+  margin-bottom: 3px;
+  font-family: "Montserrat", sans-serif;
+  font-size: calc(var(--faculty-name-size, 13) * 1px);
+  letter-spacing: 0.02em;
+}
+
+.faculty-card-copy p {
+  margin: 0;
+  font-size: calc(var(--faculty-blurb-size, 12) * 1px);
+  line-height: 1.45;
+  color: rgba(30, 37, 48, 0.8);
+}
+
+.feature-right {
+  --right-heading-size: 44px;
+  --right-intro-size: 16px;
+  --right-card-title-size: 16px;
+  --right-card-meta-size: 11px;
+  --right-card-summary-size: 14px;
+}
+
+.feature-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 46px 42px 36px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.close-marks span {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: 999px;
+  font-family: "DM Mono", monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+
+.section-title {
+  align-self: flex-start;
+  width: min(calc(var(--right-heading-width, 82) * 1%), 100%);
+  font-size: var(--right-heading-size, 44px);
+  line-height: 0.98;
+}
+
+.support-intro {
+  align-self: flex-start;
+  width: min(calc(var(--right-intro-width, 84) * 1%), 100%);
+  font-size: var(--right-intro-size, 16px);
+  color: rgba(30, 37, 48, 0.78);
+}
+
+.support-list {
+  align-self: flex-start;
+  width: min(calc(var(--right-list-width, 100) * 1%), 100%);
+}
+
+.support-item {
+  border-top: 1px solid rgba(30, 37, 48, 0.1);
+  overflow: hidden;
+}
+
+.support-list .support-item:last-child {
+  border-bottom: 1px solid rgba(30, 37, 48, 0.1);
+}
+
+.support-toggle {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 16px;
+  padding: 13px 4px;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.support-toggle:hover {
+  background: rgba(240, 234, 216, 0.45);
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.support-text strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: var(--right-card-title-size, 16px);
+  line-height: 1.35;
+}
+
+.support-text span {
+  font-family: "DM Mono", monospace;
+  font-size: var(--right-card-meta-size, 11px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(122, 107, 90, 0.8);
+}
+
+.support-caret {
+  width: 34px;
+  height: 34px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(30, 37, 48, 0.06);
+  transition: transform 0.3s ease;
+}
+
+.support-item.is-open .support-caret {
+  transform: rotate(45deg);
+}
+
+.support-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.34s ease;
+}
+
+.support-panel-inner {
+  padding: 0 4px 14px;
+}
+
+.support-panel p {
+  font-size: var(--right-card-summary-size, 14px);
+  color: rgba(30, 37, 48, 0.78);
+}
+
+.close-left {
+  color: var(--ivory);
+  background:
+    linear-gradient(180deg, rgba(16, 21, 28, 0.26), rgba(16, 21, 28, 0.76)),
+    linear-gradient(135deg, rgba(200, 72, 38, 0.18), transparent 24%),
+    linear-gradient(180deg, #2a3440, #171d27 84%);
+}
+
+.close-left .close-kicker {
+  color: rgba(246, 168, 93, 0.9);
+}
+
+.close-title {
+  margin-top: 18px;
+  font-size: clamp(2.3rem, 3vw, 3.3rem);
+  line-height: 0.98;
+}
+
+.close-copy {
+  margin-top: 18px;
+  max-width: 30rem;
+  color: rgba(240, 234, 216, 0.82);
+}
+
+.close-marks {
+  margin-top: 34px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.close-marks span {
+  padding: 9px 12px;
+  border: 1px solid rgba(240, 234, 216, 0.12);
+  background: rgba(240, 234, 216, 0.06);
+}
+
+.close-right {
+  background: linear-gradient(180deg, rgba(250, 250, 242, 0.96), rgba(240, 234, 216, 0.9));
+}
+
+.closing-card {
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(30, 37, 48, 0.09);
+}
+
+.closing-card img {
+  width: 140px;
+  height: auto;
+  object-fit: contain;
+}
+
+.closing-list article {
+  background: rgba(240, 234, 216, 0.74);
+}
+
+.controls {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  width: min(1480px, 96vw);
+  margin: 1.5vh auto 0;
+  color: rgba(240, 234, 216, 0.76);
+}
+
+.controls-left,
+.nav-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hint,
+.page-status {
+  font-family: "DM Mono", monospace;
+  text-transform: uppercase;
+}
+
+.hint {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+}
+
+.nav-button {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(240, 234, 216, 0.1);
+  color: var(--ivory);
+  border: 1px solid rgba(240, 234, 216, 0.14);
+  backdrop-filter: blur(14px);
+  cursor: pointer;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.nav-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: rgba(246, 168, 93, 0.52);
+  background: rgba(246, 168, 93, 0.14);
+}
+
+.nav-button:disabled {
+  opacity: 0.32;
+  cursor: default;
+}
+
+.nav-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.page-status {
+  min-width: 106px;
+  text-align: center;
+  font-size: 0.76rem;
+  letter-spacing: 0.18em;
+}
+
+@media (max-width: 1100px) {
+  .narrow-message {
+    display: flex;
+  }
+
+  .app-shell {
+    display: none;
+  }
+}
+
+body.preview-embed .app-shell {
+  display: block !important;
+}
+
+.toc-list {
+  margin-top: 24px;
+  display: grid;
+  gap: 0;
+}
+
+.toc-item {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  width: 100%;
+  padding: 13px 0;
+  border: 0;
+  border-bottom: 1px solid rgba(30, 37, 48, 0.1);
+  background: transparent;
+  font-size: 1rem;
+  color: var(--navy);
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+}
+
+.toc-item:first-child {
+  border-top: 1px solid rgba(30, 37, 48, 0.1);
+}
+
+.toc-item:hover {
+  padding-left: 8px;
+  padding-right: 8px;
+  background: rgba(240, 234, 216, 0.5);
+}
+
+.toc-num {
+  font-family: "DM Mono", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  color: var(--orange-red);
+  flex: none;
+}
+
+.theme-roster {
+  margin-top: 18px;
+  display: grid;
+  gap: 10px;
+}
+
+.theme-roster-item {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  padding: 13px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(30, 37, 48, 0.08);
+}
+
+.theme-roster-item:hover {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(200, 72, 38, 0.18);
+}
+
+.theme-roster-item strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.92rem;
+}
+
+.theme-roster-item p {
+  margin: 0;
+  font-size: 0.84rem;
+  color: rgba(30, 37, 48, 0.68);
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spread,
+  .support-panel,
+  .support-caret,
+  .nav-button {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.spread.flip-base {
+  opacity: 1;
+  pointer-events: none;
+  transition: none !important;
+}
+
+.spread.reveal-target {
+  opacity: 1 !important;
+  pointer-events: none;
+}
+
+.spread.static-base {
+  opacity: 1 !important;
+  pointer-events: none;
+}
+
+.flip-leaf {
+  position: absolute;
+  top: 0;
+  width: 51.5%;
+  height: 100%;
+  z-index: 20;
+  transform-style: preserve-3d;
+  pointer-events: none;
+  will-change: transform;
+  filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.28));
+}
+
+.flip-leaf.forward {
+  left: 48.5%;
+  transform-origin: left center;
+  transform: perspective(2800px) rotateY(0deg) translateZ(8px);
+}
+
+.flip-leaf.backward {
+  left: 0;
+  transform-origin: right center;
+  transform: perspective(2800px) rotateY(0deg) translateZ(8px);
+}
+
+.flip-leaf.animating.forward {
+  transform: perspective(2800px) rotateY(-168deg) translateZ(18px);
+  transition: transform 760ms cubic-bezier(0.24, 0.68, 0.2, 1);
+}
+
+.flip-leaf.animating.backward {
+  transform: perspective(2800px) rotateY(168deg) translateZ(18px);
+  transition: transform 760ms cubic-bezier(0.24, 0.68, 0.2, 1);
+}
+
+.flip-leaf::before,
+.flip-leaf::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.flip-leaf.forward::before,
+.flip-leaf.backward::before {
+  width: 52px;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.24), rgba(0, 0, 0, 0.08), transparent);
+}
+
+.flip-leaf.forward::before {
+  left: -4px;
+}
+
+.flip-leaf.backward::before {
+  right: -4px;
+  transform: scaleX(-1);
+}
+
+.flip-leaf::after {
+  width: 18px;
+  right: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.12));
+  opacity: 0.7;
+}
+
+.flip-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  background: var(--ivory);
+  box-shadow:
+    0 12px 26px rgba(0, 0, 0, 0.16),
+    inset 0 0 0 1px rgba(30, 37, 48, 0.08);
+  border-radius: 8px;
+}
+
+.flip-face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.flip-leaf.forward .flip-front::after,
+.flip-leaf.backward .flip-back::after {
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.18), transparent 18%, transparent 78%, rgba(0, 0, 0, 0.1));
+}
+
+.flip-leaf.forward .flip-back::after,
+.flip-leaf.backward .flip-front::after {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.18), transparent 26%, transparent 82%, rgba(0, 0, 0, 0.16));
+}
+
+.flip-back {
+  transform: rotateY(180deg);
+}
+
+.flip-face-content {
+  width: 100%;
+  height: 100%;
+  transform-origin: center center;
+}
+
+.flip-leaf.forward .flip-front .flip-face-content {
+  transform: skewY(-0.8deg) scaleX(1.02);
+}
+
+.flip-leaf.forward .flip-back .flip-face-content {
+  transform: skewY(0.8deg) scaleX(1.02);
+}
+
+.flip-leaf.backward .flip-front .flip-face-content {
+  transform: skewY(0.8deg) scaleX(1.02);
+}
+
+.flip-leaf.backward .flip-back .flip-face-content {
+  transform: skewY(-0.8deg) scaleX(1.02);
+}
+
+.flip-face-content > .page {
+  width: 100%;
+  height: 100%;
+}
+</style>
+</head>
+<body>
+<div class="narrow-message">
+  <div>
+    <strong>Desktop view recommended</strong>
+    <p>This Foundry flipbook is designed as an open magazine spread. For the intended page-turn effect, open it on a desktop or landscape tablet wider than 1100 pixels.</p>
+  </div>
+</div>
+
+<div class="app-shell">
+  <div class="ambient-glow"></div>
+
+  <header class="topbar">
+    <div class="brand-lockup">
+      <img src="assets/branding/foundry-logomark-orange.png" alt="The Candler Foundry">
+      <div class="brand-copy">
+        <span>Foundry Field Guide</span>
+        <strong>The Candler Foundry at Emory</strong>
+      </div>
+    </div>
+    <div class="topbar-meta">
+      <a class="meta-chip" href="admin.html">Edit Copy</a>
+      <button class="meta-chip" id="sound-toggle" type="button" aria-pressed="false">Sound Off</button>
+      <div class="meta-chip" id="theme-chip">Cover</div>
+    </div>
+  </header>
+
+  <main class="book-frame">
+    <div class="book-surface"></div>
+    <div class="hinge"></div>
+    <section class="book-stage" id="book-stage" aria-live="polite"></section>
+  </main>
+
+  <footer class="controls">
+    <div class="controls-left">
+      <div class="hint">Arrow keys turn pages</div>
+    </div>
+    <div class="nav-group">
+      <button class="nav-button" id="prev-button" type="button" aria-label="Previous spread">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M15 6L9 12L15 18" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="page-status" id="page-status">01 / 08</div>
+      <button class="nav-button" id="next-button" type="button" aria-label="Next spread">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </footer>
+</div>
+
+<script src="content.js"></script>
+<script>
+const bookStage = document.getElementById("book-stage");
+const pageStatus = document.getElementById("page-status");
+const themeChip = document.getElementById("theme-chip");
+const prevButton = document.getElementById("prev-button");
+const nextButton = document.getElementById("next-button");
+const soundToggle = document.getElementById("sound-toggle");
+const searchParams = new URLSearchParams(window.location.search);
+const isPreviewEmbed = searchParams.get("preview") === "1";
+const CONTENT_STORAGE_KEY = "flipbook-content-v1";
+const SOUND_STORAGE_KEY = "flipbook-sound-enabled";
+const FLIP_SOUND_PATH = "assets/audio/Page forward sound.mp3";
+
+let BOOK = [];
+let currentIndex = 0;
+let isAnimating = false;
+let soundEnabled = localStorage.getItem(SOUND_STORAGE_KEY) === "true";
+
+function deepClone(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function inferEntryType(entry, index, total) {
+  if (!entry || typeof entry !== "object") return "spread";
+  if (entry.type === "cover" || entry.type === "note" || entry.type === "spread" || entry.type === "close") {
+    return entry.type;
+  }
+  if (index === 0 || "tocEyebrow" in entry || ("subtitle" in entry && !("feature" in entry))) {
+    return "cover";
+  }
+  if (index === total - 1 || "cardEyebrow" in entry || "aboutCopy" in entry) {
+    return "close";
+  }
+  if ("themes" in entry || "leftEyebrow" in entry || "points" in entry) {
+    return "note";
+  }
+  if ("feature" in entry || "supporting" in entry || "genre" in entry) {
+    return "spread";
+  }
+  return "spread";
+}
+
+function getSpreadTemplateVersion() {
+  return 2;
+}
+
+function createDefaultSpreadLayout() {
+  return {
+    imageY: 10,
+    imageScalePercent: 84,
+    imageShadow: "soft",
+    genreY: 4,
+    genreFontSize: 24,
+    genreFontFamily: "montserrat",
+    genreWidthPercent: 72,
+    courseLabelY: 61,
+    courseLabelFontSize: 12,
+    courseLabelFontFamily: "mono",
+    courseLabelWidthPercent: 52,
+    facultyY: 82,
+    facultyScalePercent: 100,
+    facultyWidthPercent: 84,
+    rightHeadingFontSize: 44,
+    rightHeadingWidthPercent: 82,
+    rightIntroFontSize: 16,
+    rightIntroWidthPercent: 84,
+    rightCardTitleFontSize: 16,
+    rightCardMetaFontSize: 11,
+    rightCardSummaryFontSize: 14,
+    rightListWidthPercent: 100
+  };
+}
+
+function getDefaultHeadshot(instructor = "") {
+  const normalized = instructor.toLowerCase();
+  if (normalized.includes("elizabeth arnold")) return "assets/headshots/elizabeth-arnold.jpg";
+  if (normalized.includes("ryan bonfiglio")) return "assets/headshots/ryan-bonfiglio.jpg";
+  if (normalized.includes("teresa fry brown")) return "assets/headshots/teresa-fry-brown.jpg";
+  return "";
+}
+
+function getDefaultFacultyBlurb(instructor = "") {
+  const normalized = instructor.toLowerCase();
+  if (normalized.includes("elizabeth arnold")) {
+    return "New Testament scholar and teacher of Pauline literature, helping learners hear Scripture with greater historical and theological clarity.";
+  }
+  if (normalized.includes("ryan bonfiglio")) {
+    return "Old Testament professor bringing Hebrew language, theological imagination, and close textual reading into lively public-facing teaching.";
+  }
+  if (normalized.includes("teresa fry brown")) {
+    return "Preaching professor and homiletician known for voice, embodiment, and the living tradition of proclamation in ministry.";
+  }
+  if (normalized.includes("add faculty")) {
+    return "Add a short faculty blurb here.";
+  }
+  return "Add a short faculty blurb here.";
+}
+
+function getLeftBlockDefaults(kind, order = 0) {
+  const defaults = {
+    header: {
+      xPercent: 0,
+      yPercent: 63,
+      widthPercent: 84,
+      textAlign: "left",
+      fontFamily: "louize-bold",
+      fontSize: 28,
+      lineHeight: 1.02
+    },
+    text: {
+      xPercent: 0,
+      yPercent: 73,
+      widthPercent: 82,
+      textAlign: "left",
+      fontFamily: "montserrat",
+      fontSize: 15,
+      lineHeight: 1.58
+    },
+    quote: {
+      xPercent: 0,
+      yPercent: 93,
+      widthPercent: 96,
+      textAlign: "left",
+      fontFamily: "louize-italic",
+      fontSize: 16,
+      lineHeight: 1.24
+    }
+  };
+  const base = defaults[kind] || defaults.text;
+  return {
+    ...base,
+    yPercent: Math.min(base.yPercent + Math.max(0, order - 2) * 3, 95)
+  };
+}
+
+function normalizeLeftBlock(block, order = 0) {
+  const nextBlock = block && typeof block === "object" ? { ...block } : {};
+  const kind = nextBlock.kind || "text";
+  const defaults = getLeftBlockDefaults(kind, order);
+  return {
+    kind,
+    text: typeof nextBlock.text === "string" ? nextBlock.text : "",
+    widthPercent: Math.max(20, Math.min(Number(nextBlock.widthPercent) || defaults.widthPercent, 100)),
+    xPercent: Math.max(0, Math.min(Number(nextBlock.xPercent) || defaults.xPercent, 80)),
+    yPercent: Math.max(0, Math.min(Number(nextBlock.yPercent) || defaults.yPercent, 95)),
+    textAlign: nextBlock.textAlign || nextBlock.align || defaults.textAlign,
+    align: nextBlock.align || nextBlock.textAlign || defaults.textAlign,
+    fontFamily: nextBlock.fontFamily || defaults.fontFamily,
+    fontSize: Math.max(8, Math.min(Number(nextBlock.fontSize) || defaults.fontSize, 72)),
+    lineHeight: Math.max(0.8, Math.min(Number(nextBlock.lineHeight) || defaults.lineHeight, 2.4))
+  };
+}
+
+function createDefaultLeftBlocks(entry) {
+  const feature = entry && entry.feature ? entry.feature : {};
+  return [
+    normalizeLeftBlock({ kind: "header", text: feature.title || "" }, 0),
+    normalizeLeftBlock({ kind: "text", text: feature.lede || "" }, 1),
+    normalizeLeftBlock({ kind: "quote", text: feature.quote || "" }, 2)
+  ].filter((block) => block.text.trim());
+}
+
+function normalizeContent(data) {
+  return deepClone(data).map((entry, index, all) => {
+    const nextEntry = entry && typeof entry === "object" ? entry : {};
+    nextEntry.type = inferEntryType(nextEntry, index, all.length);
+    if (nextEntry.type === "spread") {
+      const templateVersion = Number(nextEntry.templateVersion) || 0;
+      nextEntry.feature = {
+        courseLabel: "Featured Course",
+        headshot: getDefaultHeadshot(nextEntry.feature?.instructor || ""),
+        facultyBlurb: getDefaultFacultyBlurb(nextEntry.feature?.instructor || ""),
+        ...(nextEntry.feature || {})
+      };
+      nextEntry.supportTitle = nextEntry.supportTitle || "Also in this theme";
+      nextEntry.layout = {
+        ...createDefaultSpreadLayout(),
+        ...(nextEntry.layout || {})
+      };
+      nextEntry.layout.imageScalePercent = Math.max(40, Math.min(Number(nextEntry.layout.imageScalePercent ?? nextEntry.layout.imageWidthPercent) || 84, 140));
+      nextEntry.layout.imageY = Math.max(0, Math.min(Number(nextEntry.layout.imageY) || 10, 40));
+      nextEntry.layout.genreY = Math.max(0, Math.min(Number(nextEntry.layout.genreY) || 4, 25));
+      nextEntry.layout.genreFontSize = Math.max(10, Math.min(Number(nextEntry.layout.genreFontSize) || 24, 42));
+      nextEntry.layout.genreWidthPercent = Math.max(24, Math.min(Number(nextEntry.layout.genreWidthPercent) || 72, 100));
+      nextEntry.layout.courseLabelWidthPercent = Math.max(24, Math.min(Number(nextEntry.layout.courseLabelWidthPercent) || 52, 100));
+      nextEntry.layout.facultyY = Math.max(60, Math.min(Number(nextEntry.layout.facultyY) || 82, 92));
+      nextEntry.layout.facultyWidthPercent = Math.max(34, Math.min(Number(nextEntry.layout.facultyWidthPercent) || 84, 120));
+      nextEntry.layout.rightHeadingWidthPercent = Math.max(35, Math.min(Number(nextEntry.layout.rightHeadingWidthPercent) || 82, 100));
+      nextEntry.layout.rightIntroWidthPercent = Math.max(35, Math.min(Number(nextEntry.layout.rightIntroWidthPercent) || 84, 100));
+      nextEntry.layout.rightListWidthPercent = Math.max(50, Math.min(Number(nextEntry.layout.rightListWidthPercent) || 100, 100));
+      nextEntry.leftBlocks = templateVersion >= getSpreadTemplateVersion() && Array.isArray(nextEntry.leftBlocks) && nextEntry.leftBlocks.length
+        ? nextEntry.leftBlocks
+            .map((block, blockIndex) => normalizeLeftBlock(block, blockIndex))
+            .filter((block) => block.kind !== "meta" && block.text.trim())
+        : createDefaultLeftBlocks(nextEntry);
+      nextEntry.templateVersion = getSpreadTemplateVersion();
+    }
+    return nextEntry;
+  });
+}
+
+function buildBlockTextPool(entry) {
+  const pool = { header: [], text: [], quote: [] };
+  (Array.isArray(entry.leftBlocks) ? entry.leftBlocks : []).forEach((block) => {
+    if (pool[block.kind]) {
+      pool[block.kind].push(block.text || "");
+    }
+  });
+  if (!pool.header.length && entry.feature?.title) pool.header.push(entry.feature.title);
+  if (!pool.text.length && entry.feature?.lede) pool.text.push(entry.feature.lede);
+  if (!pool.quote.length && entry.feature?.quote) pool.quote.push(entry.feature.quote);
+  return pool;
+}
+
+function takeTemplateText(kind, pool, entry) {
+  if (pool[kind] && pool[kind].length) {
+    return pool[kind].shift() || "";
+  }
+  if (kind === "header") return entry.feature?.title || "";
+  if (kind === "text") return entry.feature?.lede || "";
+  if (kind === "quote") return entry.feature?.quote || "";
+  return "";
+}
+
+function applyMasterSpreadTemplate(data) {
+  const spreadEntries = data
+    .map((entry, index) => ({ entry, index }))
+    .filter(({ entry }) => entry.type === "spread");
+
+  if (!spreadEntries.length) return data;
+  const masterEntry = spreadEntries[0].entry;
+  const masterLayout = {
+    ...createDefaultSpreadLayout(),
+    ...(masterEntry.layout || {})
+  };
+  const masterBlocks = Array.isArray(masterEntry.leftBlocks) && masterEntry.leftBlocks.length
+    ? masterEntry.leftBlocks.map((block, index) => normalizeLeftBlock(block, index))
+    : createDefaultLeftBlocks(masterEntry);
+
+  spreadEntries.forEach(({ entry }, spreadOrder) => {
+    entry.supportTitle = masterEntry.supportTitle || entry.supportTitle || "Also in this theme";
+    entry.layout = {
+      ...(entry.layout || {}),
+      ...masterLayout
+    };
+    entry.feature = {
+      ...(entry.feature || {}),
+      courseLabel: masterEntry.feature?.courseLabel || entry.feature?.courseLabel || "Featured Course"
+    };
+    if (spreadOrder > 0) {
+      const pool = buildBlockTextPool(entry);
+      entry.leftBlocks = masterBlocks.map((templateBlock, blockIndex) => normalizeLeftBlock({
+        ...templateBlock,
+        text: takeTemplateText(templateBlock.kind, pool, entry)
+      }, blockIndex));
+    } else {
+      entry.leftBlocks = masterBlocks.map((block, blockIndex) => normalizeLeftBlock(block, blockIndex));
+    }
+  });
+
+  return data;
+}
+
+function loadBookData() {
+  try {
+    const saved = localStorage.getItem(CONTENT_STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length) {
+        return applyMasterSpreadTemplate(normalizeContent(parsed));
+      }
+    }
+  } catch (error) {}
+  return Array.isArray(window.FLIPBOOK_CONTENT) ? applyMasterSpreadTemplate(normalizeContent(window.FLIPBOOK_CONTENT)) : [];
+}
+
+function updatePreviewScale() {
+  if (!isPreviewEmbed) return;
+  const widthScale = window.innerWidth / 1540;
+  const heightScale = window.innerHeight / 980;
+  const scale = Math.min(widthScale, heightScale, 1);
+  document.documentElement.style.setProperty("--preview-scale", String(scale));
+}
+
+function getCoursePages() {
+  return BOOK
+    .map((entry, index) => ({ entry, index }))
+    .filter(({ entry }) => entry.type === "spread");
+}
+
+function renderCover(index) {
+  const entry = BOOK[index];
+  const tocItems = getCoursePages();
+  return `
+    <div class="page page-left cover-left">
+      <img class="cover-logo" src="assets/branding/foundry-logomark-orange.png" alt="">
+      <div class="eyebrow">${entry.eyebrow || ""}</div>
+      <h1 class="cover-title">${entry.title || ""}</h1>
+      <p class="cover-subtitle">${entry.subtitle || ""}</p>
+    </div>
+    <div class="page page-right cover-right">
+      <div class="eyebrow note-kicker">${entry.tocEyebrow || ""}</div>
+      <div class="toc-list">
+        ${tocItems.map(({ entry: tocEntry, index: tocIndex }, itemIndex) => `<button class="toc-item" type="button" data-target-index="${tocIndex}"><span class="toc-num">${String(itemIndex + 1).padStart(2, "0")}</span>${tocEntry.label || tocEntry.genre || `Category ${itemIndex + 1}`}</button>`).join("")}
+      </div>
+      <div class="paper-grain"></div>
+    </div>
+  `;
+}
+
+function renderNote(index) {
+  const entry = BOOK[index];
+  const points = Array.isArray(entry.points) ? entry.points : [];
+  const linkedThemes = getCoursePages().slice(0, 6);
+  const themes = linkedThemes.length
+    ? linkedThemes.map(({ entry: spreadEntry, index: spreadIndex }) => ({
+        title: spreadEntry.label || spreadEntry.genre || `Category ${spreadIndex + 1}`,
+        copy: spreadEntry.intro || "",
+        index: spreadIndex
+      }))
+    : (Array.isArray(entry.themes) ? entry.themes : []);
+  return `
+    <div class="page page-left note-left">
+      <div class="eyebrow note-kicker">${entry.leftEyebrow || ""}</div>
+      <h2 class="note-title">${entry.title || ""}</h2>
+      <p class="note-copy">${entry.copy || ""}</p>
+      <div class="note-points">
+        ${points.map((point) => `<article class="note-point"><strong>${point.title || ""}</strong>${point.copy || ""}</article>`).join("")}
+      </div>
+      <div class="paper-grain"></div>
+    </div>
+    <div class="page page-right note-right">
+      <div class="eyebrow" style="color: var(--orange-red);">${entry.rightEyebrow || ""}</div>
+      <div class="theme-roster">
+        ${themes.map((theme) => `<button class="theme-roster-item" type="button"${typeof theme.index === "number" ? ` data-target-index="${theme.index}"` : ""}><strong>${theme.title || ""}</strong><p>${theme.copy || ""}</p></button>`).join("")}
+      </div>
+      <div class="paper-grain"></div>
+    </div>
+  `;
+}
+
+function renderSupportItem(item, itemIndex, spreadIndex) {
+  const itemId = `support-${spreadIndex}-${itemIndex}`;
+  const isOpen = itemIndex === 0 ? " is-open" : "";
+  const panelHeight = itemIndex === 0 ? ` style="max-height:240px;"` : "";
+  return `
+    <article class="support-item${isOpen}">
+      <button class="support-toggle" type="button" aria-expanded="${itemIndex === 0}" aria-controls="${itemId}">
+        <div class="support-text">
+          <strong>${item.title}</strong>
+          <span>${item.instructor} &middot; ${item.meta}</span>
+        </div>
+        <span class="support-caret" aria-hidden="true">+</span>
+      </button>
+      <div class="support-panel" id="${itemId}"${panelHeight}>
+        <div class="support-panel-inner">
+          <p>${item.summary}</p>
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function getImageShadow(value) {
+  if (value === "none") return "none";
+  if (value === "strong") return "drop-shadow(0 18px 24px rgba(30, 37, 48, 0.22))";
+  return "drop-shadow(0 12px 18px rgba(30, 37, 48, 0.16))";
+}
+
+function getEditorFontFamily(value, fallbackKind = "text") {
+  if (value === "louize") return "'Louize', 'DM Serif Display', serif";
+  if (value === "louize-italic") return "'Louize Italic', 'Louize', 'DM Serif Display', serif";
+  if (value === "louize-bold") return "'Louize Bold', 'Louize', 'DM Serif Display', serif";
+  if (value === "montserrat") return "'Montserrat', 'DM Sans', sans-serif";
+  if (value === "serif") return "'DM Serif Display', serif";
+  if (value === "mono") return "'DM Mono', monospace";
+  if (value === "sans") return "'DM Sans', sans-serif";
+  return fallbackKind === "header" || fallbackKind === "quote"
+    ? "'Louize', 'DM Serif Display', serif"
+    : fallbackKind === "meta"
+      ? "'DM Mono', monospace"
+      : "'Montserrat', 'DM Sans', sans-serif";
+}
+
+function renderLeftBlock(block) {
+  const normalized = normalizeLeftBlock(block);
+  const kind = normalized.kind || "text";
+  if (!normalized.text.trim()) return "";
+  const className = {
+    header: "feature-block feature-block-header",
+    quote: "feature-block feature-block-quote",
+    text: "feature-block feature-block-text"
+  }[kind] || "feature-block feature-block-text";
+  const tagName = kind === "quote" ? "blockquote" : kind === "header" ? "h2" : "p";
+  return `<${tagName} class="${className}" style="--block-x:${normalized.xPercent}; --block-y:${normalized.yPercent}; --block-width:${normalized.widthPercent}; --block-text-align:${normalized.textAlign || "left"}; --block-font-family:${getEditorFontFamily(normalized.fontFamily, kind)}; --block-font-size:${normalized.fontSize}px; --block-line-height:${normalized.lineHeight};">${normalized.text || ""}</${tagName}>`;
+}
+
+function renderFacultyCard(entry) {
+  const feature = entry.feature || {};
+  if (!feature.instructor && !feature.facultyBlurb && !feature.headshot) return "";
+  const scalePercent = Math.max(60, Math.min(Number(entry.layout?.facultyScalePercent) || 100, 140));
+  const scale = scalePercent / 100;
+  const facultyWidth = Math.max(34, Math.min(Number(entry.layout?.facultyWidthPercent) || 84, 120));
+  const avatarSize = Math.round(54 * scale);
+  const nameSize = Math.round(13 * scale);
+  const blurbSize = Math.round(12 * scale);
+  const gapSize = Math.round(14 * scale);
+  const avatar = feature.headshot
+    ? `<img src="${feature.headshot}" alt="${feature.instructor || "Faculty headshot"}">`
+    : `<div class="faculty-card-mark"><img src="assets/branding/foundry-logomark-orange.png" alt=""></div>`;
+  return `
+    <div class="faculty-card" style="--faculty-y:${Math.max(60, Math.min(Number(entry.layout?.facultyY) || 82, 92))}; --faculty-width:${facultyWidth}%; --faculty-avatar-size:${avatarSize}; --faculty-name-size:${nameSize}; --faculty-blurb-size:${blurbSize}; --faculty-gap:${gapSize};">
+      ${avatar}
+      <div class="faculty-card-copy">
+        <strong>${feature.instructor || ""}</strong>
+        <p>${feature.facultyBlurb || ""}</p>
+      </div>
+    </div>
+  `;
+}
+
+function renderSpread(entry, index) {
+  const layout = {
+    ...createDefaultSpreadLayout(),
+    ...(entry.layout || {})
+  };
+  const feature = entry.feature || {};
+  const blocks = Array.isArray(entry.leftBlocks) && entry.leftBlocks.length
+    ? entry.leftBlocks.map((block, blockIndex) => normalizeLeftBlock(block, blockIndex))
+    : createDefaultLeftBlocks(entry);
+  const imageScale = Math.max(40, Math.min(Number(layout.imageScalePercent ?? layout.imageWidthPercent) || 84, 140));
+  const imageY = Math.max(0, Math.min(Number(layout.imageY) || 10, 40));
+  const genreY = Math.max(0, Math.min(Number(layout.genreY) || 4, 25));
+  const genreFontSize = Math.max(10, Math.min(Number(layout.genreFontSize) || 24, 42));
+  const genreWidth = Math.max(24, Math.min(Number(layout.genreWidthPercent) || 72, 100));
+  const courseLabelY = Math.max(42, Math.min(Number(layout.courseLabelY) || 61, 78));
+  const courseLabelFontSize = Math.max(10, Math.min(Number(layout.courseLabelFontSize) || 12, 28));
+  const courseLabelWidth = Math.max(24, Math.min(Number(layout.courseLabelWidthPercent) || 52, 100));
+  const rightHeadingWidth = Math.max(35, Math.min(Number(layout.rightHeadingWidthPercent) || 82, 100));
+  const rightIntroWidth = Math.max(35, Math.min(Number(layout.rightIntroWidthPercent) || 84, 100));
+  const rightListWidth = Math.max(50, Math.min(Number(layout.rightListWidthPercent) || 100, 100));
+  const supporting = Array.isArray(entry.supporting) ? entry.supporting : [];
+  return `
+    <div class="page page-left feature-left">
+      <div class="feature-canvas">
+        <div class="feature-genre" style="--genre-y:${genreY}; --genre-width:${genreWidth}; --genre-font-size:${genreFontSize}px; --genre-font-family:${getEditorFontFamily(layout.genreFontFamily || "montserrat", "text")};">${entry.genre}</div>
+        ${feature.image ? `<div class="feature-image-card" style="--image-y:${imageY}; --image-scale:${imageScale}; --image-shadow:${getImageShadow(layout.imageShadow || "soft")};"><img src="${feature.image}" alt="${feature.title || entry.label || entry.genre || ""}"></div>` : ""}
+        <div class="feature-course-label" style="--course-label-y:${courseLabelY}; --course-label-width:${courseLabelWidth}; --course-label-font-size:${courseLabelFontSize}px; --course-label-font-family:${getEditorFontFamily(layout.courseLabelFontFamily || "mono", "meta")};">${feature.courseLabel || "Featured Course"}</div>
+        ${blocks.map((block) => renderLeftBlock(block)).join("")}
+        ${renderFacultyCard(entry)}
+        <div class="paper-grain"></div>
+      </div>
+    </div>
+    <div class="page page-right feature-right" style="--right-heading-size:${Math.max(24, Math.min(Number(layout.rightHeadingFontSize) || 44, 58))}px; --right-heading-width:${rightHeadingWidth}; --right-intro-size:${Math.max(12, Math.min(Number(layout.rightIntroFontSize) || 16, 24))}px; --right-intro-width:${rightIntroWidth}; --right-card-title-size:${Math.max(12, Math.min(Number(layout.rightCardTitleFontSize) || 16, 30))}px; --right-card-meta-size:${Math.max(9, Math.min(Number(layout.rightCardMetaFontSize) || 11, 18))}px; --right-card-summary-size:${Math.max(11, Math.min(Number(layout.rightCardSummaryFontSize) || 14, 22))}px; --right-list-width:${rightListWidth};">
+      <div class="eyebrow support-kicker" style="font-family:${getEditorFontFamily(layout.genreFontFamily || "montserrat", "text")}; font-size:${genreFontSize}px;">${entry.genre}</div>
+      <h3 class="section-title">${entry.supportTitle || "Also in this theme"}</h3>
+      <p class="support-intro">${entry.intro}</p>
+      <div class="support-list">${supporting.map((item, i) => renderSupportItem(item, i, index)).join("")}</div>
+      <div class="paper-grain"></div>
+    </div>
+  `;
+}
+
+function renderClose(index) {
+  const entry = BOOK[index];
+  const marks = Array.isArray(entry.marks) ? entry.marks : [];
+  return `
+    <div class="page page-left close-left">
+      <div class="eyebrow close-kicker">${entry.eyebrow || ""}</div>
+      <h2 class="close-title">${entry.title || ""}</h2>
+      <p class="close-copy">${entry.copy || ""}</p>
+      <div class="close-marks">
+        ${marks.map((mark) => `<span>${mark}</span>`).join("")}
+      </div>
+      <div class="paper-grain"></div>
+    </div>
+    <div class="page page-right close-right">
+      <div class="closing-card">
+        <img src="assets/branding/foundry-logo-orange.png" alt="The Candler Foundry">
+        <div class="eyebrow close-kicker">${entry.cardEyebrow || ""}</div>
+        <p class="close-copy" style="color: rgba(30, 37, 48, 0.8); margin-top: 0;">${entry.cardCopy || ""}</p>
+      </div>
+      <div class="closing-list">
+        <article><strong>Featured faculty</strong>${entry.facultyCopy || ""}</article>
+        <article><strong>Additional instructors</strong>${entry.additionalCopy || ""}</article>
+        <article><strong>About the Foundry</strong>${entry.aboutCopy || ""}</article>
+      </div>
+      <div class="paper-grain"></div>
+    </div>
+  `;
+}
+
+function renderEntry(entry, index) {
+  if (entry.type === "cover") return renderCover(index);
+  if (entry.type === "note") return renderNote(index);
+  if (entry.type === "close") return renderClose(index);
+  return renderSpread(entry, index);
+}
+
+function buildBook() {
+  if (!BOOK.length) {
+    bookStage.innerHTML = `<article class="spread current" style="opacity:1;"><div class="page page-left note-left"><div class="eyebrow note-kicker">Content error</div><h2 class="note-title">No flipbook content loaded.</h2><p class="note-copy">Check <code>content.js</code> or clear local browser overrides in <a href="admin.html">admin.html</a>.</p></div><div class="page page-right note-right"><div class="paper-grain"></div></div></article>`;
+    return;
+  }
+  try {
+    bookStage.innerHTML = BOOK.map((entry, index) => `<article class="spread" data-index="${index}" aria-label="${entry.label || `Page ${index + 1}`}">${renderEntry(entry, index)}</article>`).join("");
+    attachAccordionBehavior();
+    attachTocBehavior();
+    updateBook(false);
+  } catch (error) {
+    bookStage.innerHTML = `<article class="spread current" style="opacity:1;"><div class="page page-left note-left"><div class="eyebrow note-kicker">Preview error</div><h2 class="note-title">This page data needs a quick repair.</h2><p class="note-copy">${String(error && error.message ? error.message : error)}</p></div><div class="page page-right note-right"><div class="paper-grain"></div></div></article>`;
+  }
+}
+
+function attachAccordionBehavior() {
+  const spreads = Array.from(bookStage.querySelectorAll(".spread"));
+  spreads.forEach((spread) => {
+    const items = Array.from(spread.querySelectorAll(".support-item"));
+    items.forEach((item) => {
+      const button = item.querySelector(".support-toggle");
+      const panel = item.querySelector(".support-panel");
+      if (!button || !panel) return;
+      button.addEventListener("click", () => {
+        const alreadyOpen = item.classList.contains("is-open");
+        items.forEach((other) => {
+          other.classList.remove("is-open");
+          const otherButton = other.querySelector(".support-toggle");
+          const otherPanel = other.querySelector(".support-panel");
+          if (otherButton && otherPanel) {
+            otherButton.setAttribute("aria-expanded", "false");
+            otherPanel.style.maxHeight = "0px";
+          }
+        });
+        if (!alreadyOpen) {
+          item.classList.add("is-open");
+          button.setAttribute("aria-expanded", "true");
+          panel.style.maxHeight = `${panel.scrollHeight}px`;
+        }
+      });
+    });
+  });
+}
+
+function attachTocBehavior() {
+  const tocButtons = Array.from(bookStage.querySelectorAll("[data-target-index]"));
+  tocButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const target = Number(button.getAttribute("data-target-index"));
+      if (!Number.isNaN(target)) {
+        goTo(target);
+      }
+    });
+  });
+}
+
+function playFlipSound() {
+  if (!soundEnabled) return;
+  try {
+    const audio = new Audio(FLIP_SOUND_PATH);
+    audio.volume = 0.24;
+    audio.playbackRate = 1;
+    audio.play().catch(() => {});
+  } catch (error) {}
+}
+
+function parseIndexFromHash() {
+  const match = window.location.hash.match(/page=(\d+)/i);
+  if (!match) return 0;
+  const value = Number(match[1]) - 1;
+  if (Number.isNaN(value)) return 0;
+  return Math.min(Math.max(value, 0), BOOK.length - 1);
+}
+
+function updateBook(shouldAnimate = true) {
+  if (!BOOK.length) return;
+  const spreads = Array.from(bookStage.querySelectorAll(".spread"));
+  spreads.forEach((spread, index) => {
+    spread.className = "spread";
+    if (index === currentIndex) spread.classList.add("current");
+    else if (index === currentIndex + 1) spread.classList.add("next");
+    else if (index === currentIndex - 1) spread.classList.add("prev");
+    else if (index > currentIndex) spread.classList.add("after");
+    else spread.classList.add("before");
+    if (!shouldAnimate) {
+      spread.style.transitionDuration = "0ms";
+      requestAnimationFrame(() => {
+        spread.style.transitionDuration = "";
+      });
+    }
+  });
+  pageStatus.textContent = `${String(currentIndex + 1).padStart(2, "0")} / ${String(BOOK.length).padStart(2, "0")}`;
+  themeChip.textContent = BOOK[currentIndex].label;
+  history.replaceState(null, "", `#page=${currentIndex + 1}`);
+  prevButton.disabled = currentIndex === 0;
+  nextButton.disabled = currentIndex === BOOK.length - 1;
+}
+
+function updateSoundButton() {
+  soundToggle.textContent = soundEnabled ? "Sound On" : "Sound Off";
+  soundToggle.setAttribute("aria-pressed", String(soundEnabled));
+}
+
+function clonePageFace(page, className) {
+  const face = document.createElement("div");
+  face.className = `flip-face ${className}`;
+  const content = document.createElement("div");
+  content.className = "flip-face-content";
+  const clone = page.cloneNode(true);
+  clone.style.width = "100%";
+  clone.style.height = "100%";
+  content.appendChild(clone);
+  face.appendChild(content);
+  return face;
+}
+
+function createFlipLeaf(outPage, inPage, dir) {
+  const leaf = document.createElement("div");
+  leaf.className = `flip-leaf ${dir === "fwd" ? "forward" : "backward"}`;
+  leaf.appendChild(clonePageFace(outPage, "flip-front"));
+  leaf.appendChild(clonePageFace(inPage, "flip-back"));
+  return leaf;
+}
+
+function prepareRevealTarget(spread, dir) {
+  spread.classList.add("reveal-target");
+  spread.style.opacity = "1";
+  spread.style.transition = "clip-path 760ms cubic-bezier(0.24, 0.68, 0.2, 1), opacity 120ms linear";
+  spread.style.clipPath = dir === "fwd"
+    ? "inset(0 50% 0 0 round 18px)"
+    : "inset(0 0 0 50% round 18px)";
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      spread.style.clipPath = dir === "fwd"
+        ? "inset(0 0 0 0 round 18px)"
+        : "inset(0 0 0 0 round 18px)";
+    });
+  });
+}
+
+function clearRevealTarget(spread) {
+  spread.classList.remove("reveal-target");
+  spread.style.clipPath = "";
+  spread.style.transition = "";
+  spread.style.opacity = "";
+}
+
+function prepareStaticBase(spread, dir) {
+  spread.classList.add("static-base");
+  spread.style.opacity = "1";
+  spread.style.transition = "none";
+  spread.style.clipPath = dir === "fwd"
+    ? "inset(0 50% 0 0 round 18px)"
+    : "inset(0 0 0 50% round 18px)";
+}
+
+function clearStaticBase(spread) {
+  spread.classList.remove("static-base");
+  spread.style.clipPath = "";
+  spread.style.transition = "";
+  spread.style.opacity = "";
+}
+
+function goTo(index) {
+  if (isAnimating || !BOOK.length || index === currentIndex || index < 0 || index >= BOOK.length) return;
+  isAnimating = true;
+  playFlipSound();
+
+  const dir = index > currentIndex ? "fwd" : "bwd";
+  const spreads = Array.from(bookStage.querySelectorAll(".spread"));
+  const fromSpread = spreads[currentIndex];
+  const toSpread = spreads[index];
+  const outPage = fromSpread.querySelector(dir === "fwd" ? ".page-right" : ".page-left");
+  const inPage = toSpread.querySelector(dir === "fwd" ? ".page-left" : ".page-right");
+
+  spreads.forEach((spread) => {
+    spread.className = "spread";
+  });
+  fromSpread.classList.add("flip-base");
+  toSpread.classList.add("flip-base");
+  fromSpread.style.zIndex = "5";
+  toSpread.style.zIndex = "4";
+
+  outPage.style.visibility = "hidden";
+  prepareStaticBase(fromSpread, dir);
+  prepareRevealTarget(toSpread, dir);
+
+  const leaf = createFlipLeaf(outPage, inPage, dir);
+  bookStage.appendChild(leaf);
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      leaf.classList.add("animating");
+    });
+  });
+
+  setTimeout(() => {
+    leaf.remove();
+    outPage.style.visibility = "";
+    clearStaticBase(fromSpread);
+    clearRevealTarget(toSpread);
+    currentIndex = index;
+    updateBook(false);
+    isAnimating = false;
+  }, 780);
+
+  prevButton.disabled = index === 0;
+  nextButton.disabled = index === BOOK.length - 1;
+}
+
+prevButton.addEventListener("click", () => goTo(currentIndex - 1));
+nextButton.addEventListener("click", () => goTo(currentIndex + 1));
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "ArrowRight" || event.key === "PageDown") {
+    event.preventDefault();
+    goTo(currentIndex + 1);
+  }
+  if (event.key === "ArrowLeft" || event.key === "PageUp") {
+    event.preventDefault();
+    goTo(currentIndex - 1);
+  }
+  if (event.key === "Home") {
+    event.preventDefault();
+    goTo(0);
+  }
+  if (event.key === "End") {
+    event.preventDefault();
+    goTo(BOOK.length - 1);
+  }
+});
+
+window.addEventListener("hashchange", () => {
+  if (!BOOK.length) return;
+  const nextIndex = parseIndexFromHash();
+  if (nextIndex !== currentIndex) {
+    currentIndex = nextIndex;
+    updateBook(false);
+  }
+});
+
+window.addEventListener("storage", (event) => {
+  if (event.key !== CONTENT_STORAGE_KEY) return;
+  BOOK = loadBookData();
+  currentIndex = Math.min(currentIndex, Math.max(BOOK.length - 1, 0));
+  buildBook();
+});
+
+window.addEventListener("message", (event) => {
+  const { data } = event;
+  if (!data || typeof data !== "object") return;
+  if (data.type === "flipbook:update" && Array.isArray(data.content)) {
+    BOOK = applyMasterSpreadTemplate(normalizeContent(data.content));
+    currentIndex = Math.min(currentIndex, Math.max(BOOK.length - 1, 0));
+    buildBook();
+    return;
+  }
+  if (data.type === "flipbook:navigate" && typeof data.index === "number") {
+    goTo(data.index);
+  }
+});
+
+soundToggle.addEventListener("click", () => {
+  soundEnabled = !soundEnabled;
+  localStorage.setItem(SOUND_STORAGE_KEY, String(soundEnabled));
+  updateSoundButton();
+});
+
+if (isPreviewEmbed) {
+  document.body.classList.add("preview-embed");
+  updatePreviewScale();
+  window.addEventListener("resize", updatePreviewScale);
+}
+
+BOOK = loadBookData();
+currentIndex = parseIndexFromHash();
+updateSoundButton();
+buildBook();
+</script>
+</body>
+</html>
+
