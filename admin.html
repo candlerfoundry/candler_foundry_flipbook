@@ -672,13 +672,11 @@ function createSpreadTemplate(number) {
       {
         title: "Supporting course 1",
         instructor: "Add faculty name",
-        meta: "Term",
         summary: "Add the summary for the first supporting course in this category."
       },
       {
         title: "Supporting course 2",
         instructor: "Add faculty name",
-        meta: "Term",
         summary: "Add the summary for the second supporting course in this category."
       }
     ],
@@ -699,7 +697,6 @@ function createSupportingTemplate(number) {
   return {
     title: `Supporting course ${number}`,
     instructor: "Add faculty name",
-    meta: "Term",
     summary: "Add the summary for this supporting course."
   };
 }
@@ -1409,9 +1406,9 @@ function renderSupportingCourseEditor(item, path, index, total) {
     setByPath(workingData, path.concat("instructor"), nextValue);
     persistWorkingData("Updated supporting course instructor");
   }));
-  fieldGrid.appendChild(createField("Term / meta", item.meta || "", path.concat("meta"), (nextValue) => {
-    setByPath(workingData, path.concat("meta"), nextValue);
-    persistWorkingData("Updated supporting course meta");
+  fieldGrid.appendChild(createField("Headshot path (optional)", item.headshot || "", path.concat("headshot"), (nextValue) => {
+    setByPath(workingData, path.concat("headshot"), nextValue);
+    persistWorkingData("Updated supporting course headshot");
   }));
   wrap.appendChild(fieldGrid);
 
@@ -1459,7 +1456,7 @@ function renderSupportingCoursesSection(entry, path) {
   const styleGrid = document.createElement("div");
   styleGrid.className = "field-grid";
   styleGrid.appendChild(createRangeField("Course title size", entry.layout.rightCardTitleFontSize, path.concat("layout", "rightCardTitleFontSize"), { min: 12, max: 30, step: 1, suffix: "px", message: "Updated supporting course title size" }));
-  styleGrid.appendChild(createRangeField("Course meta size", entry.layout.rightCardMetaFontSize, path.concat("layout", "rightCardMetaFontSize"), { min: 9, max: 18, step: 1, suffix: "px", message: "Updated supporting course meta size" }));
+  styleGrid.appendChild(createRangeField("Instructor name size", entry.layout.rightCardMetaFontSize, path.concat("layout", "rightCardMetaFontSize"), { min: 9, max: 18, step: 1, suffix: "px", message: "Updated instructor name size" }));
   styleGrid.appendChild(createRangeField("Course summary size", entry.layout.rightCardSummaryFontSize, path.concat("layout", "rightCardSummaryFontSize"), { min: 11, max: 22, step: 1, suffix: "px", message: "Updated supporting course summary size" }));
   styleGrid.appendChild(createRangeField("Course stack width", entry.layout.rightListWidthPercent, path.concat("layout", "rightListWidthPercent"), { min: 50, max: 100, step: 1, suffix: "%", message: "Updated supporting course width" }));
   section.appendChild(styleGrid);
@@ -1565,7 +1562,7 @@ function renderSpreadEditor(entry, path, label) {
     });
   wrap.appendChild(blocksSection);
 
-  const facultySection = createSection("Faculty card", "This replaces the old meta footer with a circular headshot and a short faculty blurb.", "left");
+  const facultySection = createSection("Faculty card", "The centered instructor tile at the bottom of the left page — headshot, name, and a short blurb.", "left");
   const facultyGrid = document.createElement("div");
   facultyGrid.className = "field-grid";
   facultyGrid.appendChild(createField("Instructor name", entry.feature?.instructor || "", path.concat("feature", "instructor"), (nextValue) => {

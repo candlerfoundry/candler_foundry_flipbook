@@ -367,9 +367,13 @@ button.meta-chip {
   opacity: 0;
   pointer-events: none;
   transition: none;
+  /* Layered shadow: large ambient, mid, and close-contact shadows
+     plus a crisp 1px inner edge so the book reads as a real object on the surface. */
   box-shadow:
-    0 16px 42px rgba(0, 0, 0, 0.24),
-    inset 0 0 0 1px rgba(30, 37, 48, 0.06);
+    0 42px 84px -24px rgba(0, 0, 0, 0.55),
+    0 22px 44px rgba(0, 0, 0, 0.26),
+    0 6px 14px rgba(0, 0, 0, 0.16),
+    inset 0 0 0 1px rgba(30, 37, 48, 0.08);
 }
 
 .spread::after {
@@ -378,7 +382,27 @@ button.meta-chip {
   inset: 0;
   pointer-events: none;
   z-index: 4;
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.12), transparent 11%, transparent 89%, rgba(0, 0, 0, 0.12));
+  background:
+    /* Gutter shadow: a soft dark band along the center binding,
+       darker in the middle, fading into each page. This is the single
+       biggest move for making the flipbook feel like a physical book. */
+    linear-gradient(
+      90deg,
+      transparent 44%,
+      rgba(0, 0, 0, 0.10) 47.5%,
+      rgba(0, 0, 0, 0.22) 50%,
+      rgba(0, 0, 0, 0.10) 52.5%,
+      transparent 56%
+    ),
+    /* Subtle outer-edge darkening at the far left/right of the spread,
+       suggesting the ream of pages behind each page. */
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.10),
+      transparent 9%,
+      transparent 91%,
+      rgba(0, 0, 0, 0.10)
+    );
 }
 
 .spread.current {
@@ -416,15 +440,28 @@ button.meta-chip {
 
 .page-left {
   background:
+    /* Directional lighting: slightly brighter top-outer corner, softly cooler toward the gutter. */
+    radial-gradient(ellipse at 15% 0%, rgba(255, 253, 244, 0.55), transparent 48%),
     linear-gradient(180deg, rgba(250, 250, 242, 0.12), transparent 24%),
     linear-gradient(120deg, rgba(30, 37, 48, 0.06), transparent 18%);
+  /* Page-edge shadows on the three outer sides (top, left, bottom)
+     imply page thickness. The gutter side is handled by .spread::after. */
+  box-shadow:
+    inset 6px 0 12px -6px rgba(0, 0, 0, 0.14),
+    inset 0 6px 10px -6px rgba(0, 0, 0, 0.10),
+    inset 0 -6px 12px -6px rgba(0, 0, 0, 0.12);
 }
 
 .page-right {
   background:
+    radial-gradient(ellipse at 85% 0%, rgba(255, 253, 244, 0.55), transparent 48%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.54), transparent 30%),
     linear-gradient(180deg, rgba(30, 37, 48, 0.02), transparent 100%);
   border-left: 1px solid rgba(30, 37, 48, 0.08);
+  box-shadow:
+    inset -6px 0 12px -6px rgba(0, 0, 0, 0.14),
+    inset 0 6px 10px -6px rgba(0, 0, 0, 0.10),
+    inset 0 -6px 12px -6px rgba(0, 0, 0, 0.12);
 }
 
 .paper-grain {
@@ -432,11 +469,12 @@ button.meta-chip {
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(transparent 93%, rgba(122, 107, 90, 0.06)),
-    radial-gradient(circle at 20% 20%, rgba(122, 107, 90, 0.05) 0 1px, transparent 1px);
-  background-size: auto, 18px 18px;
+    linear-gradient(transparent 93%, rgba(122, 107, 90, 0.07)),
+    radial-gradient(circle at 20% 20%, rgba(122, 107, 90, 0.06) 0 1px, transparent 1px),
+    radial-gradient(circle at 70% 60%, rgba(122, 107, 90, 0.04) 0 1px, transparent 1px);
+  background-size: auto, 18px 18px, 24px 24px;
   mix-blend-mode: multiply;
-  opacity: 0.34;
+  opacity: 0.42;
 }
 
 
@@ -543,7 +581,6 @@ button.meta-chip {
 }
 
 .note-kicker,
-.support-kicker,
 .close-kicker {
   color: var(--orange-red);
 }
@@ -700,7 +737,9 @@ button.meta-chip {
 
 .faculty-card {
   position: absolute;
-  left: 0;
+  /* Centered horizontally on the page. The translate pairs with left:50%. */
+  left: 50%;
+  transform: translateX(-50%);
   top: calc(var(--faculty-y, 82) * 1%);
   width: min(var(--faculty-width, 84%), 100%);
   max-width: none;
@@ -708,11 +747,26 @@ button.meta-chip {
   grid-template-columns: calc(var(--faculty-avatar-size, 54) * 1px) minmax(0, 1fr);
   gap: calc(var(--faculty-gap, 14) * 1px);
   align-items: center;
-  padding: 12px 14px;
+  padding: 14px 18px;
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(247, 233, 222, 0.95), rgba(239, 221, 205, 0.92));
-  border: 1px solid rgba(200, 72, 38, 0.12);
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.06);
+  /* Soft baby-blue tile — low-saturation, slightly cool, chosen to contrast
+     gently with the warm cream page without fighting the orange/amber palette. */
+  background: linear-gradient(180deg, #e4ecf3 0%, #d6e1ea 100%);
+  border: 1px solid rgba(90, 120, 150, 0.18);
+  /* Ambient occlusion: layered shadow so the card reads as a placed object on the page. */
+  box-shadow:
+    0 14px 28px rgba(30, 60, 100, 0.10),
+    0 4px 8px rgba(30, 60, 100, 0.06);
+}
+
+.faculty-kicker {
+  display: block;
+  margin-bottom: 4px;
+  font-family: "DM Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(50, 75, 105, 0.78);
 }
 
 .faculty-card img,
@@ -804,21 +858,33 @@ button.meta-chip {
 }
 
 .support-item {
-  border-top: 1px solid rgba(30, 37, 48, 0.1);
+  /* Editorial dashed rule between rows, softer than a solid table border. */
+  border-top: 1px dashed rgba(30, 37, 48, 0.18);
+  /* Thin amber rule on the left edge for rhythm and category color
+     without adding any new words. Slightly warmer on hover. */
+  border-left: 2px solid rgba(246, 168, 93, 0.55);
+  padding-left: 10px;
   overflow: hidden;
+  transition: border-left-color 0.25s ease, background 0.25s ease;
 }
 
 .support-list .support-item:last-child {
-  border-bottom: 1px solid rgba(30, 37, 48, 0.1);
+  border-bottom: 1px dashed rgba(30, 37, 48, 0.18);
+}
+
+.support-item:hover,
+.support-item.is-open {
+  border-left-color: rgba(200, 72, 38, 0.8);
 }
 
 .support-toggle {
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr auto;
+  /* avatar | text | caret */
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 16px;
-  padding: 13px 4px;
+  gap: 14px;
+  padding: 11px 6px 11px 0;
   text-align: left;
   border: 0;
   background: transparent;
@@ -827,9 +893,28 @@ button.meta-chip {
 }
 
 .support-toggle:hover {
-  background: rgba(240, 234, 216, 0.45);
-  padding-left: 10px;
-  padding-right: 10px;
+  background: rgba(240, 234, 216, 0.4);
+}
+
+.support-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid rgba(30, 37, 48, 0.08);
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.support-avatar-mark {
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(200, 72, 38, 0.14);
+}
+
+.support-avatar-mark img {
+  width: 22px;
+  height: 22px;
 }
 
 .support-text strong {
@@ -848,13 +933,20 @@ button.meta-chip {
 }
 
 .support-caret {
-  width: 34px;
-  height: 34px;
+  width: 22px;
+  height: 22px;
   display: inline-grid;
   place-items: center;
-  border-radius: 50%;
-  background: rgba(30, 37, 48, 0.06);
-  transition: transform 0.3s ease;
+  font-size: 18px;
+  line-height: 1;
+  color: rgba(122, 107, 90, 0.7);
+  background: transparent;
+  transition: transform 0.3s ease, color 0.25s ease;
+}
+
+.support-item:hover .support-caret,
+.support-item.is-open .support-caret {
+  color: var(--orange-red);
 }
 
 .support-item.is-open .support-caret {
@@ -1635,12 +1727,19 @@ function renderSupportItem(item, itemIndex, spreadIndex) {
   const itemId = `support-${spreadIndex}-${itemIndex}`;
   const isOpen = itemIndex === 0 ? " is-open" : "";
   const panelHeight = itemIndex === 0 ? ` style="max-height:240px;"` : "";
+  // Resolve headshot: explicit field wins; otherwise look up by instructor name;
+  // if neither, fall back to the Foundry logomark disc (same pattern as the faculty card).
+  const resolvedHeadshot = item.headshot || getDefaultHeadshot(item.instructor || "");
+  const avatar = resolvedHeadshot
+    ? `<img class="support-avatar" src="${resolvedHeadshot}" alt="${item.instructor || ""}">`
+    : `<span class="support-avatar support-avatar-mark" aria-hidden="true"><img src="assets/branding/foundry-logomark-orange.png" alt=""></span>`;
   return `
     <article class="support-item${isOpen}">
       <button class="support-toggle" type="button" aria-expanded="${itemIndex === 0}" aria-controls="${itemId}">
+        ${avatar}
         <div class="support-text">
           <strong>${item.title}</strong>
-          <span>${item.instructor} &middot; ${item.meta}</span>
+          <span>${item.instructor || ""}</span>
         </div>
         <span class="support-caret" aria-hidden="true">+</span>
       </button>
@@ -1655,8 +1754,10 @@ function renderSupportItem(item, itemIndex, spreadIndex) {
 
 function getImageShadow(value) {
   if (value === "none") return "none";
-  if (value === "strong") return "drop-shadow(0 18px 24px rgba(30, 37, 48, 0.22))";
-  return "drop-shadow(0 12px 18px rgba(30, 37, 48, 0.16))";
+  // Ambient occlusion + mid shadow stack so the course image feels placed on the page,
+  // not pasted onto it. Two layered drop-shadows mimic a close-contact plus a diffuse ambient.
+  if (value === "strong") return "drop-shadow(0 28px 44px rgba(30, 37, 48, 0.30)) drop-shadow(0 8px 14px rgba(30, 37, 48, 0.14))";
+  return "drop-shadow(0 20px 32px rgba(30, 37, 48, 0.20)) drop-shadow(0 6px 10px rgba(30, 37, 48, 0.10))";
 }
 
 function getEditorFontFamily(value, fallbackKind = "text") {
@@ -1704,6 +1805,7 @@ function renderFacultyCard(entry) {
     <div class="faculty-card" style="--faculty-y:${Math.max(60, Math.min(Number(entry.layout?.facultyY) || 82, 92))}; --faculty-width:${facultyWidth}%; --faculty-avatar-size:${avatarSize}; --faculty-name-size:${nameSize}; --faculty-blurb-size:${blurbSize}; --faculty-gap:${gapSize};">
       ${avatar}
       <div class="faculty-card-copy">
+        <span class="faculty-kicker">Instructor</span>
         <strong>${feature.instructor || ""}</strong>
         <p>${feature.facultyBlurb || ""}</p>
       </div>
@@ -1744,7 +1846,6 @@ function renderSpread(entry, index) {
       </div>
     </div>
     <div class="page page-right feature-right" style="--right-heading-size:${Math.max(24, Math.min(Number(layout.rightHeadingFontSize) || 44, 58))}px; --right-heading-width:${rightHeadingWidth}; --right-intro-size:${Math.max(12, Math.min(Number(layout.rightIntroFontSize) || 16, 24))}px; --right-intro-width:${rightIntroWidth}; --right-card-title-size:${Math.max(12, Math.min(Number(layout.rightCardTitleFontSize) || 16, 30))}px; --right-card-meta-size:${Math.max(9, Math.min(Number(layout.rightCardMetaFontSize) || 11, 18))}px; --right-card-summary-size:${Math.max(11, Math.min(Number(layout.rightCardSummaryFontSize) || 14, 22))}px; --right-list-width:${rightListWidth};">
-      <div class="eyebrow support-kicker" style="font-family:${getEditorFontFamily(layout.genreFontFamily || "montserrat", "text")}; font-size:${genreFontSize}px;">${entry.genre}</div>
       <h3 class="section-title">${entry.supportTitle || "Also in this theme"}</h3>
       <p class="support-intro">${entry.intro}</p>
       <div class="support-list">${supporting.map((item, i) => renderSupportItem(item, i, index)).join("")}</div>
