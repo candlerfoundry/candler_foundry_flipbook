@@ -56,7 +56,8 @@ window.FLIPBOOK_CONTENT = [
       "instructor": "TESTTEST Dr. Elizabeth \"Ebby\" Arnold",
       "image": "assets/graphics/five-misconceptions-of-paul.png",
       "lede": "Paul may be one of the most familiar figures in Christian memory - and one of the most misunderstood. This course revisits the assumptions clinging to his letters and asks what he was actually saying.",
-      "quote": "Paul becomes more compelling once his letters are allowed to sound like letters again."
+      "quote": "Paul becomes more compelling once his letters are allowed to sound like letters again.",
+      "facultyBio": "Elizabeth \"Ebby\" Arnold is the Scholar in Residence for The Candler Foundry. She holds a PhD in New Testament from Emory University and her dissertation focuses on the wilderness in Luke-Acts. Through both The Candler Foundry and Candler's MDiv program, Ebby teaches courses on a variety of subjects, including the Gospels, Romans, 1-2 Corinthians, and Luke-Acts. Ebby is currently creating Candler Foundry's Foundations in Faith and Leadership, an on-line certificate program for community- and church-based theological education. Her research areas include the literary interpretation of scripture, humor and emotion in the Bible, and the intersection of the church and the academy."
     },
     "supporting": [
       {
@@ -248,7 +249,8 @@ window.FLIPBOOK_CONTENT = [
       "instructor": "Dr. Elizabeth Arnold",
       "image": "assets/graphics/faith-in-the-wild.jpg",
       "lede": "Wilderness in Scripture is never only a place of danger. It is where communities form, illusions are stripped away, and God is encountered in unexpectedly sustaining ways.",
-      "quote": "The wilderness is where vulnerability and provision keep finding each other."
+      "quote": "The wilderness is where vulnerability and provision keep finding each other.",
+      "facultyBio": "Elizabeth \"Ebby\" Arnold is the Scholar in Residence for The Candler Foundry. She holds a PhD in New Testament from Emory University and her dissertation focuses on the wilderness in Luke-Acts. Through both The Candler Foundry and Candler's MDiv program, Ebby teaches courses on a variety of subjects, including the Gospels, Romans, 1-2 Corinthians, and Luke-Acts. Ebby is currently creating Candler Foundry's Foundations in Faith and Leadership, an on-line certificate program for community- and church-based theological education. Her research areas include the literary interpretation of scripture, humor and emotion in the Bible, and the intersection of the church and the academy."
     },
     "supporting": [
       {

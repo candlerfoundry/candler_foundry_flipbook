@@ -1574,9 +1574,13 @@ function renderSpreadEditor(entry, path, label) {
   facultyGrid.appendChild(createRangeField("Faculty box width", entry.layout.facultyWidthPercent, path.concat("layout", "facultyWidthPercent"), { min: 34, max: 120, step: 1, suffix: "%", message: "Resized faculty width" }));
   facultySection.appendChild(facultyGrid);
   facultySection.appendChild(createImageField("Instructor headshot", entry.feature?.headshot || "", path.concat("feature", "headshot")));
-  facultySection.appendChild(createField("Faculty blurb", entry.feature?.facultyBlurb || "", path.concat("feature", "facultyBlurb"), (nextValue) => {
+  facultySection.appendChild(createField("Faculty blurb (front of card)", entry.feature?.facultyBlurb || "", path.concat("feature", "facultyBlurb"), (nextValue) => {
     setByPath(workingData, path.concat("feature", "facultyBlurb"), nextValue);
     persistWorkingData("Updated faculty blurb");
+  }));
+  facultySection.appendChild(createField("Faculty bio (back of flip card)", entry.feature?.facultyBio || "", path.concat("feature", "facultyBio"), (nextValue) => {
+    setByPath(workingData, path.concat("feature", "facultyBio"), nextValue);
+    persistWorkingData("Updated faculty bio");
   }));
   wrap.appendChild(facultySection);
 

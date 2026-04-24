@@ -735,28 +735,109 @@ button.meta-chip {
   color: rgba(30, 37, 48, 0.72);
 }
 
-.faculty-card {
+/*
+ * Faculty flip card
+ *
+ * Structure:
+ *   .faculty-card-slot   positioning wrapper on the page; provides perspective
+ *     button.faculty-card  clickable / focusable; toggles .is-flipped
+ *       .faculty-card-inner  the 3D-rotating container (preserve-3d)
+ *         .faculty-card-face.faculty-card-front  headshot + name + blurb
+ *         .faculty-card-face.faculty-card-back   bio + return affordance
+ */
+
+.faculty-card-slot {
   position: absolute;
-  /* Centered horizontally on the page. The translate pairs with left:50%. */
   left: 50%;
-  transform: translateX(-50%);
   top: calc(var(--faculty-y, 82) * 1%);
   width: min(var(--faculty-width, 84%), 100%);
   max-width: none;
-  display: grid;
-  grid-template-columns: calc(var(--faculty-avatar-size, 54) * 1px) minmax(0, 1fr);
-  gap: calc(var(--faculty-gap, 14) * 1px);
-  align-items: center;
-  padding: 14px 18px;
+  transform: translateX(-50%);
+  perspective: 1400px;
+}
+
+.faculty-card {
+  all: unset;
+  display: block;
+  width: 100%;
+  cursor: pointer;
+  position: relative;
+  min-height: calc(var(--faculty-card-height, 190) * 1px);
+  transform-style: preserve-3d;
+}
+
+.faculty-card:focus-visible {
+  outline: 2px solid var(--amber, #f6a85d);
+  outline-offset: 3px;
+  border-radius: 20px;
+}
+
+.faculty-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  transition: transform 0.7s cubic-bezier(0.3, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.faculty-card.is-flipped .faculty-card-inner {
+  transform: rotateY(180deg);
+}
+
+.faculty-card-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   border-radius: 18px;
-  /* Soft baby-blue tile — low-saturation, slightly cool, chosen to contrast
-     gently with the warm cream page without fighting the orange/amber palette. */
+  padding: 16px 20px 30px;
   background: linear-gradient(180deg, #e4ecf3 0%, #d6e1ea 100%);
   border: 1px solid rgba(90, 120, 150, 0.18);
-  /* Ambient occlusion: layered shadow so the card reads as a placed object on the page. */
   box-shadow:
     0 14px 28px rgba(30, 60, 100, 0.10),
     0 4px 8px rgba(30, 60, 100, 0.06);
+  overflow: hidden;
+}
+
+.faculty-card-front {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 18px;
+  align-items: center;
+}
+
+.faculty-card-back {
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.faculty-avatar-large {
+  width: calc(var(--faculty-avatar-size, 100) * 1px);
+  height: calc(var(--faculty-avatar-size, 100) * 1px);
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.92);
+  box-shadow: 0 6px 14px rgba(30, 60, 100, 0.18);
+  background: rgba(255, 255, 255, 0.75);
+  display: grid;
+  place-items: center;
+}
+
+.faculty-avatar-large img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+
+.faculty-avatar-large.faculty-card-mark img {
+  width: 48%;
+  height: 48%;
 }
 
 .faculty-kicker {
@@ -769,46 +850,61 @@ button.meta-chip {
   color: rgba(50, 75, 105, 0.78);
 }
 
-.faculty-card img,
-.faculty-card-mark {
-  width: calc(var(--faculty-avatar-size, 54) * 1px);
-  height: calc(var(--faculty-avatar-size, 54) * 1px);
-  border-radius: 50%;
-  overflow: hidden;
-}
-
-.faculty-card img {
-  object-fit: cover;
-  border: 1px solid rgba(30, 37, 48, 0.08);
-}
-
-.faculty-card-mark {
-  display: grid;
-  place-items: center;
-  background: rgba(255, 255, 255, 0.78);
-}
-
-.faculty-card-mark img {
-  width: 28px;
-  height: 28px;
-  border: 0;
+.faculty-card-copy {
+  min-width: 0;
 }
 
 .faculty-card-copy strong {
   display: block;
-  margin-bottom: 3px;
+  margin-bottom: 4px;
   font-family: "Montserrat", sans-serif;
-  font-size: calc(var(--faculty-name-size, 13) * 1px);
-  letter-spacing: 0.02em;
+  font-size: calc(var(--faculty-name-size, 15) * 1px);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
 }
 
-.faculty-card-copy p {
+.faculty-blurb {
   margin: 0;
   font-size: calc(var(--faculty-blurb-size, 12) * 1px);
   line-height: 1.45;
-  color: rgba(30, 37, 48, 0.8);
+  color: rgba(30, 37, 48, 0.82);
 }
 
+.faculty-bio {
+  margin: 0;
+  font-size: calc(var(--faculty-bio-size, 12) * 1px);
+  line-height: 1.55;
+  color: rgba(30, 37, 48, 0.86);
+  overflow-y: auto;
+  max-height: calc(var(--faculty-card-height, 190) * 1px - 70px);
+  scrollbar-width: thin;
+}
+
+.faculty-flip-hint {
+  position: absolute;
+  right: 16px;
+  bottom: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: "DM Mono", monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(50, 75, 105, 0.58);
+  pointer-events: none;
+}
+
+.faculty-flip-hint .flip-arrow {
+  font-size: 13px;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+.faculty-card:hover .faculty-flip-hint {
+  color: rgba(200, 72, 38, 0.72);
+}
 .feature-right {
   --right-heading-size: 44px;
   --right-intro-size: 16px;
@@ -897,24 +993,27 @@ button.meta-chip {
 }
 
 .support-avatar {
-  width: 38px;
-  height: 38px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   object-fit: cover;
+  object-position: top center;
   flex-shrink: 0;
-  border: 1px solid rgba(30, 37, 48, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 6px rgba(30, 37, 48, 0.12);
   background: rgba(255, 255, 255, 0.78);
 }
 
 .support-avatar-mark {
   display: grid;
   place-items: center;
-  border: 1px solid rgba(200, 72, 38, 0.14);
+  border: 1.5px solid rgba(200, 72, 38, 0.18);
+  box-shadow: 0 2px 6px rgba(30, 37, 48, 0.08);
 }
 
 .support-avatar-mark img {
-  width: 22px;
-  height: 22px;
+  width: 30px;
+  height: 30px;
 }
 
 .support-text strong {
@@ -1455,11 +1554,52 @@ function createDefaultSpreadLayout() {
   };
 }
 
+// Faculty name -> headshot file. Keys are lowercased substrings that should
+// appear in the instructor field. First match wins. When adding a new instructor,
+// drop their photo in assets/headshots/<first-last>.jpg and add a row here.
+const HEADSHOT_TABLE = [
+  ["amey adkins", "amey-victoria-adkins-jones.jpg"],
+  ["amey victoria", "amey-victoria-adkins-jones.jpg"],
+  ["anthony briggman", "anthony-briggman.jpg"],
+  ["bo adams", "bo-adams.jpg"],
+  ["brett opalinski", "brett-opalinski.jpg"],
+  ["craig ford", "craig-ford.jpg"],
+  ["danielle tummino", "danielle-tummino-hansen.jpg"],
+  ["deanna womack", "deanna-womack.jpg"],
+  ["elizabeth arnold", "elizabeth-arnold.jpg"],
+  ["ebby arnold", "elizabeth-arnold.jpg"],
+  ["gabrielle thomas", "gabrielle-thomas.jpg"],
+  ["gregory wllison", "gregory-wllison-ii.jpg"],
+  ["gregory willison", "gregory-wllison-ii.jpg"],
+  ["ian mcfarland", "ian-mcfarland.jpg"],
+  ["jennifer ayres", "jennifer-ayres.jpg"],
+  ["jennifer quigley", "jennifer-quigley.jpg"],
+  ["joanne solis", "joanne-solis-walker.jpg"],
+  ["joel kemp", "joel-kemp.jpg"],
+  ["john thompson-quartey", "john-thompson-quartey.jpg"],
+  ["john thompson", "john-thompson-quartey.jpg"],
+  ["khalia williams", "khalia-williams.jpg"],
+  ["lahronda little", "lahronda-little.jpg"],
+  ["luke timothy johnson", "luke-timothy-johnson.jpg"],
+  ["luke johnson", "luke-timothy-johnson.jpg"],
+  ["musa dube", "musa-dube.jpg"],
+  ["nichole phillips", "nichole-phillips.jpg"],
+  ["noel erskine", "noel-erskine.jpg"],
+  ["robert franklin", "robert-franklin.jpg"],
+  ["roger nam", "roger-nam.jpg"],
+  ["ryan bonfiglio", "ryan-bonfiglio.jpg"],
+  ["sam martinez", "sam-martinez.jpg"],
+  ["sarah bogue", "sarah-bogue.jpg"],
+  ["susan hylen", "susan-hylen.jpg"],
+  ["teresa fry brown", "teresa-fry-brown.jpg"],
+  ["tony alonso", "tony-alonso.jpg"]
+];
+
 function getDefaultHeadshot(instructor = "") {
   const normalized = instructor.toLowerCase();
-  if (normalized.includes("elizabeth arnold")) return "assets/headshots/elizabeth-arnold.jpg";
-  if (normalized.includes("ryan bonfiglio")) return "assets/headshots/ryan-bonfiglio.jpg";
-  if (normalized.includes("teresa fry brown")) return "assets/headshots/teresa-fry-brown.jpg";
+  for (const [needle, file] of HEADSHOT_TABLE) {
+    if (normalized.includes(needle)) return `assets/headshots/${file}`;
+  }
   return "";
 }
 
@@ -1790,25 +1930,63 @@ function renderLeftBlock(block) {
 
 function renderFacultyCard(entry) {
   const feature = entry.feature || {};
-  if (!feature.instructor && !feature.facultyBlurb && !feature.headshot) return "";
+  if (!feature.instructor && !feature.facultyBlurb && !feature.headshot && !feature.facultyBio) return "";
   const scalePercent = Math.max(60, Math.min(Number(entry.layout?.facultyScalePercent) || 100, 140));
   const scale = scalePercent / 100;
   const facultyWidth = Math.max(34, Math.min(Number(entry.layout?.facultyWidthPercent) || 84, 120));
-  const avatarSize = Math.round(54 * scale);
-  const nameSize = Math.round(13 * scale);
+  const avatarSize = Math.round(100 * scale);
+  const nameSize = Math.round(15 * scale);
   const blurbSize = Math.round(12 * scale);
-  const gapSize = Math.round(14 * scale);
-  const avatar = feature.headshot
-    ? `<img src="${feature.headshot}" alt="${feature.instructor || "Faculty headshot"}">`
-    : `<div class="faculty-card-mark"><img src="assets/branding/foundry-logomark-orange.png" alt=""></div>`;
+  const bioSize = Math.round(12 * scale);
+  const cardHeight = Math.round(190 * scale);
+
+  const resolvedHeadshot = feature.headshot || getDefaultHeadshot(feature.instructor || "");
+  const avatarInner = resolvedHeadshot
+    ? `<img src="${resolvedHeadshot}" alt="${feature.instructor || "Faculty headshot"}">`
+    : `<img src="assets/branding/foundry-logomark-orange.png" alt="" aria-hidden="true">`;
+  const avatarClass = resolvedHeadshot ? "faculty-avatar-large" : "faculty-avatar-large faculty-card-mark";
+
+  const blurbText = feature.facultyBlurb || "";
+  const bioText = feature.facultyBio || "";
+  const firstName = (feature.instructor || "").replace(/^Dr\.?\s+/i, "").split(/\s+/)[0] || "this instructor";
+  const backKicker = `About ${firstName}`;
+
+  const showBack = bioText.trim().length > 0;
+  const flipHintFront = showBack ? `<span class="faculty-flip-hint">Tap for bio <span class="flip-arrow" aria-hidden="true">↻</span></span>` : "";
+  const backFace = showBack
+    ? `<div class="faculty-card-face faculty-card-back">
+         <span class="faculty-kicker">${backKicker}</span>
+         <p class="faculty-bio">${bioText}</p>
+         <span class="faculty-flip-hint">Back to front <span class="flip-arrow" aria-hidden="true">↺</span></span>
+       </div>`
+    : "";
+
+  const cssVars = [
+    `--faculty-y:${Math.max(60, Math.min(Number(entry.layout?.facultyY) || 82, 92))}`,
+    `--faculty-width:${facultyWidth}%`,
+    `--faculty-avatar-size:${avatarSize}`,
+    `--faculty-name-size:${nameSize}`,
+    `--faculty-blurb-size:${blurbSize}`,
+    `--faculty-bio-size:${bioSize}`,
+    `--faculty-card-height:${cardHeight}`
+  ].join("; ");
+
   return `
-    <div class="faculty-card" style="--faculty-y:${Math.max(60, Math.min(Number(entry.layout?.facultyY) || 82, 92))}; --faculty-width:${facultyWidth}%; --faculty-avatar-size:${avatarSize}; --faculty-name-size:${nameSize}; --faculty-blurb-size:${blurbSize}; --faculty-gap:${gapSize};">
-      ${avatar}
-      <div class="faculty-card-copy">
-        <span class="faculty-kicker">Instructor</span>
-        <strong>${feature.instructor || ""}</strong>
-        <p>${feature.facultyBlurb || ""}</p>
-      </div>
+    <div class="faculty-card-slot" style="${cssVars};">
+      <button class="faculty-card" type="button" aria-pressed="false"${showBack ? ' aria-label="Tap to see instructor bio"' : ""}>
+        <div class="faculty-card-inner">
+          <div class="faculty-card-face faculty-card-front">
+            <div class="${avatarClass}">${avatarInner}</div>
+            <div class="faculty-card-copy">
+              <span class="faculty-kicker">Instructor</span>
+              <strong>${feature.instructor || ""}</strong>
+              <p class="faculty-blurb">${blurbText}</p>
+            </div>
+            ${flipHintFront}
+          </div>
+          ${backFace}
+        </div>
+      </button>
     </div>
   `;
 }
@@ -1898,6 +2076,7 @@ function buildBook() {
   try {
     bookStage.innerHTML = BOOK.map((entry, index) => `<article class="spread" data-index="${index}" aria-label="${entry.label || `Page ${index + 1}`}">${renderEntry(entry, index)}</article>`).join("");
     attachAccordionBehavior();
+    attachFacultyCardBehavior();
     attachTocBehavior();
     updateBook(false);
   } catch (error) {
@@ -1930,6 +2109,16 @@ function attachAccordionBehavior() {
           panel.style.maxHeight = `${panel.scrollHeight}px`;
         }
       });
+    });
+  });
+}
+
+function attachFacultyCardBehavior() {
+  const cards = Array.from(bookStage.querySelectorAll(".faculty-card"));
+  cards.forEach((card) => {
+    card.addEventListener("click", () => {
+      const flipped = card.classList.toggle("is-flipped");
+      card.setAttribute("aria-pressed", String(flipped));
     });
   });
 }
