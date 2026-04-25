@@ -1582,6 +1582,16 @@ function renderSpreadEditor(entry, path, label) {
     setByPath(workingData, path.concat("feature", "facultyBio"), nextValue);
     persistWorkingData("Updated faculty bio");
   }));
+
+  // Size sliders for the instructor card and the right-page avatars.
+  const sizeGrid = document.createElement("div");
+  sizeGrid.className = "field-grid";
+  sizeGrid.appendChild(createRangeField("Instructor headshot size", entry.layout?.facultyAvatarSizePx || 130, path.concat("layout", "facultyAvatarSizePx"), { min: 60, max: 200, step: 2, suffix: "px", message: "Updated instructor headshot size" }));
+  sizeGrid.appendChild(createRangeField("Instructor name size", entry.layout?.facultyNameSizePx || 15, path.concat("layout", "facultyNameSizePx"), { min: 11, max: 24, step: 1, suffix: "px", message: "Updated instructor name size" }));
+  sizeGrid.appendChild(createRangeField("Instructor blurb size", entry.layout?.facultyBlurbSizePx || 12, path.concat("layout", "facultyBlurbSizePx"), { min: 10, max: 18, step: 1, suffix: "px", message: "Updated instructor blurb size" }));
+  sizeGrid.appendChild(createRangeField("Right-page headshot size", entry.layout?.rightCardAvatarSizePx || 52, path.concat("layout", "rightCardAvatarSizePx"), { min: 32, max: 80, step: 2, suffix: "px", message: "Updated right-page headshot size" }));
+  facultySection.appendChild(sizeGrid);
+
   wrap.appendChild(facultySection);
 
   const rightPageSection = createSection("Right-page copy", "Keep the right-page heading and intro together here. The orange category header above it follows the left-page category label.", "right");

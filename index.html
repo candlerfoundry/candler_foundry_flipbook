@@ -342,6 +342,22 @@ button.meta-chip {
   transform-style: preserve-3d;
 }
 
+
+/*
+ * Letterbox scaling. The book renders at fixed "design" dimensions
+ * (1410 x 820). A CSS transform scales it uniformly to fit whatever size
+ * .book-stage is rendered at. Keeps every absolute-positioned element on
+ * the page in proportion regardless of viewport.
+ */
+.book-scaler {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1410px;
+  height: 820px;
+  transform: translate(-50%, -50%) scale(var(--book-scale, 1));
+  transform-origin: center center;
+}
 .book-stage::before {
   content: "";
   position: absolute;
@@ -993,8 +1009,8 @@ button.meta-chip {
 }
 
 .support-avatar {
-  width: 52px;
-  height: 52px;
+  width: calc(var(--support-avatar-size, 52) * 1px);
+  height: calc(var(--support-avatar-size, 52) * 1px);
   border-radius: 50%;
   object-fit: cover;
   object-position: top center;
@@ -1012,8 +1028,8 @@ button.meta-chip {
 }
 
 .support-avatar-mark img {
-  width: 30px;
-  height: 30px;
+  width: calc(var(--support-avatar-size, 52) * 0.58px);
+  height: calc(var(--support-avatar-size, 52) * 0.58px);
 }
 
 .support-text strong {
@@ -1806,6 +1822,23 @@ function updatePreviewScale() {
   document.documentElement.style.setProperty("--preview-scale", String(scale));
 }
 
+
+function updateBookScale() {
+  const stage = document.getElementById("book-stage");
+  if (!stage) return;
+  const rect = stage.getBoundingClientRect();
+  if (rect.width === 0 || rect.height === 0) return;
+  // Design size: 1410 x 820. Min(width, height) ratios so we never overflow.
+  const scale = Math.min(rect.width / 1410, rect.height / 820, 1);
+  document.documentElement.style.setProperty("--book-scale", String(scale));
+}
+
+window.addEventListener("resize", updateBookScale);
+if (typeof ResizeObserver !== "undefined") {
+  const _stageEl = document.getElementById("book-stage");
+  if (_stageEl) new ResizeObserver(updateBookScale).observe(_stageEl);
+}
+
 function getCoursePages() {
   return BOOK
     .map((entry, index) => ({ entry, index }))
@@ -1934,9 +1967,9 @@ function renderFacultyCard(entry) {
   const scalePercent = Math.max(60, Math.min(Number(entry.layout?.facultyScalePercent) || 100, 140));
   const scale = scalePercent / 100;
   const facultyWidth = Math.max(34, Math.min(Number(entry.layout?.facultyWidthPercent) || 84, 120));
-  const avatarSize = Math.round(100 * scale);
-  const nameSize = Math.round(15 * scale);
-  const blurbSize = Math.round(12 * scale);
+  const avatarSize = Number(entry.layout?.facultyAvatarSizePx) || Math.round(130 * scale);
+  const nameSize = Number(entry.layout?.facultyNameSizePx) || Math.round(15 * scale);
+  const blurbSize = Number(entry.layout?.facultyBlurbSizePx) || Math.round(12 * scale);
   const bioSize = Math.round(12 * scale);
   const cardHeight = Math.round(190 * scale);
 
@@ -2011,6 +2044,7 @@ function renderSpread(entry, index) {
   const rightHeadingWidth = Math.max(35, Math.min(Number(layout.rightHeadingWidthPercent) || 82, 100));
   const rightIntroWidth = Math.max(35, Math.min(Number(layout.rightIntroWidthPercent) || 84, 100));
   const rightListWidth = Math.max(50, Math.min(Number(layout.rightListWidthPercent) || 100, 100));
+  const rightAvatarSize = Math.max(28, Math.min(Number(layout.rightCardAvatarSizePx) || 52, 96));
   const supporting = Array.isArray(entry.supporting) ? entry.supporting : [];
   return `
     <div class="page page-left feature-left">
@@ -2023,7 +2057,7 @@ function renderSpread(entry, index) {
         <div class="paper-grain"></div>
       </div>
     </div>
-    <div class="page page-right feature-right" style="--right-heading-size:${Math.max(24, Math.min(Number(layout.rightHeadingFontSize) || 44, 58))}px; --right-heading-width:${rightHeadingWidth}; --right-intro-size:${Math.max(12, Math.min(Number(layout.rightIntroFontSize) || 16, 24))}px; --right-intro-width:${rightIntroWidth}; --right-card-title-size:${Math.max(12, Math.min(Number(layout.rightCardTitleFontSize) || 16, 30))}px; --right-card-meta-size:${Math.max(9, Math.min(Number(layout.rightCardMetaFontSize) || 11, 18))}px; --right-card-summary-size:${Math.max(11, Math.min(Number(layout.rightCardSummaryFontSize) || 14, 22))}px; --right-list-width:${rightListWidth};">
+    <div class="page page-right feature-right" style="--right-heading-size:${Math.max(24, Math.min(Number(layout.rightHeadingFontSize) || 44, 58))}px; --right-heading-width:${rightHeadingWidth}; --right-intro-size:${Math.max(12, Math.min(Number(layout.rightIntroFontSize) || 16, 24))}px; --right-intro-width:${rightIntroWidth}; --right-card-title-size:${Math.max(12, Math.min(Number(layout.rightCardTitleFontSize) || 16, 30))}px; --right-card-meta-size:${Math.max(9, Math.min(Number(layout.rightCardMetaFontSize) || 11, 18))}px; --right-card-summary-size:${Math.max(11, Math.min(Number(layout.rightCardSummaryFontSize) || 14, 22))}px; --support-avatar-size:${rightAvatarSize}; --right-list-width:${rightListWidth};">
       <h3 class="section-title">${entry.supportTitle || "Also in this theme"}</h3>
       <p class="support-intro">${entry.intro}</p>
       <div class="support-list">${supporting.map((item, i) => renderSupportItem(item, i, index)).join("")}</div>
@@ -2070,17 +2104,17 @@ function renderEntry(entry, index) {
 
 function buildBook() {
   if (!BOOK.length) {
-    bookStage.innerHTML = `<article class="spread current" style="opacity:1;"><div class="page page-left note-left"><div class="eyebrow note-kicker">Content error</div><h2 class="note-title">No flipbook content loaded.</h2><p class="note-copy">Check <code>content.js</code> or clear local browser overrides in <a href="admin.html">admin.html</a>.</p></div><div class="page page-right note-right"><div class="paper-grain"></div></div></article>`;
+    bookStage.innerHTML = `<div class="book-scaler"><article class="spread current" style="opacity:1;"><div class="page page-left note-left"><div class="eyebrow note-kicker">Content error</div><h2 class="note-title">No flipbook content loaded.</h2><p class="note-copy">Check <code>content.js</code> or clear local browser overrides in <a href="admin.html">admin.html</a>.</p></div><div class="page page-right note-right"><div class="paper-grain"></div></div></article></div>`;
     return;
   }
   try {
-    bookStage.innerHTML = BOOK.map((entry, index) => `<article class="spread" data-index="${index}" aria-label="${entry.label || `Page ${index + 1}`}">${renderEntry(entry, index)}</article>`).join("");
+    bookStage.innerHTML = `<div class="book-scaler">` + BOOK.map((entry, index) => `<article class="spread" data-index="${index}" aria-label="${entry.label || `Page ${index + 1}`}">${renderEntry(entry, index)}</article>`).join("") + `</div>`;
     attachAccordionBehavior();
     attachFacultyCardBehavior();
     attachTocBehavior();
     updateBook(false);
   } catch (error) {
-    bookStage.innerHTML = `<article class="spread current" style="opacity:1;"><div class="page page-left note-left"><div class="eyebrow note-kicker">Preview error</div><h2 class="note-title">This page data needs a quick repair.</h2><p class="note-copy">${String(error && error.message ? error.message : error)}</p></div><div class="page page-right note-right"><div class="paper-grain"></div></div></article>`;
+    bookStage.innerHTML = `<div class="book-scaler"><article class="spread current" style="opacity:1;"><div class="page page-left note-left"><div class="eyebrow note-kicker">Preview error</div><h2 class="note-title">This page data needs a quick repair.</h2><p class="note-copy">${String(error && error.message ? error.message : error)}</p></div><div class="page page-right note-right"><div class="paper-grain"></div></div></article></div>`;
   }
 }
 
@@ -2358,6 +2392,7 @@ BOOK = loadBookData();
 currentIndex = parseIndexFromHash();
 updateSoundButton();
 buildBook();
+updateBookScale();
 </script>
 </body>
 </html>
