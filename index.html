@@ -1826,10 +1826,15 @@ function updatePreviewScale() {
 function updateBookScale() {
   const stage = document.getElementById("book-stage");
   if (!stage) return;
-  const rect = stage.getBoundingClientRect();
-  if (rect.width === 0 || rect.height === 0) return;
-  // Design size: 1410 x 820. Min(width, height) ratios so we never overflow.
-  const scale = Math.min(rect.width / 1500, rect.height / 780, 1);
+  // offsetWidth/offsetHeight return the layout (un-transformed) box size, so
+  // this works correctly in the editor preview iframe where an ancestor has
+  // its own transform: scale().
+  const w = stage.offsetWidth;
+  const h = stage.offsetHeight;
+  if (w === 0 || h === 0) return;
+  // Design size: 1500 x 780. Allow scaling up beyond 1.0 so the book fills
+  // bigger monitors. Pick the dimension that fits and respect aspect.
+  const scale = Math.min(w / 1500, h / 780);
   document.documentElement.style.setProperty("--book-scale", String(scale));
 }
 
