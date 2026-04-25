@@ -26,6 +26,8 @@ There are **two paths** for changes to land on the live site, and they can both 
 
 **Path B &mdash; Local clone (for code, CSS, assets).** Developers clone the repo, edit `index.html`, `admin.html`, images, etc. locally, and push.
 
+**Path C &mdash; Claude commits via the GitHub API on Emily's behalf.** Set up to avoid running PowerShell or Git commands manually for routine code/asset changes. See **[Working with Claude](#working-with-claude)** below for full details &mdash; in short, a fine-grained PAT lives in a gitignored file at `.claude-git-token`, and Claude reads it from its sandboxed workspace mount and uses GitHub's Git Data API (`/git/blobs`, `/git/trees`, `/git/commits`, `/git/refs`) to commit and update `main` directly. No local files need to be in a clean state for Claude commits to succeed &mdash; the API path bypasses local entirely.
+
 ### Golden rules
 
 1. **Always `git pull` before you start local work.** The web editor may have committed new copy since your last pull, and your local clone won't know. If you edit on stale files and push, you'll hit "rejected: fetch first" and need to resolve a merge.
@@ -117,6 +119,102 @@ Right now anyone with the `/admin` URL can edit. When you're ready to gate it:
 
 - **Simple shared-secret (quick):** set `EDITOR_TOKEN` in Netlify env vars, and add a prompt in `admin.html` that collects the token and sends it as an `x-editor-token` header. The function already rejects requests without a matching token when `EDITOR_TOKEN` is set.
 - **Proper user login:** use **Netlify Identity** to gate `/admin.html` behind invited users. The function can inspect the Netlify Identity JWT to identify the committer and include their name/email in the commit message.
+
+## Working with Claude
+
+Claude (running in Cowork mode) has access to the repo via two channels: a read/write mount of `C:\Scripts\Flipbook` for direct file operations, and a sandboxed Linux shell with allowlisted outbound HTTPS for API calls. To commit on Emily's behalf without going through PowerShell, Claude reads `.claude-git-token` (a gitignored file at the repo root) and uses GitHub's Git Data API to push commits directly.
+
+### Token file
+
+- **Path:** `C:\Scripts\Flipbook\.claude-git-token`
+- **Format:** the bare token on one line, no quotes, no `KEY=` prefix &mdash; just `github_pat_…`
+- **Scope:** fine-grained PAT, **resource owner: `candlerfoundry`**, **repository access: only `candler_foundry_flipbook`**, **permissions: `Contents: Read and write`** (everything else No access)
+- **Gitignored:** the rule lives in `.gitignore` (line `.claude-git-token`); never commit this file
+- **Rotation:** match your normal PAT rotation policy; the same token works for both Claude commits and Netlify's `save-content` function so you only need to manage one secret
+
+### How Claude commits
+
+```
+1. Read token from .claude-git-token
+2. GET /repos/{owner}/{repo}/git/ref/heads/main         -> current commit SHA
+3. GET /repos/{owner}/{repo}/git/commits/{sha}          -> tree SHA
+4. POST /git/blobs (base64 content) for each changed file
+5. POST /git/trees with base_tree=<parent> + new entries
+6. POST /git/commits with the new tree and the parent SHA
+7. PATCH /git/refs/heads/main to the new commit SHA
+```
+
+This is a **single atomic multi-file commit**, not a sequence of Contents API PUTs. Netlify auto-rebuilds when the ref updates.
+
+### Why use the API path instead of editing local files
+
+Local files can drift from the repo state for a few reasons specific to this machine: (a) the editor's `localStorage` draft can be ahead of `content.js` if Emily was drafting and someone else (or the API) committed; (b) Cowork's mount layer between Claude's Linux sandbox and Windows occasionally truncates files mid-write &mdash; we've seen this several times in 2026, always recoverable by re-pulling from GitHub; (c) Windows Git's `core.autocrlf=true` rewrites line endings on checkout, which can collide with Claude-written LF files. Going through the API path sidesteps all three: Claude pulls the current file from GitHub, edits in `/tmp`, and PUTs the result back. The local copy is purely a viewer.
+
+### Workflow for Claude in a fresh session
+
+1. **Confirm the token is readable**: Linux-side path is `/sessions/<session>/mnt/Flipbook/.claude-git-token`. Read it; never echo the value back to the user.
+2. **Sanity-check the token** with a `GET /user` and `GET /repos/candlerfoundry/candler_foundry_flipbook` call. Confirm `permissions.push: true`.
+3. **Pull the current state of any file you intend to edit** from `https://raw.githubusercontent.com/candlerfoundry/candler_foundry_flipbook/main/<path>` rather than reading local; locals may be stale or truncated.
+4. **Edit in /tmp or in-memory**, write a Python script (or similar) that performs the edits.
+5. **Commit via the Git Data API** using the seven-step pattern above.
+6. **Update local mirror** by writing the same content to `C:\Scripts\Flipbook\<path>` so Emily can browse the new files locally; not required for correctness.
+7. **Tell Emily the commit SHA and the GitHub URL** so she can verify in her browser and trust the change.
+
+## Architecture notes
+
+### Content schema (`content.js`)
+
+`window.FLIPBOOK_CONTENT` is an array of page entries. Five entry `type` values: `cover`, `note` (Foundry intro page with themes), `spread` (a category spread &mdash; this is the bulk of the flipbook), `close` (back cover). Each spread has:
+
+- `genre`, `intro`, `supportTitle` &mdash; right-page heading bits
+- `feature.{title, instructor, image, lede, quote, courseLabel, headshot, facultyBlurb, facultyBio}` &mdash; left-page featured course
+- `supporting[]` &mdash; right-page accordion list, each with `{title, instructor, summary, headshot?}`
+- `leftBlocks[]` &mdash; positioned text blocks (header / text / quote) on the left page
+- `layout{}` &mdash; per-spread sizing knobs (font sizes, % positions, scale factors)
+
+### Faculty card flip
+
+Each spread's left page renders a **3D flip card** for the featured instructor:
+- **Front:** large circular headshot (default 130 design-px), `INSTRUCTOR` mono kicker, name, short blurb, a "Tap for bio &#8634;" hint
+- **Back:** kicker `About <FirstName>`, full bio text, "Back to front &#8634;" hint
+- **Interaction:** native `<button>`; click, tap, Enter, or Space toggles `.is-flipped` which applies `transform: rotateY(180deg)` to `.faculty-card-inner`. The back face only renders if `feature.facultyBio` is truthy.
+
+### Headshot resolution
+
+`getDefaultHeadshot(instructor)` in `index.html` walks a `HEADSHOT_TABLE` of ~35 lowercased name substrings. First match wins; fallback is the Foundry logomark in a circular disc. To add an instructor: drop their photo at `assets/headshots/<first-last>.jpg` and add a row to the table. All 30 photos in `assets/headshots/` were sourced from the sister repo `candlerfoundry/executive-bi-dashboard` under `assets/faculty-staff-headshots/`, normalized to lowercase-dashed filenames.
+
+### Letterbox scaling (responsive layout)
+
+The book renders at fixed **design dimensions of 1500&times;780** inside a `.book-scaler` element. JS computes `scale = min(stage.offsetWidth / 1500, stage.offsetHeight / 780)` and applies it via `--book-scale` on `.book-scaler`. **Important:** use `offsetWidth`/`offsetHeight` (layout box), not `getBoundingClientRect` (rendered box) &mdash; the editor's preview iframe applies its own ancestor `transform: scale`, and `getBoundingClientRect` would compound the two and double-shrink the book. There's no `Math.min(..., 1)` cap; the book scales up beyond 1.0 on big monitors.
+
+### Editor sliders for layout knobs
+
+`admin.html` exposes per-spread range sliders bound to keys in the `layout` object:
+- Image: `imageY`, `imageScalePercent`, `imageMaxHeight`, `imageWidthPercent`, `imageX`, `imageAlign`, `imageShadow`
+- Genre/category: `genreY`, `genreFontSize`, `genreFontFamily`, `genreWidthPercent`
+- Course label: `courseLabelY`, `courseLabelFontSize`, `courseLabelFontFamily`, `courseLabelWidthPercent`
+- Faculty card: `facultyY`, `facultyWidthPercent`, `facultyAvatarSizePx`, `facultyNameSizePx`, `facultyBlurbSizePx`
+- Right page: `rightHeadingFontSize`, `rightIntroFontSize`, `rightCardTitleFontSize`, `rightCardMetaFontSize`, `rightCardSummaryFontSize`, `rightListWidthPercent`, `rightCardAvatarSizePx`
+
+Defaults are wired into `createDefaultSpreadLayout()` and `applyMasterSpreadTemplate()`. New layout fields fall through to defaults if missing on a spread.
+
+### Netlify Function: `save-content`
+
+Located at `netlify/functions/save-content.js`. POSTed by the **Publish to live site** button in `admin.html` with `{content: <FLIPBOOK_CONTENT array>, message?: <commit message>}`. Reads four env vars (`GITHUB_TOKEN`, `GITHUB_OWNER`, `GITHUB_REPO`, `GITHUB_BRANCH`), looks up the existing `content.js` SHA, and PUTs the new content via the **Contents** API (single-file commit, distinct from the Claude path which uses the lower-level **Git Data** API for multi-file commits). Optional `EDITOR_TOKEN` env var enables a shared-secret gate that requires an `x-editor-token` header.
+
+## Known issues
+
+### Local file truncation (Cowork mount + Windows specific)
+
+When Claude writes a large file to the mount, the resulting file on the Windows side is occasionally truncated mid-statement, ending up the same byte size as Claude's LF-only write rather than the CRLF-converted size that Windows Git would produce. We've hit this on `index.html`, `admin.html`, `content.js`, and `README.md`. Confirmed via canary test that nothing on the Windows side is rewriting files in the background &mdash; it's a transient mount/sync interaction at the moment of write. The recovery path is always the same: pull the file fresh from GitHub, re-apply edits, push via the API. The Path C (Claude API) workflow is robust to this because it sources from GitHub, not local.
+
+### Editor `localStorage` shadowing
+
+`admin.html` loads `content.js` as the bundled baseline, then overlays any draft saved in `localStorage`. If the deployed `content.js` changes (e.g., schema migration, or someone else publishes), the editor will keep showing the in-browser draft until **Discard saved draft** is clicked, an incognito window is used, or DevTools clears site data. Hard refresh does **not** clear `localStorage`. Add a brief `Discard saved draft` reminder when shipping any schema change.
+
+### `Dr. ian McFarland` typo
+
+`content.js` for the NT spread has `"instructor": "Dr. ian McFarland"` (lowercase `i`). Cosmetic; flagged but not auto-corrected since instructor strings are Emily's copy domain. Fix via the editor when convenient.
 
 ## Local development
 
