@@ -8,6 +8,7 @@ playwright-*.png
 .env
 .env.*
 !.env.example
+.claude-git-token
 
 # OS / editor junk
 .DS_Store
@@ -23,9 +24,4 @@ Thumbs.db
 # Non-production leftovers (kept locally, not shipped to the live site)
 # The root-level "Friendly Students 2.png" is an unused duplicate;
 # the version the flipbook actually uses is at assets/branding/friendly-students-2.png
-Friendly Students 2.png
-pauls-vision-carousel-mockup.html
-assets/Instructors Linking Preview.xlsx
-
-# Netlify local CLI
-.netlify/
+Friendly Students 
