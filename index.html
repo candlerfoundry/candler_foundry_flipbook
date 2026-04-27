@@ -1396,17 +1396,36 @@ button.meta-chip {
  * empty space on large ones.
  */
 .spf-page {
-  background: var(--ivory);
-  overflow: hidden;
+  /* StPageFlip adds .stf__item to this element at runtime, which carries
+     transform-style: preserve-3d. preserve-3d defeats overflow:hidden on
+     descendants, so we delegate clipping + the opaque base background to
+     an inner .spf-page-clip wrapper that has the default flat
+     transform-style. */
   position: relative;
 }
-.spf-page .page {
+.spf-page-clip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--ivory);
+  /* Default transform-style: flat -- this is the layer where overflow:hidden
+     actually works, so the 750x780 .page child below cannot overhang the
+     wrapper's pageWidth x pageHeight box during a backward flip. */
+}
+.spf-page-clip .page {
   position: absolute;
   top: 0;
   left: 0;
   width: 750px;
   height: 780px;
   transform-origin: top left;
+  /* Independent opaque base behind the mostly-transparent
+     .page-left / .page-right gradients, so the page reads as solid even
+     if the wrapper's background is under-painted by the library's
+     clip-path + 3D transform interaction. */
+  background: var(--ivory);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   /* transform: scale(...) is set via JS on every (re)build. */
 }
 
@@ -2642,13 +2661,23 @@ function buildBookPageFlip() {
       lw.className = 'spf-page';
       lw.dataset.entryIndex = String(index);
       lw.dataset.side = 'left';
-      lw.appendChild(leftPage);
+      // .spf-page-clip is the layer that actually clips and supplies the
+      // opaque ivory base. The library will add transform-style:
+      // preserve-3d to .spf-page (via .stf__item) at runtime; we keep the
+      // clip layer flat so overflow:hidden actually works.
+      const lc = document.createElement('div');
+      lc.className = 'spf-page-clip';
+      lc.appendChild(leftPage);
+      lw.appendChild(lc);
       pageEls.push(lw);
       const rw = document.createElement('div');
       rw.className = 'spf-page';
       rw.dataset.entryIndex = String(index);
       rw.dataset.side = 'right';
-      rw.appendChild(rightPage);
+      const rc = document.createElement('div');
+      rc.className = 'spf-page-clip';
+      rc.appendChild(rightPage);
+      rw.appendChild(rc);
       pageEls.push(rw);
     }
     tempWrapper.innerHTML = '';
@@ -2710,6 +2739,9 @@ function buildBookPageFlip() {
   // or too small on large screens (L-shaped dead space at bottom-right).
   // querySelectorAll is used broadly to catch any nodes the library cloned.
   const contentScale = pageWidth / 750;
+  // Selector covers both the fresh structure (.spf-page > .spf-page-clip > .page)
+  // and any clones the library may produce; the descendant combinator matches
+  // either depth.
   bookStage.querySelectorAll('.spf-page .page').forEach(p => {
     p.style.transform = `scale(${contentScale})`;
   });
