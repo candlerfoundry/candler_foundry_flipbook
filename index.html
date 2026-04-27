@@ -1331,6 +1331,56 @@ button.meta-chip {
   width: 100%;
   height: 100%;
 }
+
+/* Center-gutter shadow overlay (replaces .spread::after for PageFlip
+   mode). Floats absolutely over the book center so the spread reads as
+   a real magazine binding even though the library no longer uses our
+   .spread element. */
+.book-gutter-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 14%;
+  max-width: 220px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 30;
+  background:
+    /* Soft inward page curve toward the gutter -- darker valley at the
+       binding seam, fading outward into each page. Same shape as the old
+       .spread::after gradient, scaled to a narrower overlay band. */
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(0, 0, 0, 0.06) 14%,
+      rgba(0, 0, 0, 0.16) 32%,
+      rgba(0, 0, 0, 0.30) 48%,
+      rgba(0, 0, 0, 0.36) 50%,
+      rgba(0, 0, 0, 0.30) 52%,
+      rgba(0, 0, 0, 0.16) 68%,
+      rgba(0, 0, 0, 0.06) 86%,
+      transparent 100%
+    ),
+    /* Subtle bright lift on each side of the valley -- glossy paper. */
+    linear-gradient(
+      90deg,
+      transparent 12%,
+      rgba(255, 253, 244, 0.05) 28%,
+      transparent 42%,
+      transparent 58%,
+      rgba(255, 253, 244, 0.05) 72%,
+      transparent 88%
+    );
+}
+
+/* Page-content scaling: the .page inside each .spf-page is rendered at
+   the design's logical size (the library's configured 750x780 per page).
+   Container queries on .spf-page let inner content scale proportionally
+   to the container -- so cards/typography grow on a wider monitor instead
+   of staying pinned at design-px sizes. */
+.spf-page { container-type: size; }
+
 /* The library applies its own width/height to each page; we just ensure
    the inner .page content fills the page wrapper cleanly. */
 .spf-page {
@@ -2605,19 +2655,62 @@ function buildBookPageFlip() {
     maxWidth: 1500,
     minHeight: 333,
     maxHeight: 1560,
+    autoSize: false,           // book sizes to parent, not the other way around
     drawShadow: true,
-    flippingTime: 1200,
+    flippingTime: 950,         // slightly faster than 1200ms per feedback
     showCover: false,
     usePortrait: false,
     mobileScrollSupport: true,
     swipeDistance: 30,
     clickEventForward: true,
+    /* disableFlipByClick: true means the library only flips on corner
+       grab/drag -- clicks anywhere ELSE in the page pass through to inner
+       buttons (faculty card 'Tap for bio', supporting card accordion,
+       TOC items). The page-turn 'tap to advance' affordance is now
+       solely the prev/next overlay buttons + arrow keys. */
+    disableFlipByClick: true,
     useMouseEvents: true,
     maxShadowOpacity: 0.5,
     startPage: Math.max(0, currentIndex * 2),
   });
 
   pageFlipInstance.loadFromHTML(container.querySelectorAll('.spf-page'));
+
+  // Inner-button listeners must be attached AFTER loadFromHTML because
+  // the library may clone/move page nodes during init.
+  attachAccordionBehavior();
+  attachFacultyCardBehavior();
+  attachTocBehavior();
+
+  // Add the center-gutter shadow overlay (was previously rendered by
+  // .spread::after, which doesn't exist in PageFlip mode).
+  if (!bookStage.querySelector('.book-gutter-overlay')) {
+    const gutter = document.createElement('div');
+    gutter.className = 'book-gutter-overlay';
+    gutter.setAttribute('aria-hidden', 'true');
+    bookStage.appendChild(gutter);
+  }
+
+  // Defensive resize handling: if the viewport changes substantially,
+  // destroy + rebuild the PageFlip instance so it picks up the new
+  // container size. The library's internal stretch handling is sometimes
+  // sluggish to react.
+  if (!buildBookPageFlip._resizeBound) {
+    let resizeTimer = null;
+    window.addEventListener('resize', () => {
+      if (!pageFlipInstance) return;
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        const savedIndex = currentIndex;
+        try { pageFlipInstance.destroy(); } catch (_) {}
+        pageFlipInstance = null;
+        buildBookPageFlip();
+        currentIndex = savedIndex;
+        updateBook(false);
+      }, 220);
+    });
+    buildBookPageFlip._resizeBound = true;
+  }
 
   // Update UI when the user (or our nav buttons) flips a page.
   pageFlipInstance.on('flip', (e) => {
@@ -2661,8 +2754,12 @@ function buildBook() {
 }
 
 function attachAccordionBehavior() {
-  const spreads = Array.from(bookStage.querySelectorAll(".spread"));
-  spreads.forEach((spread) => {
+  // Each "page group" -- a .spread in legacy mode, or each .spf-page wrapper
+  // in PageFlip mode -- gets its own accordion (only one open per group).
+  const containers = pageFlipInstance
+    ? Array.from(bookStage.querySelectorAll(".spf-page"))
+    : Array.from(bookStage.querySelectorAll(".spread"));
+  containers.forEach((spread) => {
     const items = Array.from(spread.querySelectorAll(".support-item"));
     items.forEach((item) => {
       const button = item.querySelector(".support-toggle");
