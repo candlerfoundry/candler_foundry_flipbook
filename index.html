@@ -1613,6 +1613,11 @@ body.preview-embed .app-shell {
   .nav-button {
     transition-duration: 0.01ms !important;
   }
+  /* Skip the curl keyframes; just snap the page across instantly. */
+  .flip-leaf.animating.forward,
+  .flip-leaf.animating.backward {
+    animation: none !important;
+  }
 }
 
 .spread.flip-base {
