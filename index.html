@@ -1377,27 +1377,32 @@ button.meta-chip {
     );
 }
 
-/* Page-content scaling: the .page inside each .spf-page is rendered at
-   the design's logical size (the library's configured 750x780 per page).
-   Container queries on .spf-page let inner content scale proportionally
-   to the container -- so cards/typography grow on a wider monitor instead
-   of staying pinned at design-px sizes. */
-.spf-page { container-type: size; }
-
-/* The library applies its own width/height to each page; we just ensure
-   the inner .page content fills the page wrapper cleanly. */
+/*
+ * The .spf-page wrapper is sized by StPageFlip (we pass per-page width
+ * and height into the library). The actual .page content inside is
+ * rendered at the design's fixed 750x780 logical size and visually
+ * scaled to fit via transform: scale() (set via JS, see applySpfPageScale).
+ *
+ * This is the same letterbox approach our legacy .book-scaler used: the
+ * library handles flip mechanics + outer page-wrapper sizing; we handle
+ * proportional scaling of our DOM content. Without this, content
+ * rendered at design pixels overflows on small screens / leaves big
+ * empty space on large ones.
+ */
 .spf-page {
   background: var(--ivory);
   overflow: hidden;
+  position: relative;
 }
 .spf-page .page {
-  position: relative;
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 750px;
+  height: 780px;
+  transform-origin: top left;
+  /* transform: scale(...) is set via JS on every (re)build. */
 }
-/* The library wraps each page in its own div with computed transforms;
-   our inner .page styling (page-left / page-right backgrounds, edges,
-   etc.) keeps working since it doesn't depend on the parent .spread. */
 
 /* ---- Floating overlay chrome (replaces the old topbar + footer) ---- */
 /*
