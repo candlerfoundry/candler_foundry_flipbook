@@ -103,14 +103,13 @@ select {
   position: relative;
   width: 100%;
   height: 100%;
-  padding: 12px 18px;
+  padding: 8px;
   display: grid;
-  grid-template-rows: auto 1fr auto;
-  gap: 10px;
-  /* Grid rows: topbar (auto) | book-frame cell (1fr, takes leftover height) |
-     controls (auto). The book-frame inside the 1fr cell uses aspect-ratio
-     fitting so the spread always fills the stage edge-to-edge with no black
-     bars, regardless of monitor aspect ratio. */
+  place-items: center;
+  /* Single centered cell. The book-frame absorbs the full viewport at the
+     1500/780 design ratio. Brand, meta chips, side nav buttons, and the
+     status pill all float absolutely on top of the book so they don't
+     steal vertical space. */
 }
 
 body.preview-embed .narrow-message {
@@ -254,16 +253,11 @@ button.meta-chip {
 .book-frame {
   position: relative;
   z-index: 2;
-  /* Fit the largest 1500x780-ratio rectangle that fits inside the grid
-     cell. width:100%/max-width gives the horizontal cap; max-height:100%
-     plus aspect-ratio gives the vertical cap. The browser picks whichever
-     is more restrictive. */
-  width: 100%;
-  max-width: 1700px;
-  max-height: 100%;
+  /* Width is the smallest of: parent width, hard cap 1700px, OR the width
+     that keeps the book within the viewport height. The third term means
+     the book never overflows vertically -- the bottom cannot be cut off. */
+  width: min(100%, 1700px, calc((100dvh - 16px) * 1500 / 780));
   aspect-ratio: 1500 / 780;
-  align-self: center;
-  justify-self: center;
   perspective: 2800px;
 }
 
@@ -1313,6 +1307,211 @@ button.meta-chip {
   letter-spacing: 0.18em;
 }
 
+
+/* ---- Floating overlay chrome (replaces the old topbar + footer) ---- */
+/*
+ * The topbar and footer used to consume vertical layout space, squeezing
+ * the book.  Now everything floats absolutely on top of the book stage:
+ *   - .brand-overlay   top-left, Foundry logo + tagline
+ *   - .meta-overlay    top-right, sound toggle + edit-copy link
+ *   - .nav-side        left/right edges, vertically-centered prev/next
+ *   - .status-overlay  bottom-center, page count + theme + arrow hint
+ */
+.brand-overlay {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px 8px 12px;
+  border-radius: 999px;
+  background: rgba(20, 25, 33, 0.42);
+  border: 1px solid rgba(240, 234, 216, 0.10);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: rgba(250, 250, 242, 0.86);
+  pointer-events: auto;
+}
+
+.brand-overlay img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.brand-overlay .brand-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  line-height: 1;
+}
+
+.brand-overlay .brand-copy span {
+  font-family: "DM Mono", monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(240, 234, 216, 0.62);
+}
+
+.brand-overlay .brand-copy strong {
+  font-family: "DM Serif Display", serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: var(--ivory);
+  letter-spacing: 0.005em;
+}
+
+.meta-overlay {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.meta-overlay .meta-chip {
+  background: rgba(20, 25, 33, 0.42);
+  border: 1px solid rgba(240, 234, 216, 0.10);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 999px;
+  padding: 8px 13px;
+  font-family: "DM Mono", monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(240, 234, 216, 0.84);
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+.meta-overlay .meta-chip:hover {
+  background: rgba(246, 168, 93, 0.16);
+  border-color: rgba(246, 168, 93, 0.5);
+  color: var(--ivory);
+}
+
+a.meta-chip {
+  text-decoration: none;
+}
+
+/* Side nav buttons -- absolute on the .app-shell, vertically centered */
+.nav-side {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 12;
+  width: 56px;
+  height: 56px;
+  /* Inherits the visual treatment from .nav-button (background, border,
+     blur). We just bump the size and position. */
+}
+
+.nav-side svg {
+  width: 22px;
+  height: 22px;
+}
+
+.nav-side:hover:not(:disabled) {
+  transform: translateY(calc(-50% - 1px));
+}
+
+.nav-side-prev {
+  left: 14px;
+}
+
+.nav-side-next {
+  right: 14px;
+}
+
+/* Bottom-center status pill */
+.status-overlay {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  background: rgba(20, 25, 33, 0.42);
+  border: 1px solid rgba(240, 234, 216, 0.10);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: rgba(240, 234, 216, 0.84);
+  pointer-events: auto;
+  font-family: "DM Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.status-overlay .page-status {
+  min-width: 76px;
+  text-align: center;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  color: var(--ivory);
+}
+
+.status-overlay .status-chip {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  letter-spacing: 0.16em;
+  font-size: 0.68rem;
+  color: rgba(246, 168, 93, 0.92);
+}
+
+.status-overlay .hint {
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  color: rgba(240, 234, 216, 0.6);
+}
+
+.status-divider {
+  color: rgba(240, 234, 216, 0.32);
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.status-divider-quiet {
+  color: rgba(240, 234, 216, 0.18);
+}
+
+/* Hide all floating chrome inside the editor's preview iframe -- the
+   editor already provides its own controls; the overlays would just clutter. */
+body.preview-embed .brand-overlay,
+body.preview-embed .meta-overlay,
+body.preview-embed .nav-side,
+body.preview-embed .status-overlay {
+  display: none !important;
+}
+
+/* On very narrow viewports collapse the brand text and just keep the mark */
+@media (max-width: 720px) {
+  .brand-overlay .brand-copy {
+    display: none;
+  }
+  .brand-overlay {
+    padding: 8px;
+  }
+  .meta-overlay .meta-chip {
+    padding: 7px 10px;
+    font-size: 0.6rem;
+  }
+}
+
+/* ---- end floating overlay chrome ---- */
+
 @media (max-width: 520px) {
   .narrow-message {
     display: flex;
@@ -1564,44 +1763,46 @@ body.preview-embed .app-shell {
 <div class="app-shell">
   <div class="ambient-glow"></div>
 
-  <header class="topbar">
-    <div class="brand-lockup">
-      <img src="assets/branding/foundry-logomark-orange.png" alt="The Candler Foundry">
-      <div class="brand-copy">
-        <span>Foundry Field Guide</span>
-        <strong>The Candler Foundry at Emory</strong>
-      </div>
-    </div>
-    <div class="topbar-meta">
-      <a class="meta-chip" href="admin.html">Edit Copy</a>
-      <button class="meta-chip" id="sound-toggle" type="button" aria-pressed="false">Sound Off</button>
-      <div class="meta-chip" id="theme-chip">Cover</div>
-    </div>
-  </header>
-
   <main class="book-frame">
     <div class="book-surface"></div>
     <section class="book-stage" id="book-stage" aria-live="polite"></section>
   </main>
 
-  <footer class="controls">
-    <div class="controls-left">
-      <div class="hint">Arrow keys turn pages</div>
+  <!-- Floating top-left brand overlay -->
+  <div class="brand-overlay" aria-hidden="false">
+    <img src="assets/branding/foundry-logomark-orange.png" alt="The Candler Foundry">
+    <div class="brand-copy">
+      <span>Foundry Field Guide</span>
+      <strong>The Candler Foundry at Emory</strong>
     </div>
-    <div class="nav-group">
-      <button class="nav-button" id="prev-button" type="button" aria-label="Previous spread">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M15 6L9 12L15 18" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-      <div class="page-status" id="page-status">01 / 08</div>
-      <button class="nav-button" id="next-button" type="button" aria-label="Next spread">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-    </div>
-  </footer>
+  </div>
+
+  <!-- Floating top-right meta overlay (sound + edit) -->
+  <div class="meta-overlay">
+    <button class="meta-chip" id="sound-toggle" type="button" aria-pressed="false">Sound Off</button>
+    <a class="meta-chip" href="admin.html">Edit Copy</a>
+  </div>
+
+  <!-- Floating side prev/next buttons, vertically centered on the viewport -->
+  <button class="nav-button nav-side nav-side-prev" id="prev-button" type="button" aria-label="Previous spread">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M15 6L9 12L15 18" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <button class="nav-button nav-side nav-side-next" id="next-button" type="button" aria-label="Next spread">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <!-- Floating bottom-center status pill: page count + theme + hint -->
+  <div class="status-overlay">
+    <div class="page-status" id="page-status">01 / 08</div>
+    <span class="status-divider" aria-hidden="true">&middot;</span>
+    <div class="meta-chip status-chip" id="theme-chip">Cover</div>
+    <span class="status-divider status-divider-quiet" aria-hidden="true">&middot;</span>
+    <div class="hint">Arrow keys turn pages</div>
+  </div>
 </div>
 
 <script src="content.js"></script>
