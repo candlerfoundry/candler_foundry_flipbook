@@ -1,3 +1,6 @@
+HTTP 200 
+Content-Type: text/plain; charset=utf-8
+
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1330,6 +1333,7 @@ button.meta-chip {
 #pageflip-book {
   width: 100%;
   height: 100%;
+  position: relative; /* own stacking context so flip-animation z-index beats the gutter overlay */
 }
 
 /* Center-gutter shadow overlay (replaces .spread::after for PageFlip
@@ -1345,10 +1349,12 @@ button.meta-chip {
   max-width: 220px;
   transform: translateX(-50%);
   pointer-events: none;
-  /* Z-index sits ON TOP of static pages (startZIndex: 0) so the gutter
-     shadow shows on a flat spread, but UNDER any page mid-flip (which the
-     library raises well above 5). Page-turn renders over the gutter. */
-  z-index: 5;
+  /* z-index: 2 keeps the overlay above static page content (which sits at 0
+     inside #pageflip-book) while staying below the library's flip-animation
+     elements (which use much higher internal values). #pageflip-book must
+     have position:relative so these z-indices are scoped to its stacking
+     context rather than competing with the overlay from the outside. */
+  z-index: 2;
   background:
     /* Soft inward page curve toward the gutter -- darker valley at the
        binding seam, fading outward into each page. Same shape as the old
@@ -2650,19 +2656,21 @@ function buildBookPageFlip() {
   pageEls.forEach((p) => container.appendChild(p));
 
   // Compute per-page dimensions from the current bookStage size.
-  // Maintain the design's 1500/780 spread aspect ratio (so each page
-  // is 750/780 = ~0.96).  size:'fixed' tells the library these are exact
-  // pixel sizes; we re-init on resize via the ResizeObserver below.
-  const stageRect = bookStage.getBoundingClientRect();
+  // Use offsetWidth/offsetHeight (layout box, not rendered box) so this
+  // works correctly even inside the editor preview iframe, where an ancestor
+  // transform:scale() would cause getBoundingClientRect() to return the
+  // already-scaled size and double-shrink the content.
+  const stageW = bookStage.offsetWidth;
+  const stageH = bookStage.offsetHeight;
   const SPREAD_ASPECT = 1500 / 780;
   let bookW, bookH;
-  if (stageRect.width / stageRect.height > SPREAD_ASPECT) {
+  if (stageW / stageH > SPREAD_ASPECT) {
     // Container wider than spread aspect -- bound by height
-    bookH = Math.max(200, Math.floor(stageRect.height));
+    bookH = Math.max(200, Math.floor(stageH));
     bookW = Math.floor(bookH * SPREAD_ASPECT);
   } else {
     // Container narrower -- bound by width
-    bookW = Math.max(400, Math.floor(stageRect.width));
+    bookW = Math.max(400, Math.floor(stageW));
     bookH = Math.floor(bookW / SPREAD_ASPECT);
   }
   const pageWidth = Math.floor(bookW / 2);
@@ -2696,19 +2704,34 @@ function buildBookPageFlip() {
 
   pageFlipInstance.loadFromHTML(container.querySelectorAll('.spf-page'));
 
+  // Scale the fixed design-size (750×780) .page content to exactly fill its
+  // wrapper, which the library sized to pageWidth×pageHeight. Without this
+  // the content stays at design pixels: too large on small screens (clipped)
+  // or too small on large screens (L-shaped dead space at bottom-right).
+  // querySelectorAll is used broadly to catch any nodes the library cloned.
+  const contentScale = pageWidth / 750;
+  bookStage.querySelectorAll('.spf-page .page').forEach(p => {
+    p.style.transform = `scale(${contentScale})`;
+  });
+
   // Inner-button listeners must be attached AFTER loadFromHTML because
   // the library may clone/move page nodes during init.
   attachAccordionBehavior();
   attachFacultyCardBehavior();
   attachTocBehavior();
 
-  // Add the center-gutter shadow overlay (was previously rendered by
-  // .spread::after, which doesn't exist in PageFlip mode).
-  if (!bookStage.querySelector('.book-gutter-overlay')) {
+  // Add the center-gutter shadow overlay inside #pageflip-book (not
+  // bookStage). Keeping it inside the library's container means it
+  // participates in the same stacking context as the library's pages, so
+  // z-index:2 puts it above static pages (z-index 0) but below the animated
+  // flip canvas (which the library raises to much higher values internally).
+  // If it were a sibling of #pageflip-book in bookStage, it would always
+  // paint on top of everything regardless of its z-index.
+  if (!container.querySelector('.book-gutter-overlay')) {
     const gutter = document.createElement('div');
     gutter.className = 'book-gutter-overlay';
     gutter.setAttribute('aria-hidden', 'true');
-    bookStage.appendChild(gutter);
+    container.appendChild(gutter);
   }
 
   // Resize handling via ResizeObserver on bookStage. Triggers a full
