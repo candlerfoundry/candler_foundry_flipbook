@@ -1314,6 +1314,38 @@ button.meta-chip {
 }
 
 
+
+/* ---- StPageFlip integration ---- */
+/*
+ * StPageFlip renders pages with its own canvas-based 3D mesh deformation
+ * (the Heyzine-style corner peel). Our content (faculty card, supporting
+ * list, cover, etc.) lives INSIDE each page wrapper; the library handles
+ * the page-flip animation around them.
+ *
+ * The library replaces the old .book-scaler / .spread / .flip-leaf model
+ * entirely when active. In editor preview mode (body.preview-embed), we
+ * fall back to the original rendering so the editor's preview iframe is
+ * unaffected.
+ */
+#pageflip-book {
+  width: 100%;
+  height: 100%;
+}
+/* The library applies its own width/height to each page; we just ensure
+   the inner .page content fills the page wrapper cleanly. */
+.spf-page {
+  background: var(--ivory);
+  overflow: hidden;
+}
+.spf-page .page {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+/* The library wraps each page in its own div with computed transforms;
+   our inner .page styling (page-left / page-right backgrounds, edges,
+   etc.) keeps working since it doesn't depend on the parent .spread. */
+
 /* ---- Floating overlay chrome (replaces the old topbar + footer) ---- */
 /*
  * The topbar and footer used to consume vertical layout space, squeezing
@@ -1910,6 +1942,7 @@ body.preview-embed .app-shell {
 </div>
 
 <script src="content.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
 <script>
 const bookStage = document.getElementById("book-stage");
 const pageStatus = document.getElementById("page-status");
@@ -2521,10 +2554,100 @@ function renderEntry(entry, index) {
   return renderSpread(entry, index);
 }
 
+// ---- StPageFlip integration ----
+//
+// pageFlipInstance is the active library instance, or null if we're using
+// the legacy renderer (preview-embed mode, or library failed to load).
+let pageFlipInstance = null;
+
+function buildBookPageFlip() {
+  // Replace the book-stage's contents with a fresh container the library
+  // can take over. Generate one .spf-page wrapper per page (each entry
+  // produces 2 pages: left and right).
+  bookStage.innerHTML = '<div id="pageflip-book"></div>';
+  const container = document.getElementById('pageflip-book');
+
+  const tempWrapper = document.createElement('div');
+  const pageEls = [];
+  BOOK.forEach((entry, index) => {
+    tempWrapper.innerHTML = renderEntry(entry, index);
+    const leftPage = tempWrapper.querySelector('.page-left');
+    const rightPage = tempWrapper.querySelector('.page-right');
+    if (leftPage && rightPage) {
+      const lw = document.createElement('div');
+      lw.className = 'spf-page';
+      lw.dataset.entryIndex = String(index);
+      lw.dataset.side = 'left';
+      lw.appendChild(leftPage);
+      pageEls.push(lw);
+      const rw = document.createElement('div');
+      rw.className = 'spf-page';
+      rw.dataset.entryIndex = String(index);
+      rw.dataset.side = 'right';
+      rw.appendChild(rightPage);
+      pageEls.push(rw);
+    }
+    tempWrapper.innerHTML = '';
+  });
+  pageEls.forEach((p) => container.appendChild(p));
+
+  // Initialize the library. width/height are the design dims for one page
+  // (half a spread); size:stretch lets the library scale to fit container.
+  if (pageFlipInstance) {
+    try { pageFlipInstance.destroy(); } catch (_) {}
+    pageFlipInstance = null;
+  }
+  pageFlipInstance = new St.PageFlip(container, {
+    width: 750,
+    height: 780,
+    size: 'stretch',
+    minWidth: 320,
+    maxWidth: 1500,
+    minHeight: 333,
+    maxHeight: 1560,
+    drawShadow: true,
+    flippingTime: 1200,
+    showCover: false,
+    usePortrait: false,
+    mobileScrollSupport: true,
+    swipeDistance: 30,
+    clickEventForward: true,
+    useMouseEvents: true,
+    maxShadowOpacity: 0.5,
+    startPage: Math.max(0, currentIndex * 2),
+  });
+
+  pageFlipInstance.loadFromHTML(container.querySelectorAll('.spf-page'));
+
+  // Update UI when the user (or our nav buttons) flips a page.
+  pageFlipInstance.on('flip', (e) => {
+    const pageNum = e.data;
+    const entryIndex = Math.floor(pageNum / 2);
+    if (entryIndex !== currentIndex) {
+      currentIndex = entryIndex;
+      updateBook(false);
+    }
+    playFlipSound();
+  });
+}
+
 function buildBook() {
   if (!BOOK.length) {
     bookStage.innerHTML = `<div class="book-scaler"><article class="spread current" style="opacity:1;"><div class="page page-left note-left"><div class="eyebrow note-kicker">Content error</div><h2 class="note-title">No flipbook content loaded.</h2><p class="note-copy">Check <code>content.js</code> or clear local browser overrides in <a href="admin.html">admin.html</a>.</p></div><div class="page page-right note-right"><div class="paper-grain"></div></div></article></div>`;
     return;
+  }
+  // Use StPageFlip for the live viewer (true mesh-based corner peel).
+  // Fall back to the legacy spread renderer in editor preview-embed mode
+  // and any case where the library script didn't load.
+  if (typeof St !== 'undefined' && St.PageFlip && !isPreviewEmbed) {
+    try {
+      buildBookPageFlip();
+      updateBook(false);
+      return;
+    } catch (err) {
+      console.error('StPageFlip init failed; falling back to legacy renderer.', err);
+      pageFlipInstance = null;
+    }
   }
   try {
     bookStage.innerHTML = `<div class="book-scaler">` + BOOK.map((entry, index) => `<article class="spread" data-index="${index}" aria-label="${entry.label || `Page ${index + 1}`}">${renderEntry(entry, index)}</article>`).join("") + `</div>`;
@@ -2608,6 +2731,17 @@ function parseIndexFromHash() {
 
 function updateBook(shouldAnimate = true) {
   if (!BOOK.length) return;
+  if (pageFlipInstance) {
+    // No spread elements when PageFlip is active; just update chrome.
+    pageStatus.textContent = `${String(currentIndex + 1).padStart(2, "0")} / ${String(BOOK.length).padStart(2, "0")}`;
+    if (BOOK[currentIndex] && BOOK[currentIndex].label) {
+      themeChip.textContent = BOOK[currentIndex].label;
+    }
+    history.replaceState(null, "", `#page=${currentIndex + 1}`);
+    prevButton.disabled = currentIndex === 0;
+    nextButton.disabled = currentIndex === BOOK.length - 1;
+    return;
+  }
   const spreads = Array.from(bookStage.querySelectorAll(".spread"));
   spreads.forEach((spread, index) => {
     spread.className = "spread";
@@ -2697,7 +2831,18 @@ function clearStaticBase(spread) {
 }
 
 function goTo(index) {
-  if (isAnimating || !BOOK.length || index === currentIndex || index < 0 || index >= BOOK.length) return;
+  if (!BOOK.length || index === currentIndex || index < 0 || index >= BOOK.length) return;
+  if (pageFlipInstance) {
+    // Delegate to the library; the 'flip' event handler updates state.
+    try {
+      pageFlipInstance.flip(index * 2, 'bottom');
+    } catch (_) {
+      // If flip fails (e.g. mid-animation), ignore -- library queues are
+      // per-instance and re-clicks while flipping are handled internally.
+    }
+    return;
+  }
+  if (isAnimating) return;
   isAnimating = true;
   playFlipSound();
 
