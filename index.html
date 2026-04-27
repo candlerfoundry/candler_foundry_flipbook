@@ -1345,7 +1345,10 @@ button.meta-chip {
   max-width: 220px;
   transform: translateX(-50%);
   pointer-events: none;
-  z-index: 30;
+  /* Z-index sits ON TOP of static pages (startZIndex: 0) so the gutter
+     shadow shows on a flat spread, but UNDER any page mid-flip (which the
+     library raises well above 5). Page-turn renders over the gutter. */
+  z-index: 5;
   background:
     /* Soft inward page curve toward the gutter -- darker valley at the
        binding seam, fading outward into each page. Same shape as the old
@@ -2641,23 +2644,36 @@ function buildBookPageFlip() {
   });
   pageEls.forEach((p) => container.appendChild(p));
 
-  // Initialize the library. width/height are the design dims for one page
-  // (half a spread); size:stretch lets the library scale to fit container.
+  // Compute per-page dimensions from the current bookStage size.
+  // Maintain the design's 1500/780 spread aspect ratio (so each page
+  // is 750/780 = ~0.96).  size:'fixed' tells the library these are exact
+  // pixel sizes; we re-init on resize via the ResizeObserver below.
+  const stageRect = bookStage.getBoundingClientRect();
+  const SPREAD_ASPECT = 1500 / 780;
+  let bookW, bookH;
+  if (stageRect.width / stageRect.height > SPREAD_ASPECT) {
+    // Container wider than spread aspect -- bound by height
+    bookH = Math.max(200, Math.floor(stageRect.height));
+    bookW = Math.floor(bookH * SPREAD_ASPECT);
+  } else {
+    // Container narrower -- bound by width
+    bookW = Math.max(400, Math.floor(stageRect.width));
+    bookH = Math.floor(bookW / SPREAD_ASPECT);
+  }
+  const pageWidth = Math.floor(bookW / 2);
+  const pageHeight = bookH;
+
   if (pageFlipInstance) {
     try { pageFlipInstance.destroy(); } catch (_) {}
     pageFlipInstance = null;
   }
   pageFlipInstance = new St.PageFlip(container, {
-    width: 750,
-    height: 780,
-    size: 'stretch',
-    minWidth: 320,
-    maxWidth: 1500,
-    minHeight: 333,
-    maxHeight: 1560,
-    autoSize: false,           // book sizes to parent, not the other way around
+    width: pageWidth,
+    height: pageHeight,
+    size: 'fixed',
+    autoSize: false,
     drawShadow: true,
-    flippingTime: 950,         // slightly faster than 1200ms per feedback
+    flippingTime: 950,
     showCover: false,
     usePortrait: false,
     mobileScrollSupport: true,
@@ -2666,8 +2682,7 @@ function buildBookPageFlip() {
     /* disableFlipByClick: true means the library only flips on corner
        grab/drag -- clicks anywhere ELSE in the page pass through to inner
        buttons (faculty card 'Tap for bio', supporting card accordion,
-       TOC items). The page-turn 'tap to advance' affordance is now
-       solely the prev/next overlay buttons + arrow keys. */
+       TOC items). */
     disableFlipByClick: true,
     useMouseEvents: true,
     maxShadowOpacity: 0.5,
@@ -2691,25 +2706,37 @@ function buildBookPageFlip() {
     bookStage.appendChild(gutter);
   }
 
-  // Defensive resize handling: if the viewport changes substantially,
-  // destroy + rebuild the PageFlip instance so it picks up the new
-  // container size. The library's internal stretch handling is sometimes
-  // sluggish to react.
-  if (!buildBookPageFlip._resizeBound) {
+  // Resize handling via ResizeObserver on bookStage. Triggers a full
+  // destroy + rebuild whenever the stage changes size by more than a
+  // few pixels. ResizeObserver is more reliable than window.resize:
+  // it fires on container changes (devtools open, editor preview
+  // resize, monitor switch) not just window resize.
+  if (!buildBookPageFlip._resizeObserver) {
     let resizeTimer = null;
-    window.addEventListener('resize', () => {
+    let lastW = 0, lastH = 0;
+    const observer = new ResizeObserver((entries) => {
       if (!pageFlipInstance) return;
+      const entry = entries[0];
+      const w = entry.contentRect.width;
+      const h = entry.contentRect.height;
+      // Ignore micro-changes that would just thrash. Threshold ~6px.
+      if (Math.abs(w - lastW) < 6 && Math.abs(h - lastH) < 6) return;
+      lastW = w;
+      lastH = h;
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
+        if (!pageFlipInstance) return;
         const savedIndex = currentIndex;
         try { pageFlipInstance.destroy(); } catch (_) {}
         pageFlipInstance = null;
+        // Re-render the book with new computed dimensions.
         buildBookPageFlip();
         currentIndex = savedIndex;
         updateBook(false);
-      }, 220);
+      }, 180);
     });
-    buildBookPageFlip._resizeBound = true;
+    observer.observe(bookStage);
+    buildBookPageFlip._resizeObserver = observer;
   }
 
   // Update UI when the user (or our nav buttons) flips a page.
