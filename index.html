@@ -1660,14 +1660,107 @@ body.preview-embed .app-shell {
   transform: perspective(2800px) rotateY(0deg) translateZ(8px);
 }
 
+/* 3D curl-along-spine animation. Replaces the flat linear transition
+   with @keyframes that vary perspective + translateZ + filter through
+   the rotation, so the page reads as a flexible sheet curling around
+   the spine instead of a rigid slab pivoting.
+
+   Phase 1 (0->10%): subtle rotateX(-2deg) tilts the page forward as if
+   the bottom corner is rising before the spine rotation begins. The
+   closest CSS-only nod to a true Heyzine-style corner peel.
+
+   Phase 2 (10->90%): main spine rotation with perspective tightening
+   from 2800px -> 1500px and translateZ rising 8px -> 82px so the page
+   genuinely lifts off the surface. The drop-shadow tracks laterally.
+
+   Phase 3 (90->100%): opacity fades 1 -> 0 on the leaf so by the time
+   the cleanup setTimeout removes it (1220ms), the leaf is already
+   invisible. This is the robust gusset-flash fix -- regardless of any
+   paint-timing race during cleanup, the leaf cannot show OLD page
+   content because it is opacity:0. */
+
 .flip-leaf.animating.forward {
-  transform: perspective(2800px) rotateY(-168deg) translateZ(18px);
-  transition: transform 1200ms cubic-bezier(0.45, 0.05, 0.25, 1);
+  animation: page-curl-fwd 1200ms cubic-bezier(0.45, 0.05, 0.25, 1) forwards;
 }
 
 .flip-leaf.animating.backward {
-  transform: perspective(2800px) rotateY(168deg) translateZ(18px);
-  transition: transform 1200ms cubic-bezier(0.45, 0.05, 0.25, 1);
+  animation: page-curl-bwd 1200ms cubic-bezier(0.45, 0.05, 0.25, 1) forwards;
+}
+
+@keyframes page-curl-fwd {
+  0% {
+    transform: perspective(2800px) rotateY(0deg) translateZ(8px) rotateX(0deg);
+    filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.28));
+    opacity: 1;
+  }
+  10% {
+    transform: perspective(2300px) rotateY(-8deg) translateZ(28px) rotateX(-2deg);
+    filter: drop-shadow(6px 22px 32px rgba(0, 0, 0, 0.34));
+    opacity: 1;
+  }
+  25% {
+    transform: perspective(1900px) rotateY(-46deg) translateZ(56px) rotateX(-1.6deg);
+    filter: drop-shadow(14px 26px 38px rgba(0, 0, 0, 0.42));
+    opacity: 1;
+  }
+  50% {
+    transform: perspective(1500px) rotateY(-90deg) translateZ(82px) rotateX(0deg);
+    filter: drop-shadow(0 36px 50px rgba(0, 0, 0, 0.48));
+    opacity: 1;
+  }
+  75% {
+    transform: perspective(1900px) rotateY(-134deg) translateZ(56px) rotateX(1.6deg);
+    filter: drop-shadow(-14px 26px 38px rgba(0, 0, 0, 0.42));
+    opacity: 1;
+  }
+  92% {
+    transform: perspective(2400px) rotateY(-160deg) translateZ(24px) rotateX(0.6deg);
+    filter: drop-shadow(0 22px 32px rgba(0, 0, 0, 0.32));
+    opacity: 1;
+  }
+  100% {
+    transform: perspective(2800px) rotateY(-168deg) translateZ(18px) rotateX(0deg);
+    filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.28));
+    opacity: 0;
+  }
+}
+
+@keyframes page-curl-bwd {
+  0% {
+    transform: perspective(2800px) rotateY(0deg) translateZ(8px) rotateX(0deg);
+    filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.28));
+    opacity: 1;
+  }
+  10% {
+    transform: perspective(2300px) rotateY(8deg) translateZ(28px) rotateX(-2deg);
+    filter: drop-shadow(-6px 22px 32px rgba(0, 0, 0, 0.34));
+    opacity: 1;
+  }
+  25% {
+    transform: perspective(1900px) rotateY(46deg) translateZ(56px) rotateX(-1.6deg);
+    filter: drop-shadow(-14px 26px 38px rgba(0, 0, 0, 0.42));
+    opacity: 1;
+  }
+  50% {
+    transform: perspective(1500px) rotateY(90deg) translateZ(82px) rotateX(0deg);
+    filter: drop-shadow(0 36px 50px rgba(0, 0, 0, 0.48));
+    opacity: 1;
+  }
+  75% {
+    transform: perspective(1900px) rotateY(134deg) translateZ(56px) rotateX(1.6deg);
+    filter: drop-shadow(14px 26px 38px rgba(0, 0, 0, 0.42));
+    opacity: 1;
+  }
+  92% {
+    transform: perspective(2400px) rotateY(160deg) translateZ(24px) rotateX(0.6deg);
+    filter: drop-shadow(0 22px 32px rgba(0, 0, 0, 0.32));
+    opacity: 1;
+  }
+  100% {
+    transform: perspective(2800px) rotateY(168deg) translateZ(18px) rotateX(0deg);
+    filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.28));
+    opacity: 0;
+  }
 }
 
 .flip-leaf::before,
