@@ -103,7 +103,12 @@ select {
   position: relative;
   width: 100%;
   height: 100%;
-  padding: 1.2vh 2vw 1.2vh;
+  padding: 12px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  /* Flex column so the book-frame absorbs leftover vertical space and the
+     topbar / controls always render fully on-screen, on any monitor. */
 }
 
 body.preview-embed .narrow-message {
@@ -178,7 +183,7 @@ body.preview-embed .nav-button {
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  margin-bottom: 2vh;
+  flex: 0 0 auto;
 }
 
 .brand-lockup {
@@ -247,9 +252,11 @@ button.meta-chip {
 .book-frame {
   position: relative;
   z-index: 2;
-  width: min(1700px, 98vw);
-  height: min(880px, 88vh);
+  width: 100%;
+  max-width: 1700px;
   margin: 0 auto;
+  flex: 1 1 0;
+  min-height: 320px;
   perspective: 2800px;
 }
 
@@ -383,13 +390,15 @@ button.meta-chip {
   opacity: 0;
   pointer-events: none;
   transition: none;
-  /* Layered shadow: large ambient, mid, and close-contact shadows
-     plus a crisp 1px inner edge so the book reads as a real object on the surface. */
+  /* Layered shadow: long ambient throw + mid + tight contact shadow,
+     plus a crisp 1px inner edge so the book reads as a real, weighty
+     object resting on the dark surface. */
   box-shadow:
-    0 42px 84px -24px rgba(0, 0, 0, 0.55),
-    0 22px 44px rgba(0, 0, 0, 0.26),
-    0 6px 14px rgba(0, 0, 0, 0.16),
-    inset 0 0 0 1px rgba(30, 37, 48, 0.08);
+    0 64px 120px -36px rgba(0, 0, 0, 0.60),
+    0 30px 60px -8px rgba(0, 0, 0, 0.32),
+    0 10px 22px rgba(0, 0, 0, 0.22),
+    0 2px 4px rgba(0, 0, 0, 0.18),
+    inset 0 0 0 1px rgba(30, 37, 48, 0.10);
 }
 
 .spread::after {
@@ -399,25 +408,40 @@ button.meta-chip {
   pointer-events: none;
   z-index: 4;
   background:
-    /* Gutter shadow: a soft dark band along the center binding,
-       darker in the middle, fading into each page. This is the single
-       biggest move for making the flipbook feel like a physical book. */
+    /* Soft inward page curve toward the gutter: each page dips slightly
+       as it approaches the spine, with a tight dark valley right at the
+       binding seam. Reads as the natural depression of a magazine spine. */
     linear-gradient(
       90deg,
-      transparent 44%,
-      rgba(0, 0, 0, 0.10) 47.5%,
-      rgba(0, 0, 0, 0.22) 50%,
-      rgba(0, 0, 0, 0.10) 52.5%,
-      transparent 56%
+      transparent 30%,
+      rgba(0, 0, 0, 0.06) 38%,
+      rgba(0, 0, 0, 0.14) 44%,
+      rgba(0, 0, 0, 0.26) 48%,
+      rgba(0, 0, 0, 0.34) 50%,
+      rgba(0, 0, 0, 0.26) 52%,
+      rgba(0, 0, 0, 0.14) 56%,
+      rgba(0, 0, 0, 0.06) 62%,
+      transparent 70%
     ),
-    /* Subtle outer-edge darkening at the far left/right of the spread,
-       suggesting the ream of pages behind each page. */
+    /* A whisper of brightness on the page sides of the valley -- the
+       glossy paper catches a little ambient light on the rising edge. */
     linear-gradient(
       90deg,
-      rgba(0, 0, 0, 0.10),
-      transparent 9%,
-      transparent 91%,
-      rgba(0, 0, 0, 0.10)
+      transparent 36%,
+      rgba(255, 253, 244, 0.06) 44%,
+      transparent 47%,
+      transparent 53%,
+      rgba(255, 253, 244, 0.06) 56%,
+      transparent 64%
+    ),
+    /* Outer-edge darkening at the far left/right of the spread, slightly
+       deeper than before to imply the stack of pages beneath. */
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.16),
+      transparent 7%,
+      transparent 93%,
+      rgba(0, 0, 0, 0.16)
     );
 }
 
@@ -456,28 +480,89 @@ button.meta-chip {
 
 .page-left {
   background:
+    /* Page-edge stack: faint cream/tan hairlines along the bottom and
+       outer (left) edges suggest the top sheet of a stack of paper. The
+       lines are inside the page bounds because .book-stage clips overflow. */
+    linear-gradient(180deg,
+      transparent 0,
+      transparent calc(100% - 7px),
+      rgba(186, 168, 142, 0.22) calc(100% - 7px),
+      rgba(186, 168, 142, 0.22) calc(100% - 6px),
+      transparent calc(100% - 6px),
+      transparent calc(100% - 5px),
+      rgba(186, 168, 142, 0.18) calc(100% - 5px),
+      rgba(186, 168, 142, 0.18) calc(100% - 4px),
+      transparent calc(100% - 4px),
+      transparent calc(100% - 3px),
+      rgba(186, 168, 142, 0.14) calc(100% - 3px),
+      rgba(186, 168, 142, 0.14) calc(100% - 2px),
+      transparent calc(100% - 2px)
+    ),
+    linear-gradient(90deg,
+      rgba(186, 168, 142, 0.20) 0,
+      rgba(186, 168, 142, 0.20) 1px,
+      transparent 1px,
+      transparent 2px,
+      rgba(186, 168, 142, 0.16) 2px,
+      rgba(186, 168, 142, 0.16) 3px,
+      transparent 3px,
+      transparent 4px,
+      rgba(186, 168, 142, 0.12) 4px,
+      rgba(186, 168, 142, 0.12) 5px,
+      transparent 5px
+    ),
     /* Directional lighting: slightly brighter top-outer corner, softly cooler toward the gutter. */
     radial-gradient(ellipse at 15% 0%, rgba(255, 253, 244, 0.55), transparent 48%),
     linear-gradient(180deg, rgba(250, 250, 242, 0.12), transparent 24%),
     linear-gradient(120deg, rgba(30, 37, 48, 0.06), transparent 18%);
-  /* Page-edge shadows on the three outer sides (top, left, bottom)
-     imply page thickness. The gutter side is handled by .spread::after. */
+  /* Deeper inset shadows on the three outer sides imply more page thickness.
+     The gutter side is handled by .spread::after. */
   box-shadow:
-    inset 6px 0 12px -6px rgba(0, 0, 0, 0.14),
-    inset 0 6px 10px -6px rgba(0, 0, 0, 0.10),
-    inset 0 -6px 12px -6px rgba(0, 0, 0, 0.12);
+    inset 8px 0 14px -8px rgba(0, 0, 0, 0.18),
+    inset 0 8px 12px -8px rgba(0, 0, 0, 0.12),
+    inset 0 -10px 16px -10px rgba(0, 0, 0, 0.18);
 }
 
 .page-right {
   background:
+    /* Page-edge stack: cream/tan hairlines on the bottom and outer (right)
+       edge, mirroring .page-left. */
+    linear-gradient(180deg,
+      transparent 0,
+      transparent calc(100% - 7px),
+      rgba(186, 168, 142, 0.22) calc(100% - 7px),
+      rgba(186, 168, 142, 0.22) calc(100% - 6px),
+      transparent calc(100% - 6px),
+      transparent calc(100% - 5px),
+      rgba(186, 168, 142, 0.18) calc(100% - 5px),
+      rgba(186, 168, 142, 0.18) calc(100% - 4px),
+      transparent calc(100% - 4px),
+      transparent calc(100% - 3px),
+      rgba(186, 168, 142, 0.14) calc(100% - 3px),
+      rgba(186, 168, 142, 0.14) calc(100% - 2px),
+      transparent calc(100% - 2px)
+    ),
+    linear-gradient(270deg,
+      rgba(186, 168, 142, 0.20) 0,
+      rgba(186, 168, 142, 0.20) 1px,
+      transparent 1px,
+      transparent 2px,
+      rgba(186, 168, 142, 0.16) 2px,
+      rgba(186, 168, 142, 0.16) 3px,
+      transparent 3px,
+      transparent 4px,
+      rgba(186, 168, 142, 0.12) 4px,
+      rgba(186, 168, 142, 0.12) 5px,
+      transparent 5px
+    ),
     radial-gradient(ellipse at 85% 0%, rgba(255, 253, 244, 0.55), transparent 48%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.54), transparent 30%),
     linear-gradient(180deg, rgba(30, 37, 48, 0.02), transparent 100%);
   border-left: 1px solid rgba(30, 37, 48, 0.08);
   box-shadow:
-    inset -6px 0 12px -6px rgba(0, 0, 0, 0.14),
-    inset 0 6px 10px -6px rgba(0, 0, 0, 0.10),
-    inset 0 -6px 12px -6px rgba(0, 0, 0, 0.12);
+    inset -8px 0 14px -8px rgba(0, 0, 0, 0.18),
+    inset 0 8px 12px -8px rgba(0, 0, 0, 0.12),
+    inset 0 -10px 16px -10px rgba(0, 0, 0, 0.18);
 }
 
 .paper-grain {
@@ -1146,8 +1231,10 @@ button.meta-chip {
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  width: min(1700px, 98vw);
-  margin: 0.8vh auto 0;
+  width: 100%;
+  max-width: 1700px;
+  margin: 0 auto;
+  flex: 0 0 auto;
   color: rgba(240, 234, 216, 0.76);
 }
 
@@ -1204,7 +1291,7 @@ button.meta-chip {
   letter-spacing: 0.18em;
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 520px) {
   .narrow-message {
     display: flex;
   }
@@ -1343,12 +1430,12 @@ body.preview-embed .app-shell {
 
 .flip-leaf.animating.forward {
   transform: perspective(2800px) rotateY(-168deg) translateZ(18px);
-  transition: transform 760ms cubic-bezier(0.24, 0.68, 0.2, 1);
+  transition: transform 1200ms cubic-bezier(0.45, 0.05, 0.25, 1);
 }
 
 .flip-leaf.animating.backward {
   transform: perspective(2800px) rotateY(168deg) translateZ(18px);
-  transition: transform 760ms cubic-bezier(0.24, 0.68, 0.2, 1);
+  transition: transform 1200ms cubic-bezier(0.45, 0.05, 0.25, 1);
 }
 
 .flip-leaf::before,
@@ -1472,7 +1559,6 @@ body.preview-embed .app-shell {
 
   <main class="book-frame">
     <div class="book-surface"></div>
-    <div class="hinge"></div>
     <section class="book-stage" id="book-stage" aria-live="polite"></section>
   </main>
 
@@ -2178,8 +2264,8 @@ function playFlipSound() {
   if (!soundEnabled) return;
   try {
     const audio = new Audio(FLIP_SOUND_PATH);
-    audio.volume = 0.24;
-    audio.playbackRate = 1;
+    audio.volume = 0.18;
+    audio.playbackRate = 0.78;
     audio.play().catch(() => {});
   } catch (error) {}
 }
@@ -2323,7 +2409,7 @@ function goTo(index) {
     currentIndex = index;
     updateBook(false);
     isAnimating = false;
-  }, 780);
+  }, 1220);
 
   prevButton.disabled = index === 0;
   nextButton.disabled = index === BOOK.length - 1;
