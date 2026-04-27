@@ -2720,18 +2720,29 @@ function buildBookPageFlip() {
   attachFacultyCardBehavior();
   attachTocBehavior();
 
-  // Add the center-gutter shadow overlay inside #pageflip-book (not
-  // bookStage). Keeping it inside the library's container means it
-  // participates in the same stacking context as the library's pages, so
-  // z-index:2 puts it above static pages (z-index 0) but below the animated
-  // flip canvas (which the library raises to much higher values internally).
-  // If it were a sibling of #pageflip-book in bookStage, it would always
-  // paint on top of everything regardless of its z-index.
-  if (!container.querySelector('.book-gutter-overlay')) {
+  // Add the center-gutter shadow overlay inside .stf__block -- the element
+  // the library creates inside #pageflip-book to hold all page nodes.
+  // .stf__block has perspective:2000px which makes it a stacking context;
+  // z-index:2 inside that context sits above static pages (z-index 1 from
+  // simpleDraw) while staying below every animated element the library
+  // raises during a flip: bottom-page z-index 3, flipping-page z-index 5,
+  // inner/outer shadows z-index 4-10.
+  //
+  // If the gutter were a sibling of .stf__wrapper (i.e. a direct child of
+  // #pageflip-book/.stf__parent), it would be in .stf__parent's stacking
+  // context at z-index 2 AFTER all z-index:auto children (.stf__wrapper has
+  // no z-index), permanently painting over every page and every flip
+  // animation regardless of the z-index values the library sets internally.
+  // That caused both the visible gusset-over-turning-page artifact and the
+  // "translucent" backward-flip appearance (the backward flip starts at the
+  // spine, directly under the gutter).
+  const stfBlock = container.querySelector('.stf__block');
+  const gutterHost = stfBlock || container;
+  if (!gutterHost.querySelector('.book-gutter-overlay')) {
     const gutter = document.createElement('div');
     gutter.className = 'book-gutter-overlay';
     gutter.setAttribute('aria-hidden', 'true');
-    container.appendChild(gutter);
+    gutterHost.appendChild(gutter);
   }
 
   // Resize handling via ResizeObserver on bookStage. Triggers a full
