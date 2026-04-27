@@ -1084,11 +1084,11 @@ button.meta-chip {
 .support-toggle {
   width: 100%;
   display: grid;
-  /* avatar | text | caret */
+  /* portrait avatar | text | caret */
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: 14px;
-  padding: 11px 6px 11px 0;
+  gap: 18px;
+  padding: 13px 6px 13px 2px;
   text-align: left;
   border: 0;
   background: transparent;
@@ -1101,18 +1101,25 @@ button.meta-chip {
 }
 
 .support-avatar {
-  width: calc(var(--support-avatar-size, 52) * 1px);
-  height: calc(var(--support-avatar-size, 52) * 1px);
-  border-radius: 50%;
+  /* Portrait rectangle: width is the slider-controlled --support-avatar-size,
+     height is 1.3x for an elegant 4:5 magazine-portrait crop. */
+  width: calc(var(--support-avatar-size, 64) * 1px);
+  height: calc(var(--support-avatar-size, 64) * 1.3px);
+  /* Softly rounded corners -- clipped, refined, not too playful. */
+  border-radius: 10px;
   object-fit: cover;
   object-position: center 22%;
   flex-shrink: 0;
-  border: 1.5px solid rgba(255, 255, 255, 0.95);
-  box-shadow: 0 2px 6px rgba(30, 37, 48, 0.12);
-  background: rgba(255, 255, 255, 0.78);
-  /* Force the higher-quality scaler when downsampling to small sizes;
-     default browser scaling produces visible JPEG artifacts on the
-     small round headshots. */
+  /* Crisp white inner border + thin warm outline = magazine-clipping feel. */
+  border: 1px solid rgba(255, 255, 255, 0.96);
+  outline: 1px solid rgba(30, 37, 48, 0.10);
+  outline-offset: 0;
+  box-shadow:
+    0 6px 14px rgba(30, 37, 48, 0.18),
+    0 1px 3px rgba(30, 37, 48, 0.10);
+  background: rgba(255, 255, 255, 0.80);
+  /* Force the high-quality scaler when downsampling so JPEG artifacts
+     in the source don't show as color bands at small sizes. */
   image-rendering: -webkit-optimize-contrast;
   image-rendering: high-quality;
 }
@@ -1120,13 +1127,16 @@ button.meta-chip {
 .support-avatar-mark {
   display: grid;
   place-items: center;
-  border: 1.5px solid rgba(200, 72, 38, 0.18);
-  box-shadow: 0 2px 6px rgba(30, 37, 48, 0.08);
+  border: 1px solid rgba(200, 72, 38, 0.20);
+  outline: 1px solid rgba(30, 37, 48, 0.08);
+  box-shadow:
+    0 6px 14px rgba(30, 37, 48, 0.10),
+    0 1px 3px rgba(30, 37, 48, 0.06);
 }
 
 .support-avatar-mark img {
-  width: calc(var(--support-avatar-size, 52) * 0.58px);
-  height: calc(var(--support-avatar-size, 52) * 0.58px);
+  width: calc(var(--support-avatar-size, 64) * 0.55px);
+  height: calc(var(--support-avatar-size, 64) * 0.55px);
 }
 
 .support-text strong {
@@ -1664,6 +1674,7 @@ function createDefaultSpreadLayout() {
     rightCardTitleFontSize: 16,
     rightCardMetaFontSize: 11,
     rightCardSummaryFontSize: 14,
+    rightCardAvatarSizePx: 64,
     rightListWidthPercent: 100
   };
 }
