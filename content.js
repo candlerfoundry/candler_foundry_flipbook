@@ -3,45 +3,33 @@ window.FLIPBOOK_CONTENT = [
     "type": "cover",
     "label": "Cover",
     "eyebrow": "The Candler Foundry at Emory",
-    "title": "The Foundry Field Guide",
-    "subtitle": "A curated guide to courses, faculty, and themes shaping theological education at The Candler Foundry.",
-    "tocEyebrow": "Inside this guide"
+    "title": "Courses in the Community",
+    "subtitle": "A field guide to the Foundry's open courses and partner-church classes — prepared for donors, deans, and curious congregations.",
+    "kicker": "Field Guide · 2026",
+    "photoCaption": "Foundry classroom · Atlanta"
   },
   {
     "type": "note",
     "label": "Foundry Note",
-    "leftEyebrow": "A Foundry note",
-    "title": "Scholarship that still feels hand-delivered.",
-    "copy": "The Candler Foundry partners with Candler School of Theology at Emory University to bring rigorous, accessible theological education to anyone ready for it - not just enrolled students, but curious learners, church leaders, and communities seeking deeper formation.",
+    "leftEyebrow": "From the Foundry",
+    "title": "Theology, taught the way it actually changes lives.",
+    "copy": "The Candler Foundry, an extension of Candler School of Theology at Emory University, brings rigorous theological learning out of the seminary and into the lives of partner churches and the wider public.",
     "points": [
       {
-        "title": "Who these courses are for",
-        "copy": "No prior theological training required. Foundry courses welcome learners from all backgrounds, traditions, and starting points."
+        "title": "Courses in the Community",
+        "copy": "We custom-design curricula for partner churches — designed in conversation with each congregation’s real interests, questions, and pastoral needs. Faculty travel to the church or teach over Zoom; congregations pick the topic, length, and emphasis."
       },
       {
-        "title": "How to use this guide",
-        "copy": "Use the page-turn navigation or the table of contents to jump directly to any course category that fits your audience."
+        "title": "Open Courses for the Public",
+        "copy": "Anyone, anywhere can register for our open courses, taught live over Zoom by Candler faculty for a low public price. No theological background required. Strong scholarship, accessible delivery, and an unhurried pace."
+      },
+      {
+        "title": "Why donors fund the Foundry",
+        "copy": "Every dollar widens access. Foundry programs underwrite the same Candler faculty who teach our MDiv students — making world-class theological education available to leaders and learners far beyond Atlanta."
       }
     ],
-    "rightEyebrow": "Themes in this guide",
-    "themes": [
-      {
-        "title": "New Testament",
-        "copy": "Paul's letters, John's theology, and the world of the early church - opened by some of the finest New Testament scholars at Candler."
-      },
-      {
-        "title": "Old Testament",
-        "copy": "Close attention to words, poetry, and the theological imagination of Israel's Scriptures, from sweeping surveys to twelve Hebrew words."
-      },
-      {
-        "title": "Biblical Interpretation & Justice",
-        "copy": "Where careful reading meets the urgent questions communities bring to Scripture - wilderness, liberation, and the prophetic tradition."
-      },
-      {
-        "title": "Preaching & Ministry",
-        "copy": "For those who teach, preach, and lead - grounded in craft, vocation, and the conviction that ministry is both skill and calling."
-      }
-    ]
+    "rightEyebrow": "Inside this guide",
+    "tocTitle": "Course themes featured in this issue"
   },
   {
     "type": "spread",
