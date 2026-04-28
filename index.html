@@ -1441,6 +1441,19 @@ button.meta-chip {
   opacity: 0 !important;
 }
 
+/* Backward-flip background fix --
+ * Applied to the .stf__item that currently has the `bottomPage` role
+ * during a backward flip (z-index 3, drawSoft inline transform). The
+ * library normally clips bottomPage to a polygon describing the
+ * "revealed" area under the peel; without clip the page paints across
+ * its full element bounds, giving the user a fully-visible destination
+ * spread under the peel animation instead of black space outside the
+ * polygon. */
+.stf__item.spfg-flip-unclip {
+  clip-path: none !important;
+  -webkit-clip-path: none !important;
+}
+
 /* ---- Floating overlay chrome (replaces the old topbar + footer) ---- */
 /*
  * The topbar and footer used to consume vertical layout space, squeezing
@@ -2864,7 +2877,10 @@ function buildBookPageFlip() {
   const updateHide = () => {
     if (!pageFlipInstance) return;
     if (pageFlipInstance.getState() === 'read') {
-      stfBlockEl.querySelectorAll('.spfg-flip-hide').forEach(el => el.classList.remove('spfg-flip-hide'));
+      stfBlockEl.querySelectorAll('.spfg-flip-hide, .spfg-flip-unclip').forEach(el => {
+        el.classList.remove('spfg-flip-hide');
+        el.classList.remove('spfg-flip-unclip');
+      });
       return;
     }
     const items = Array.from(stfBlockEl.querySelectorAll('.spf-page.stf__item'));
@@ -2882,10 +2898,23 @@ function buildBookPageFlip() {
     items.forEach((el) => {
       const inlineCss = el.style.cssText;
       const isCurrentVisible = el.classList.contains('--simple') && inlineCss.indexOf('display: block') !== -1;
-      if (isBackward && isCurrentVisible) {
+      // For a backward flip, the bleed-through happens in the LEFT slot only
+      // (current --left page paints over the bottomPage NT-left). The right
+      // slot has Hebrew-right at z-1 and no z-3 bottomPage there, so no
+      // bleed conflict. Leaving the current right page visible keeps the
+      // right slot from going black during the flip.
+      const isCurrentLeft = isCurrentVisible && el.classList.contains('--left');
+      // bottomPage: z-index 3 inline + no --simple (drawSoft removed it).
+      const isBottomPage = !el.classList.contains('--simple') && inlineCss.indexOf('z-index: 3') !== -1;
+      if (isBackward && isCurrentLeft) {
         el.classList.add('spfg-flip-hide');
       } else {
         el.classList.remove('spfg-flip-hide');
+      }
+      if (isBackward && isBottomPage) {
+        el.classList.add('spfg-flip-unclip');
+      } else {
+        el.classList.remove('spfg-flip-unclip');
       }
     });
     requestAnimationFrame(updateHide);
@@ -2895,7 +2924,10 @@ function buildBookPageFlip() {
     if (state === 'flipping' || state === 'user_fold' || state === 'fold_corner') {
       requestAnimationFrame(updateHide);
     } else if (state === 'read') {
-      stfBlockEl.querySelectorAll('.spfg-flip-hide').forEach(el => el.classList.remove('spfg-flip-hide'));
+      stfBlockEl.querySelectorAll('.spfg-flip-hide, .spfg-flip-unclip').forEach(el => {
+        el.classList.remove('spfg-flip-hide');
+        el.classList.remove('spfg-flip-unclip');
+      });
     }
   });
 
