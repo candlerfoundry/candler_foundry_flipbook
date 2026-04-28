@@ -1402,6 +1402,13 @@ button.meta-chip {
      an inner .spf-page-clip wrapper that has the default flat
      transform-style. */
   position: relative;
+  /* Page navigation is via arrow buttons / keys only, so any cursor drag
+     inside the spread is incidental -- prevent it from leaving a blue
+     text-selection highlight streaked across the page. */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 .spf-page-clip {
   position: absolute;
@@ -2746,12 +2753,27 @@ function buildBookPageFlip() {
     mobileScrollSupport: true,
     swipeDistance: 30,
     clickEventForward: true,
-    /* disableFlipByClick: true means the library only flips on corner
-       grab/drag -- clicks anywhere ELSE in the page pass through to inner
-       buttons (faculty card 'Tap for bio', supporting card accordion,
-       TOC items). */
-    disableFlipByClick: true,
-    useMouseEvents: true,
+    /* Page turns are initiated only by the arrow buttons (#prev-button /
+       #next-button) and the keyboard handler (ArrowLeft / ArrowRight,
+       PageUp / PageDown, Home / End) -- both call into the PageFlip API
+       directly via `goTo(...)`. We turn off the library's own mouse
+       handlers so:
+         * hovering near a page corner doesn't trigger StPageFlip's
+           `showCorner` fold preview (which was rendering the active page
+           semi-transparent and showing a phantom curled corner at the
+           bottom of the screen),
+         * hovering near the right-page top corner doesn't race with the
+           supporting card "+" toggle (the most common false flip on the
+           old configuration),
+         * click-and-drag through page text doesn't get hijacked into a
+           fold gesture, so text-selection highlights don't streak across
+           the spread.
+       Inner buttons (faculty card 'Tap for bio', accordion toggles, TOC
+       links) still work because they're handled by ordinary DOM event
+       listeners we attach in attachAccordionBehavior / attachFacultyCardBehavior
+       / attachTocBehavior. */
+    useMouseEvents: false,
+    showPageCorners: false,
     maxShadowOpacity: 0.5,
     startPage: Math.max(0, currentIndex * 2),
   });
