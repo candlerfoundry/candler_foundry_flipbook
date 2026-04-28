@@ -1429,6 +1429,18 @@ button.meta-chip {
   /* transform: scale(...) is set via JS on every (re)build. */
 }
 
+/* Backward-flip paint-order fix --
+ * Applied via JS to the static current-spread pages while a backward flip
+ * is in progress. The library's 3D rendering context (perspective on
+ * .stf__block + transform-style: preserve-3d on .stf__item) makes
+ * Chromium ignore both z-index AND DOM order for sibling .stf__item
+ * paint, so we instead force the source pages out of view with a CSS
+ * class. Class survives the library's per-frame `cssText` resets
+ * because cssText only replaces inline style, not class state. */
+.stf__item.spfg-flip-hide {
+  opacity: 0 !important;
+}
+
 /* ---- Floating overlay chrome (replaces the old topbar + footer) ---- */
 /*
  * The topbar and footer used to consume vertical layout space, squeezing
@@ -2809,6 +2821,83 @@ function buildBookPageFlip() {
     observer.observe(bookStage);
     buildBookPageFlip._resizeObserver = observer;
   }
+
+  // ---- Backward-flip paint-order fix --------------------------------
+  //
+  // StPageFlip v2.0.7 puts every page into a 3D rendering context:
+  // .stf__block has `perspective: 2000px`, every .stf__item carries
+  // `transform-style: preserve-3d`. Inside that context Chromium
+  // ignores `z-index` and DOM order for sibling stacking; siblings end
+  // up painted by some compositor-layer ordering that doesn't match
+  // either authoring signal.
+  //
+  // Forward flips happen to look correct because of how the active
+  // pages (bottomPage in the right slot, flippingPage rotating in
+  // from the corner) interact with the static current spread on the
+  // left -- no visible occlusion conflict.
+  //
+  // Backward flips put the active pages (bottomPage = previous spread's
+  // left page; flippingPage = previous spread's right page) at the
+  // SAME slot positions as the static current spread, so the current
+  // spread paints over them. The user sees the current page bleeding
+  // through the new page that's supposed to be revealed under the peel.
+  // The visual was the New-Testament/Hebrew-Insights case in the field
+  // report.
+  //
+  // Approach taken: rather than fight the 3D context, just hide the
+  // current spread's static pages (`--simple` + display:block) for
+  // the duration of any flip whose active pages sit EARLIER in DOM than
+  // the current spread (i.e., a backward flip). For backward flips this
+  // makes the active flip pages the only thing rendered in the spread
+  // area, which matches what the user expects to see.
+  //
+  // The hide is applied via a CSS class (.spfg-flip-hide) rather than
+  // inline opacity because the library's `simpleDraw` rewrites
+  // `style.cssText` on every render frame, which would wipe an inline
+  // opacity. A class survives the cssText reset.
+  //
+  // We re-evaluate every animation frame because the library can swap
+  // its `leftPage` / `rightPage` references mid-flip, which would shift
+  // which page has --simple. The check is cheap (~20 element
+  // attribute lookups).
+  const stfBlockEl = container.querySelector('.stf__block');
+  const updateHide = () => {
+    if (!pageFlipInstance) return;
+    if (pageFlipInstance.getState() === 'read') {
+      stfBlockEl.querySelectorAll('.spfg-flip-hide').forEach(el => el.classList.remove('spfg-flip-hide'));
+      return;
+    }
+    const items = Array.from(stfBlockEl.querySelectorAll('.spf-page.stf__item'));
+    let lastActiveIdx = -1;
+    let lastCurrentIdx = -1;
+    items.forEach((el, i) => {
+      const inlineCss = el.style.cssText;
+      const isActive = !!el.style.transform && !el.classList.contains('--simple');
+      const isCurrentVisible = el.classList.contains('--simple') && inlineCss.indexOf('display: block') !== -1;
+      if (isActive) lastActiveIdx = i;
+      if (isCurrentVisible) lastCurrentIdx = i;
+    });
+    // Only hide on backward: active pages earlier in DOM than current.
+    const isBackward = lastActiveIdx >= 0 && lastCurrentIdx >= 0 && lastActiveIdx < lastCurrentIdx;
+    items.forEach((el) => {
+      const inlineCss = el.style.cssText;
+      const isCurrentVisible = el.classList.contains('--simple') && inlineCss.indexOf('display: block') !== -1;
+      if (isBackward && isCurrentVisible) {
+        el.classList.add('spfg-flip-hide');
+      } else {
+        el.classList.remove('spfg-flip-hide');
+      }
+    });
+    requestAnimationFrame(updateHide);
+  };
+  pageFlipInstance.on('changeState', (e) => {
+    const state = e.data;
+    if (state === 'flipping' || state === 'user_fold' || state === 'fold_corner') {
+      requestAnimationFrame(updateHide);
+    } else if (state === 'read') {
+      stfBlockEl.querySelectorAll('.spfg-flip-hide').forEach(el => el.classList.remove('spfg-flip-hide'));
+    }
+  });
 
   // Update UI when the user (or our nav buttons) flips a page.
   pageFlipInstance.on('flip', (e) => {
