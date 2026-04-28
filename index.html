@@ -876,16 +876,25 @@ button.meta-chip {
   padding: 32px 34px 32px;
   color: var(--navy);
   overflow: hidden;
+  /* Flex column for the new Option-2 layout: header → eyebrow pill → hero
+     image band → bottom 2-column grid. The grid uses flex: 1 so it fills
+     the remaining vertical space below the hero. */
+  display: flex;
+  flex-direction: column;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(244, 237, 224, 0.96)),
     linear-gradient(180deg, rgba(250, 250, 242, 0.55), rgba(240, 234, 216, 0.45));
 }
 
 .feature-canvas {
+  /* Flex column so the new Option-2 regions stack top-to-bottom. */
   position: relative;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
-  min-height: 100%;
+  flex: 1;
+  min-height: 0;
 }
 
 .feature-image-card {
@@ -907,10 +916,9 @@ button.meta-chip {
 }
 
 .feature-genre {
-  position: absolute;
-  left: 0;
-  top: calc(var(--genre-y, 4) * 1%);
-  width: min(calc(var(--genre-width, 72) * 1%), 100%);
+  /* Now flows as a flex item at the top of the left page. */
+  position: static;
+  margin: 0 0 8px;
   font-family: var(--genre-font-family, "DM Mono", monospace);
   font-size: var(--genre-font-size, 24px);
   letter-spacing: 0.18em;
@@ -930,6 +938,141 @@ button.meta-chip {
   text-transform: uppercase;
   color: rgba(122, 107, 90, 0.92);
   line-height: 1;
+}
+
+/* New Option-2 layout: orange "★ Featured Course" pill replaces the gray
+   .feature-course-label. Flows as a flex item just below the genre. */
+.featured-eyebrow {
+  display: inline-block;
+  align-self: flex-start;
+  margin: 0 0 14px;
+  background: var(--orange-red, #E8541A);
+  color: #FFFFFF;
+  font-family: "Montserrat", "Segoe UI", sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 2px;
+}
+
+/* Hero image band: full page width, 3:2 ratio (our native asset format).
+   flex-shrink: 0 prevents the bottom grid from squishing it. */
+.featured-hero {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  border-radius: 4px;
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+  margin: 0 0 18px;
+  flex-shrink: 0;
+  background: var(--ivory);
+}
+.featured-hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Bottom region: 2-column grid that fills the remaining space.
+   Left = fluid text block; right = fixed-width instructor card. */
+.featured-bottom {
+  display: grid;
+  grid-template-columns: 1fr 130px;
+  gap: 16px;
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+}
+
+.featured-text-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.featured-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1A1A1A;
+  margin: 0 0 8px 0;
+  line-height: 1.18;
+}
+.featured-desc {
+  font-family: "Montserrat", "Segoe UI", sans-serif;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #3A3128;
+  margin: 0;
+}
+
+/* Compact instructor card front face. The back face (bio) is unchanged --
+   only the front layout is restyled. The card still uses the existing
+   .faculty-card flip mechanism (transform-style: preserve-3d, click toggles
+   .is-flipped). */
+.featured-instructor-card {
+  position: relative;
+  background: #FDFAF0;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-left: 3px solid var(--orange-red, #E8541A);
+  border-radius: 3px;
+  padding: 14px 10px;
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.featured-instructor-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  margin: 0 auto 10px;
+}
+.featured-instructor-avatar.is-fallback {
+  background: #FDFAF0;
+  display: grid;
+  place-items: center;
+}
+.featured-instructor-avatar.is-fallback img {
+  width: 60%;
+  height: 60%;
+  object-fit: contain;
+}
+.featured-instructor-label {
+  font-family: "Montserrat", "Segoe UI", sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: #888888;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+  font-weight: 600;
+}
+.featured-instructor-name {
+  font-family: "Montserrat", "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1A1A1A;
+  line-height: 1.2;
+  margin: 0 0 0;
+}
+.featured-instructor-bio-link {
+  font-family: "Montserrat", "Segoe UI", sans-serif;
+  font-size: 9px;
+  color: var(--orange-red, #E8541A);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 600;
+  border-top: 1px dashed rgba(0, 0, 0, 0.18);
+  padding-top: 8px;
+  margin-top: 10px;
+  width: 100%;
 }
 
 /* Right-page header pair: orange uppercase genre matching the left page's
@@ -1013,6 +1156,40 @@ button.meta-chip {
   max-width: none;
   transform: translateX(-50%);
   perspective: 1400px;
+}
+
+/* Option-2 layout: when the slot is inside the bottom grid, it should fill
+   its grid cell rather than absolutely positioning itself to the page. */
+.featured-bottom .faculty-card-slot.featured-instructor-slot {
+  position: relative;
+  left: auto;
+  top: auto;
+  transform: none;
+  width: 100%;
+  perspective: 1400px;
+  align-self: stretch;
+  height: 100%;
+}
+.featured-bottom .faculty-card.featured-instructor-card {
+  min-height: 0;
+  height: 100%;
+}
+/* The .faculty-card-face inside the new card is positioned absolutely
+   (existing rule) so the front and back overlap for the flip. The new
+   front face needs all the centered-content styling we defined on the
+   outer .featured-instructor-card -- copy it onto the front face too. */
+.featured-bottom .faculty-card-face.featured-instructor-front {
+  background: #FDFAF0;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-left: 3px solid var(--orange-red, #E8541A);
+  border-radius: 3px;
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-shadow: none;
 }
 
 .faculty-card {
@@ -2723,18 +2900,23 @@ function renderFacultyCard(entry) {
     `--faculty-card-height:${cardHeight}`
   ].join("; ");
 
+  // Option-2 compact instructor card. The wrapper (.faculty-card-slot) and
+  // the flip mechanics (.faculty-card, .faculty-card-inner, .faculty-card-face,
+  // is-flipped class via JS) are preserved -- only the FRONT face is restyled.
+  // The back face stays the existing bio panel.
+  const frontInner = resolvedHeadshot
+    ? `<img class="featured-instructor-avatar" src="${resolvedHeadshot}" alt="${feature.instructor || "Instructor headshot"}">`
+    : `<span class="featured-instructor-avatar is-fallback" aria-hidden="true"><img src="assets/branding/foundry-logomark-orange.png" alt=""></span>`;
+  const bioLinkText = showBack ? "Tap for Bio ↻" : "";
   return `
-    <div class="faculty-card-slot" style="${cssVars};">
-      <button class="faculty-card" type="button" aria-pressed="false"${showBack ? ' aria-label="Tap to see instructor bio"' : ""}>
+    <div class="faculty-card-slot featured-instructor-slot">
+      <button class="faculty-card featured-instructor-card" type="button" aria-pressed="false"${showBack ? ' aria-label="Tap to see instructor bio"' : ""}>
         <div class="faculty-card-inner">
-          <div class="faculty-card-face faculty-card-front">
-            <div class="${avatarClass}">${avatarInner}</div>
-            <div class="faculty-card-copy">
-              <span class="faculty-kicker">Instructor</span>
-              <strong>${feature.instructor || ""}</strong>
-              <p class="faculty-blurb">${blurbText}</p>
-            </div>
-            ${flipHintFront}
+          <div class="faculty-card-face faculty-card-front featured-instructor-front">
+            ${frontInner}
+            <div class="featured-instructor-label">Instructor</div>
+            <div class="featured-instructor-name">${feature.instructor || ""}</div>
+            ${bioLinkText ? `<div class="featured-instructor-bio-link">${bioLinkText}</div>` : ""}
           </div>
           ${backFace}
         </div>
@@ -2768,11 +2950,16 @@ function renderSpread(entry, index) {
   return `
     <div class="page page-left feature-left">
       <div class="feature-canvas">
-        <div class="feature-genre" style="--genre-y:${genreY}; --genre-width:${genreWidth}; --genre-font-size:${genreFontSize}px; --genre-font-family:${getEditorFontFamily(layout.genreFontFamily || "montserrat", "text")};">${entry.genre}</div>
-        <div class="feature-course-label" style="--course-label-y:${courseLabelY}; --course-label-width:${courseLabelWidth}; --course-label-font-size:${courseLabelFontSize}px; --course-label-font-family:${getEditorFontFamily(layout.courseLabelFontFamily || "mono", "meta")};">${feature.courseLabel || "Featured Course"}</div>
-        ${feature.image ? `<div class="feature-image-card" style="--image-y:${imageY}; --image-scale:${imageScale}; --image-shadow:${getImageShadow(layout.imageShadow || "soft")};"><img src="${feature.image}" alt="${feature.title || entry.label || entry.genre || ""}"></div>` : ""}
-        ${blocks.map((block) => renderLeftBlock(block)).join("")}
-        ${renderFacultyCard(entry)}
+        <div class="feature-genre" style="--genre-font-size:${genreFontSize}px; --genre-font-family:${getEditorFontFamily(layout.genreFontFamily || "montserrat", "text")};">${entry.genre}</div>
+        <span class="featured-eyebrow">★ ${feature.courseLabel || "Featured Course"}</span>
+        ${feature.image ? `<div class="featured-hero"><img src="${feature.image}" alt="${feature.title || entry.label || entry.genre || ""}"></div>` : `<div class="featured-hero" aria-hidden="true"></div>`}
+        <div class="featured-bottom">
+          <div class="featured-text-block">
+            <h2 class="featured-title">${feature.title || ""}</h2>
+            <p class="featured-desc">${feature.lede || ""}</p>
+          </div>
+          ${renderFacultyCard(entry)}
+        </div>
         <div class="paper-grain"></div>
       </div>
     </div>
