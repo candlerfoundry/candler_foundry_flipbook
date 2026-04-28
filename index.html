@@ -2340,7 +2340,11 @@ function applyMasterSpreadTemplate(data) {
     : createDefaultLeftBlocks(masterEntry);
 
   spreadEntries.forEach(({ entry }, spreadOrder) => {
-    entry.supportTitle = masterEntry.supportTitle || entry.supportTitle || "Also in this theme";
+    // Each spread's own supportTitle wins over the master template's,
+    // so the right-page heading reflects the spread's category
+    // (e.g., "Other Old Testament Courses") rather than always inheriting
+    // the first spread's heading.
+    entry.supportTitle = entry.supportTitle || masterEntry.supportTitle || "Also in this theme";
     entry.layout = {
       ...(entry.layout || {}),
       ...masterLayout
