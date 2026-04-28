@@ -2465,8 +2465,9 @@ function renderNote(index) {
 
 function renderSupportItem(item, itemIndex, spreadIndex) {
   const itemId = `support-${spreadIndex}-${itemIndex}`;
-  const isOpen = itemIndex === 0 ? " is-open" : "";
-  const panelHeight = itemIndex === 0 ? ` style="max-height:240px;"` : "";
+  // Supporting items default to collapsed; users expand by tapping.
+  const isOpen = "";
+  const panelHeight = "";
   // Resolve headshot: explicit field wins; otherwise look up by instructor name;
   // if neither, fall back to the Foundry logomark disc (same pattern as the faculty card).
   const resolvedHeadshot = item.headshot || getDefaultHeadshot(item.instructor || "");
@@ -2475,11 +2476,11 @@ function renderSupportItem(item, itemIndex, spreadIndex) {
     : `<span class="support-avatar support-avatar-mark" aria-hidden="true"><img src="assets/branding/foundry-logomark-orange.png" alt=""></span>`;
   return `
     <article class="support-item${isOpen}">
-      <button class="support-toggle" type="button" aria-expanded="${itemIndex === 0}" aria-controls="${itemId}">
+      <button class="support-toggle" type="button" aria-expanded="false" aria-controls="${itemId}">
         ${avatar}
         <div class="support-text">
           <strong>${item.title}</strong>
-          <span>${item.instructor || ""}</span>
+          <span>${item.instructorUrl ? `<a href="${item.instructorUrl}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation();">${item.instructor || ""}</a>` : (item.instructor || "")}</span>
         </div>
         <span class="support-caret" aria-hidden="true">+</span>
       </button>
