@@ -99,19 +99,19 @@ window.FLIPBOOK_CONTENT = [
       }
     ],
     "layout": {
-      "imageY": 9,
+      "imageY": 14,
       "imageScalePercent": 69,
       "imageShadow": "soft",
       "genreY": 1,
       "genreFontSize": 27,
       "genreFontFamily": "mono",
       "genreWidthPercent": 72,
-      "courseLabelY": 55,
+      "courseLabelY": 9,
       "courseLabelFontSize": 18,
       "courseLabelFontFamily": "mono",
       "courseLabelWidthPercent": 52,
-      "facultyY": 79,
-      "facultyScalePercent": 86,
+      "facultyY": 80,
+      "facultyScalePercent": 75,
       "facultyWidthPercent": 65,
       "rightHeadingFontSize": 31,
       "rightHeadingWidthPercent": 100,
@@ -127,10 +127,10 @@ window.FLIPBOOK_CONTENT = [
       "imageAlign": "center",
       "blockGap": 12,
       "genreX": 0,
-      "facultyAvatarSizePx": 128,
-      "facultyNameSizePx": 22,
+      "facultyAvatarSizePx": 88,
+      "facultyNameSizePx": 18,
       "rightCardAvatarSizePx": 70,
-      "facultyBlurbSizePx": 12
+      "facultyBlurbSizePx": 11
     },
     "leftBlocks": [
       {
@@ -217,19 +217,19 @@ window.FLIPBOOK_CONTENT = [
       }
     ],
     "layout": {
-      "imageY": 9,
+      "imageY": 14,
       "imageScalePercent": 69,
       "imageShadow": "soft",
       "genreY": 1,
       "genreFontSize": 27,
       "genreFontFamily": "mono",
       "genreWidthPercent": 72,
-      "courseLabelY": 55,
+      "courseLabelY": 9,
       "courseLabelFontSize": 18,
       "courseLabelFontFamily": "mono",
       "courseLabelWidthPercent": 52,
-      "facultyY": 79,
-      "facultyScalePercent": 86,
+      "facultyY": 80,
+      "facultyScalePercent": 75,
       "facultyWidthPercent": 65,
       "rightHeadingFontSize": 31,
       "rightHeadingWidthPercent": 100,
@@ -245,10 +245,10 @@ window.FLIPBOOK_CONTENT = [
       "imageAlign": "center",
       "blockGap": 12,
       "genreX": 0,
-      "facultyAvatarSizePx": 128,
-      "facultyNameSizePx": 22,
+      "facultyAvatarSizePx": 88,
+      "facultyNameSizePx": 18,
       "rightCardAvatarSizePx": 70,
-      "facultyBlurbSizePx": 12
+      "facultyBlurbSizePx": 11
     },
     "leftBlocks": [
       {
@@ -340,19 +340,19 @@ window.FLIPBOOK_CONTENT = [
       }
     ],
     "layout": {
-      "imageY": 9,
+      "imageY": 14,
       "imageScalePercent": 69,
       "imageShadow": "soft",
       "genreY": 1,
       "genreFontSize": 27,
       "genreFontFamily": "mono",
       "genreWidthPercent": 72,
-      "courseLabelY": 55,
+      "courseLabelY": 9,
       "courseLabelFontSize": 18,
       "courseLabelFontFamily": "mono",
       "courseLabelWidthPercent": 52,
-      "facultyY": 79,
-      "facultyScalePercent": 86,
+      "facultyY": 80,
+      "facultyScalePercent": 75,
       "facultyWidthPercent": 65,
       "rightHeadingFontSize": 31,
       "rightHeadingWidthPercent": 100,
@@ -368,10 +368,10 @@ window.FLIPBOOK_CONTENT = [
       "imageAlign": "center",
       "blockGap": 12,
       "genreX": 0,
-      "facultyAvatarSizePx": 128,
-      "facultyNameSizePx": 22,
+      "facultyAvatarSizePx": 88,
+      "facultyNameSizePx": 18,
       "rightCardAvatarSizePx": 70,
-      "facultyBlurbSizePx": 12
+      "facultyBlurbSizePx": 11
     },
     "leftBlocks": [
       {
@@ -454,19 +454,19 @@ window.FLIPBOOK_CONTENT = [
       }
     ],
     "layout": {
-      "imageY": 9,
+      "imageY": 14,
       "imageScalePercent": 69,
       "imageShadow": "soft",
       "genreY": 1,
       "genreFontSize": 27,
       "genreFontFamily": "mono",
       "genreWidthPercent": 72,
-      "courseLabelY": 55,
+      "courseLabelY": 9,
       "courseLabelFontSize": 18,
       "courseLabelFontFamily": "mono",
       "courseLabelWidthPercent": 52,
-      "facultyY": 79,
-      "facultyScalePercent": 86,
+      "facultyY": 80,
+      "facultyScalePercent": 75,
       "facultyWidthPercent": 65,
       "rightHeadingFontSize": 31,
       "rightHeadingWidthPercent": 100,
@@ -482,10 +482,10 @@ window.FLIPBOOK_CONTENT = [
       "imageAlign": "center",
       "blockGap": 12,
       "genreX": 0,
-      "facultyAvatarSizePx": 128,
-      "facultyNameSizePx": 22,
+      "facultyAvatarSizePx": 88,
+      "facultyNameSizePx": 18,
       "rightCardAvatarSizePx": 70,
-      "facultyBlurbSizePx": 12
+      "facultyBlurbSizePx": 11
     },
     "leftBlocks": [
       {
@@ -573,19 +573,19 @@ window.FLIPBOOK_CONTENT = [
       }
     ],
     "layout": {
-      "imageY": 9,
+      "imageY": 14,
       "imageScalePercent": 69,
       "imageShadow": "soft",
       "genreY": 1,
       "genreFontSize": 27,
       "genreFontFamily": "mono",
       "genreWidthPercent": 72,
-      "courseLabelY": 55,
+      "courseLabelY": 9,
       "courseLabelFontSize": 18,
       "courseLabelFontFamily": "mono",
       "courseLabelWidthPercent": 52,
-      "facultyY": 79,
-      "facultyScalePercent": 86,
+      "facultyY": 80,
+      "facultyScalePercent": 75,
       "facultyWidthPercent": 65,
       "rightHeadingFontSize": 31,
       "rightHeadingWidthPercent": 100,
@@ -601,10 +601,10 @@ window.FLIPBOOK_CONTENT = [
       "imageAlign": "center",
       "blockGap": 12,
       "genreX": 0,
-      "facultyAvatarSizePx": 128,
-      "facultyNameSizePx": 22,
+      "facultyAvatarSizePx": 88,
+      "facultyNameSizePx": 18,
       "rightCardAvatarSizePx": 70,
-      "facultyBlurbSizePx": 12
+      "facultyBlurbSizePx": 11
     },
     "leftBlocks": [
       {
@@ -688,19 +688,19 @@ window.FLIPBOOK_CONTENT = [
       }
     ],
     "layout": {
-      "imageY": 9,
+      "imageY": 14,
       "imageScalePercent": 69,
       "imageShadow": "soft",
       "genreY": 1,
       "genreFontSize": 27,
       "genreFontFamily": "mono",
       "genreWidthPercent": 72,
-      "courseLabelY": 55,
+      "courseLabelY": 9,
       "courseLabelFontSize": 18,
       "courseLabelFontFamily": "mono",
       "courseLabelWidthPercent": 52,
-      "facultyY": 79,
-      "facultyScalePercent": 86,
+      "facultyY": 80,
+      "facultyScalePercent": 75,
       "facultyWidthPercent": 65,
       "rightHeadingFontSize": 31,
       "rightHeadingWidthPercent": 100,
@@ -716,10 +716,10 @@ window.FLIPBOOK_CONTENT = [
       "imageAlign": "center",
       "blockGap": 12,
       "genreX": 0,
-      "facultyAvatarSizePx": 128,
-      "facultyNameSizePx": 22,
+      "facultyAvatarSizePx": 88,
+      "facultyNameSizePx": 18,
       "rightCardAvatarSizePx": 70,
-      "facultyBlurbSizePx": 12
+      "facultyBlurbSizePx": 11
     },
     "leftBlocks": [
       {
@@ -805,19 +805,19 @@ window.FLIPBOOK_CONTENT = [
       }
     ],
     "layout": {
-      "imageY": 9,
+      "imageY": 14,
       "imageScalePercent": 69,
       "imageShadow": "soft",
       "genreY": 1,
       "genreFontSize": 27,
       "genreFontFamily": "mono",
       "genreWidthPercent": 72,
-      "courseLabelY": 55,
+      "courseLabelY": 9,
       "courseLabelFontSize": 18,
       "courseLabelFontFamily": "mono",
       "courseLabelWidthPercent": 52,
-      "facultyY": 79,
-      "facultyScalePercent": 86,
+      "facultyY": 80,
+      "facultyScalePercent": 75,
       "facultyWidthPercent": 65,
       "rightHeadingFontSize": 31,
       "rightHeadingWidthPercent": 100,
@@ -833,10 +833,10 @@ window.FLIPBOOK_CONTENT = [
       "imageAlign": "center",
       "blockGap": 12,
       "genreX": 0,
-      "facultyAvatarSizePx": 128,
-      "facultyNameSizePx": 22,
+      "facultyAvatarSizePx": 88,
+      "facultyNameSizePx": 18,
       "rightCardAvatarSizePx": 70,
-      "facultyBlurbSizePx": 12
+      "facultyBlurbSizePx": 11
     },
     "leftBlocks": [
       {

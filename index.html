@@ -745,7 +745,8 @@ button.meta-chip {
 
 .feature-left {
   position: relative;
-  padding: 34px 34px 30px;
+  /* Equal top/bottom padding so the page reads as balanced top-to-bottom. */
+  padding: 32px 34px 32px;
   color: var(--navy);
   overflow: hidden;
   background:
@@ -802,6 +803,32 @@ button.meta-chip {
   text-transform: uppercase;
   color: rgba(122, 107, 90, 0.92);
   line-height: 1;
+}
+
+/* Right-page header pair: orange uppercase genre matching the left page's
+   .feature-genre, plus a smaller mono "Other Popular Courses" subheader
+   matching .feature-course-label. Static-positioned so they flow above
+   the support list rather than sitting at fixed Y like their absolute-
+   positioned cousins on the left page. */
+.section-genre {
+  margin: 0;
+  font-family: "DM Mono", monospace;
+  font-size: 24px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--orange-red);
+  line-height: 1;
+  align-self: flex-start;
+}
+.section-label {
+  margin: 0;
+  font-family: "DM Mono", monospace;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(122, 107, 90, 0.92);
+  line-height: 1;
+  align-self: flex-start;
 }
 
 .feature-block {
@@ -1021,8 +1048,9 @@ button.meta-chip {
 .feature-right {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 46px 42px 36px;
+  gap: 12px;
+  /* Equal top/bottom padding to match the left page rhythm. */
+  padding: 32px 42px 32px;
   overflow-y: auto;
   scrollbar-width: thin;
 }
@@ -1040,10 +1068,13 @@ button.meta-chip {
 
 
 .section-title {
+  /* Legacy class — replaced by .section-genre / .section-label above. Kept
+     for any older content that still renders an h3 with this class. */
   align-self: flex-start;
   width: min(calc(var(--right-heading-width, 82) * 1%), 100%);
   font-size: var(--right-heading-size, 44px);
   line-height: 0.98;
+  display: none;
 }
 
 .support-intro {
@@ -2610,7 +2641,7 @@ function renderSpread(entry, index) {
   const genreY = Math.max(0, Math.min(Number(layout.genreY) || 4, 25));
   const genreFontSize = Math.max(10, Math.min(Number(layout.genreFontSize) || 24, 42));
   const genreWidth = Math.max(24, Math.min(Number(layout.genreWidthPercent) || 72, 100));
-  const courseLabelY = Math.max(42, Math.min(Number(layout.courseLabelY) || 61, 78));
+  const courseLabelY = Math.max(3, Math.min(Number(layout.courseLabelY) || 9, 78));
   const courseLabelFontSize = Math.max(10, Math.min(Number(layout.courseLabelFontSize) || 12, 28));
   const courseLabelWidth = Math.max(24, Math.min(Number(layout.courseLabelWidthPercent) || 52, 100));
   const rightHeadingWidth = Math.max(35, Math.min(Number(layout.rightHeadingWidthPercent) || 82, 100));
@@ -2622,16 +2653,17 @@ function renderSpread(entry, index) {
     <div class="page page-left feature-left">
       <div class="feature-canvas">
         <div class="feature-genre" style="--genre-y:${genreY}; --genre-width:${genreWidth}; --genre-font-size:${genreFontSize}px; --genre-font-family:${getEditorFontFamily(layout.genreFontFamily || "montserrat", "text")};">${entry.genre}</div>
-        ${feature.image ? `<div class="feature-image-card" style="--image-y:${imageY}; --image-scale:${imageScale}; --image-shadow:${getImageShadow(layout.imageShadow || "soft")};"><img src="${feature.image}" alt="${feature.title || entry.label || entry.genre || ""}"></div>` : ""}
         <div class="feature-course-label" style="--course-label-y:${courseLabelY}; --course-label-width:${courseLabelWidth}; --course-label-font-size:${courseLabelFontSize}px; --course-label-font-family:${getEditorFontFamily(layout.courseLabelFontFamily || "mono", "meta")};">${feature.courseLabel || "Featured Course"}</div>
+        ${feature.image ? `<div class="feature-image-card" style="--image-y:${imageY}; --image-scale:${imageScale}; --image-shadow:${getImageShadow(layout.imageShadow || "soft")};"><img src="${feature.image}" alt="${feature.title || entry.label || entry.genre || ""}"></div>` : ""}
         ${blocks.map((block) => renderLeftBlock(block)).join("")}
         ${renderFacultyCard(entry)}
         <div class="paper-grain"></div>
       </div>
     </div>
     <div class="page page-right feature-right" style="--right-heading-size:${Math.max(24, Math.min(Number(layout.rightHeadingFontSize) || 44, 58))}px; --right-heading-width:${rightHeadingWidth}; --right-intro-size:${Math.max(12, Math.min(Number(layout.rightIntroFontSize) || 16, 24))}px; --right-intro-width:${rightIntroWidth}; --right-card-title-size:${Math.max(12, Math.min(Number(layout.rightCardTitleFontSize) || 16, 30))}px; --right-card-meta-size:${Math.max(9, Math.min(Number(layout.rightCardMetaFontSize) || 11, 18))}px; --right-card-summary-size:${Math.max(11, Math.min(Number(layout.rightCardSummaryFontSize) || 14, 22))}px; --support-avatar-size:${rightAvatarSize}; --right-list-width:${rightListWidth};">
-      <h3 class="section-title">${entry.supportTitle || "Also in this theme"}</h3>
-      <p class="support-intro">${entry.intro}</p>
+      <div class="section-genre">${entry.genre || ""}</div>
+      <div class="section-label">Other Popular Courses</div>
+      ${entry.intro ? `<p class="support-intro">${entry.intro}</p>` : ""}
       <div class="support-list">${supporting.map((item, i) => renderSupportItem(item, i, index)).join("")}</div>
       <div class="paper-grain"></div>
     </div>
