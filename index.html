@@ -790,6 +790,17 @@ button.meta-chip {
 .note-copy,
 .support-intro,
 .close-copy,
+/* Same orange-link rule applied inside the expanded support-panel area
+   so any inline links in summaries / panels match. */
+.support-panel a,
+.support-panel a:link,
+.support-panel a:visited,
+.support-panel a:hover,
+.support-panel a:active {
+  color: var(--orange-red, #E8541A);
+  text-decoration: underline;
+}
+
 .support-panel p {
   margin: 0;
   line-height: 1.7;
@@ -960,12 +971,15 @@ button.meta-chip {
 /* Hero image band: full page width, 3:2 ratio (our native asset format).
    flex-shrink: 0 prevents the bottom grid from squishing it. */
 .featured-hero {
-  width: 100%;
+  /* Shrunk ~15% from full width to give the bottom grid (title +
+     description, instructor card) more breathing room. Centered in the
+     page so the smaller graphic still reads as the spread's anchor. */
+  width: 85%;
   aspect-ratio: 3 / 2;
   border-radius: 4px;
   box-shadow: 0 5px 16px rgba(0, 0, 0, 0.18);
   overflow: hidden;
-  margin: 0 0 18px;
+  margin: 0 auto 16px;
   flex-shrink: 0;
   background: var(--ivory);
 }
@@ -1477,6 +1491,24 @@ button.meta-chip {
   height: calc(var(--support-avatar-size, 64) * 0.55px);
 }
 
+/* Right-page instructor name links: force Foundry orange across all link
+   states so they don't fall back to browser default blue / purple. The
+   underline is preserved so they still read as clearly clickable. */
+.support-text a,
+.support-text a:link,
+.support-text a:visited,
+.support-text a:hover,
+.support-text a:active,
+.support-text a:focus {
+  color: var(--orange-red, #E8541A);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+.support-text a:hover {
+  text-decoration-thickness: 2px;
+}
+
 .support-text strong {
   display: block;
   margin-bottom: 5px;
@@ -1521,6 +1553,17 @@ button.meta-chip {
 
 .support-panel-inner {
   padding: 0 4px 14px;
+}
+
+/* Same orange-link rule applied inside the expanded support-panel area
+   so any inline links in summaries / panels match. */
+.support-panel a,
+.support-panel a:link,
+.support-panel a:visited,
+.support-panel a:hover,
+.support-panel a:active {
+  color: var(--orange-red, #E8541A);
+  text-decoration: underline;
 }
 
 .support-panel p {
@@ -3284,12 +3327,38 @@ function buildBookPageFlip() {
   pageFlipInstance.on('changeState', (e) => {
     const state = e.data;
     if (state === 'flipping' || state === 'user_fold' || state === 'fold_corner') {
+      // Run synchronously RIGHT NOW so the very first frame of the
+      // animation is already guarded against the bleed-through, then
+      // re-run on every animation frame until the flip ends. Without the
+      // synchronous first call, frame 0 paints with the bug visible
+      // (current spread on top of the destination's bottomPage) before
+      // RAF gets a chance to fix it.
+      updateHide();
       requestAnimationFrame(updateHide);
     } else if (state === 'read') {
       stfBlockEl.querySelectorAll('.spfg-flip-hide, .spfg-flip-unclip').forEach(el => {
         el.classList.remove('spfg-flip-hide');
         el.classList.remove('spfg-flip-unclip');
       });
+    }
+  });
+
+  // Also run before EVERY click on the prev/next buttons so by the time
+  // the library starts the flip, the hide class is already poised. This
+  // catches the small window between mousedown and the library's first
+  // render frame where the un-guarded paint can show.
+  ['#prev-button', '#next-button'].forEach((sel) => {
+    const btn = document.querySelector(sel);
+    if (btn) {
+      btn.addEventListener('mousedown', () => {
+        // Small safety: schedule a few RAFs so the loop is established
+        // even if changeState is delayed by the library.
+        requestAnimationFrame(() => {
+          if (pageFlipInstance && pageFlipInstance.getState() !== 'read') {
+            updateHide();
+          }
+        });
+      }, { passive: true });
     }
   });
 
