@@ -994,7 +994,10 @@ button.meta-chip {
    Left = fluid text block; right = fixed-width instructor card. */
 .featured-bottom {
   display: grid;
-  grid-template-columns: 1fr 130px;
+  /* Right column is 25% wider than the original 130px so the instructor
+     card has more presence; the left column (title + description) gets
+     correspondingly narrower but has full vertical space to breathe. */
+  grid-template-columns: 1fr 162px;
   gap: 16px;
   align-items: stretch;
   flex: 1;
