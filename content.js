@@ -11,9 +11,9 @@ window.FLIPBOOK_CONTENT = [
   {
     "type": "note",
     "label": "Foundry Note",
-    "leftEyebrow": "Courses in the Community",
-    "title": "Theology for All.",
-    "copy": "Through our Courses in the Community program, The Foundry brings the best of Candler to living rooms and fellowship halls around the globe — taught by Candler faculty and other scholars, and built for everyone curious about Christian life and learning.",
+    "leftEyebrow": "",
+    "title": "Theology for All",
+    "copy": "Through Courses in the Community, The Foundry brings the best of Candler to living rooms and fellowship halls around the world. Taught by Candler faculty and other scholars, our courses make theological learning easy and affordable for curious learners everywhere.",
     "points": [
       {
         "tag": "Path 1 · Open",
@@ -30,11 +30,9 @@ window.FLIPBOOK_CONTENT = [
         "priceUnit": "/ session"
       }
     ],
-    "footnote": "A combination of seminary-style scholarship and lived faith you'll find nowhere else.",
     "rightEyebrow": "Get Started",
     "tocTitle": "Course Topics",
-    "banner": "assets/branding/friendly-students-2.png",
-    "bannerCaption": "Foundry classroom · Atlanta"
+    "banner": "assets/branding/friendly-students-2.png"
   },
   {
     "type": "spread",
