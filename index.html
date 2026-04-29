@@ -1154,11 +1154,11 @@ button.meta-chip {
    Left = fluid text block; right = fixed-width instructor card. */
 .featured-bottom {
   display: grid;
-  /* Right column is 25% wider than the original 130px so the instructor
-     card has more presence; the left column (title + description) gets
-     correspondingly narrower but has full vertical space to breathe. */
-  grid-template-columns: 1fr 162px;
-  gap: 16px;
+  /* Wider right column (200px) gives the instructor card more presence
+     and gives the back-face bio more room before it has to scroll.
+     Wider gap (24px) creates a clear gutter between the two columns. */
+  grid-template-columns: 1fr 200px;
+  gap: 24px;
   align-items: stretch;
   flex: 1;
   min-height: 0;
@@ -1168,6 +1168,10 @@ button.meta-chip {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  /* Internal padding so the description doesn't touch the page edge on
+     the left or the instructor card on the right. */
+  padding-left: 16px;
+  padding-right: 12px;
 }
 .featured-title {
   font-family: Georgia, "Times New Roman", serif;
@@ -1424,7 +1428,10 @@ button.meta-chip {
   transform: rotateY(180deg);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  /* Let the bio block fill the card; the "BACK TO FRONT" hint anchors
+     to the bottom-right via its own absolute positioning. */
+  align-items: stretch;
 }
 
 .faculty-avatar-large {
@@ -1486,12 +1493,16 @@ button.meta-chip {
 
 .faculty-bio {
   margin: 0;
+  flex: 1;
+  min-height: 0;
   font-size: calc(var(--faculty-bio-size, 12) * 1px);
   line-height: 1.55;
   color: rgba(30, 37, 48, 0.86);
   overflow-y: auto;
-  max-height: calc(var(--faculty-card-height, 190) * 1px - 70px);
   scrollbar-width: thin;
+  /* Padding-bottom so the last lines of the bio don't slide under the
+     "BACK TO FRONT ↺" hint when the bio is long enough to scroll. */
+  padding-bottom: 22px;
 }
 
 .faculty-flip-hint {
