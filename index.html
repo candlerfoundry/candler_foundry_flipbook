@@ -790,8 +790,15 @@ button.meta-chip {
 .note-copy,
 .support-intro,
 .close-copy,
+.support-panel p {
+  margin: 0;
+  line-height: 1.7;
+}
+
 /* Same orange-link rule applied inside the expanded support-panel area
-   so any inline links in summaries / panels match. */
+   so any inline links in summaries / panels match. (Was previously merged
+   into the .note-copy selector list above, which accidentally gave all
+   note-copy paragraphs an orange underline.) */
 .support-panel a,
 .support-panel a:link,
 .support-panel a:visited,
@@ -801,14 +808,55 @@ button.meta-chip {
   text-decoration: underline;
 }
 
-.support-panel p {
-  margin: 0;
-  line-height: 1.7;
-}
-
 .note-left,
 .close-left {
-  padding: 54px 52px 40px;
+  /* Equal top/bottom padding to match the other spreads' rhythm; slightly
+     tighter on the sides to give content a comfortable measure rather
+     than letting paragraphs run the full page width. */
+  padding: 36px 56px 36px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Soft horizontal photo banner at the top of the intro left page.
+   Uses the existing friendly-students-2.png (the same warm classroom
+   shot already on the cover) so the intro picks up the cover's visual
+   thread. Capped at 130px so it sets the mood without overpowering. */
+.note-banner {
+  position: relative;
+  width: 100%;
+  height: 130px;
+  margin-bottom: 18px;
+  border-radius: 6px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(20, 25, 33, 0.0) 40%, rgba(20, 25, 33, 0.42) 100%),
+    url("assets/branding/friendly-students-2.png") center 30%/cover;
+  flex-shrink: 0;
+}
+.note-banner-caption {
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  font-family: "DM Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(250, 250, 242, 0.92);
+}
+
+/* Cap the body paragraph + footnote to a comfortable measure so they
+   don't run edge-to-edge on a wide page. */
+.note-left .note-copy,
+.note-left .note-footnote {
+  max-width: 58ch;
+}
+
+/* Note-points grid: tighter so the two cards sit closer to the headline
+   and the price column has more breathing room. */
+.note-left .note-points {
+  margin-top: 18px;
+  gap: 12px;
 }
 
 .note-right,
@@ -829,9 +877,10 @@ button.meta-chip {
 }
 
 .note-title {
-  margin-top: 20px;
-  font-size: clamp(2rem, 3vw, 3rem);
-  line-height: 1;
+  /* Smaller default + tighter top margin for the new banner-led layout. */
+  margin-top: 14px;
+  font-size: clamp(1.7rem, 2.5vw, 2.4rem);
+  line-height: 1.04;
 }
 
 .note-copy {
@@ -2897,8 +2946,10 @@ function renderNote(index) {
     const copy = point.copy ? `<p class="point-copy">${point.copy}</p>` : "";
     return `<article class="note-point">${tagBlock}<strong>${point.title || ""}</strong>${copy}${priceBlock}</article>`;
   };
+  const bannerSrc = entry.banner || "";
   return `
     <div class="page page-left note-left">
+      ${bannerSrc ? `<div class="note-banner" style="background-image: linear-gradient(180deg, rgba(20, 25, 33, 0.0) 40%, rgba(20, 25, 33, 0.42) 100%), url('${bannerSrc}'); background-size: cover; background-position: center 30%;">${entry.bannerCaption ? `<span class=\"note-banner-caption\">${entry.bannerCaption}</span>` : ""}</div>` : `<div class="note-banner"><span class="note-banner-caption">Foundry classroom</span></div>`}
       <div class="eyebrow note-kicker">${entry.leftEyebrow || ""}</div>
       <h2 class="note-title">${entry.title || ""}</h2>
       <p class="note-copy">${entry.copy || ""}</p>

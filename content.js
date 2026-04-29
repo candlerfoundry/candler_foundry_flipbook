@@ -32,7 +32,9 @@ window.FLIPBOOK_CONTENT = [
     ],
     "footnote": "A combination of seminary-style scholarship and lived faith you'll find nowhere else.",
     "rightEyebrow": "Get Started",
-    "tocTitle": "Course Topics"
+    "tocTitle": "Course Topics",
+    "banner": "assets/branding/friendly-students-2.png",
+    "bannerCaption": "Foundry classroom · Atlanta"
   },
   {
     "type": "spread",
