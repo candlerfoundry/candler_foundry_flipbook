@@ -11,25 +11,28 @@ window.FLIPBOOK_CONTENT = [
   {
     "type": "note",
     "label": "Foundry Note",
-    "leftEyebrow": "From the Foundry",
-    "title": "Theology, taught the way it actually changes lives.",
-    "copy": "The Candler Foundry, an extension of Candler School of Theology at Emory University, brings rigorous theological learning out of the seminary and into the lives of partner churches and the wider public.",
+    "leftEyebrow": "Courses in the Community",
+    "title": "Theology for All.",
+    "copy": "Through our Courses in the Community program, The Foundry brings the best of Candler to living rooms and fellowship halls around the globe — taught by Candler faculty and other scholars, and built for everyone curious about Christian life and learning.",
     "points": [
       {
-        "title": "Courses in the Community",
-        "copy": "We custom-design curricula for partner churches — designed in conversation with each congregation’s real interests, questions, and pastoral needs. Faculty travel to the church or teach over Zoom; congregations pick the topic, length, and emphasis."
+        "tag": "Path 1 · Open",
+        "title": "Live Zoom courses, open to anyone",
+        "copy": "Four weekly sessions. No theological background required. Register, log in, learn.",
+        "price": "$50",
+        "priceUnit": "/ person"
       },
       {
-        "title": "Open Courses for the Public",
-        "copy": "Anyone, anywhere can register for our open courses, taught live over Zoom by Candler faculty for a low public price. No theological background required. Strong scholarship, accessible delivery, and an unhurried pace."
-      },
-      {
-        "title": "Why donors fund the Foundry",
-        "copy": "Every dollar widens access. Foundry programs underwrite the same Candler faculty who teach our MDiv students — making world-class theological education available to leaders and learners far beyond Atlanta."
+        "tag": "Path 2 · Custom",
+        "title": "Courses built with your church",
+        "copy": "Co-designed around your congregation's questions. Faculty travel to you, or teach over Zoom.",
+        "price": "$100",
+        "priceUnit": "/ session"
       }
     ],
-    "rightEyebrow": "Inside this guide",
-    "tocTitle": "Course themes featured in this issue"
+    "footnote": "A combination of seminary-style scholarship and lived faith you'll find nowhere else.",
+    "rightEyebrow": "Get Started",
+    "tocTitle": "Course Topics"
   },
   {
     "type": "spread",

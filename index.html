@@ -857,20 +857,93 @@ button.meta-chip {
 .editorial-rules article,
 .closing-list article {
   padding: 16px 18px;
-  border-radius: 18px;
+  border-radius: 12px;
 }
 
-.note-point,
+.note-point {
+  /* "Two paths" cards: warm cream surface with an orange accent rail and
+     a baseline price band. */
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(30, 37, 48, 0.08);
+  border-left: 3px solid var(--orange-red, #C84826);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "tag    price"
+    "title  price"
+    "copy   price";
+  column-gap: 16px;
+  row-gap: 4px;
+  align-items: baseline;
+}
+.note-point .point-tag {
+  grid-area: tag;
+  font-family: "DM Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--orange-red, #C84826);
+  font-weight: 600;
+}
+.note-point strong {
+  grid-area: title;
+  display: block;
+  font-family: "DM Serif Display", Georgia, serif;
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--navy);
+  line-height: 1.2;
+  margin: 0;
+}
+.note-point .point-copy {
+  grid-area: copy;
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: rgba(30, 37, 48, 0.84);
+}
+.note-point .point-price {
+  grid-area: price;
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+.note-point .point-price .price-num {
+  font-family: "DM Serif Display", Georgia, serif;
+  font-size: 28px;
+  color: var(--orange-red, #C84826);
+  line-height: 1;
+}
+.note-point .point-price .price-unit {
+  font-family: "DM Mono", monospace;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(122, 107, 90, 0.92);
+  margin-top: 4px;
+}
+
 .editorial-rules article {
   background: rgba(255, 255, 255, 0.62);
   border: 1px solid rgba(30, 37, 48, 0.08);
 }
-
-.note-point strong,
 .editorial-rules strong,
 .closing-list strong {
   display: block;
   margin-bottom: 6px;
+}
+
+/* Single-line marketplace footnote below the two cards. */
+.note-footnote {
+  margin: 18px 0 0;
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: rgba(122, 107, 90, 0.92);
+  line-height: 1.45;
 }
 
 .note-right {
@@ -2816,19 +2889,28 @@ function renderNote(index) {
   const points = Array.isArray(entry.points) ? entry.points : [];
   // Pull TOC from the spread entries so it stays in sync with the deck.
   const tocItems = getCoursePages();
+  const renderPoint = (point) => {
+    const priceBlock = (point.price)
+      ? `<div class="point-price"><span class="price-num">${point.price}</span>${point.priceUnit ? `<span class="price-unit">${point.priceUnit}</span>` : ""}</div>`
+      : "";
+    const tagBlock = point.tag ? `<span class="point-tag">${point.tag}</span>` : "";
+    const copy = point.copy ? `<p class="point-copy">${point.copy}</p>` : "";
+    return `<article class="note-point">${tagBlock}<strong>${point.title || ""}</strong>${copy}${priceBlock}</article>`;
+  };
   return `
     <div class="page page-left note-left">
       <div class="eyebrow note-kicker">${entry.leftEyebrow || ""}</div>
       <h2 class="note-title">${entry.title || ""}</h2>
       <p class="note-copy">${entry.copy || ""}</p>
       <div class="note-points">
-        ${points.map((point) => `<article class="note-point"><strong>${point.title || ""}</strong>${point.copy || ""}</article>`).join("")}
+        ${points.map(renderPoint).join("")}
       </div>
+      ${entry.footnote ? `<p class="note-footnote">${entry.footnote}</p>` : ""}
       <div class="paper-grain"></div>
     </div>
     <div class="page page-right note-right">
       <div class="eyebrow note-kicker">${entry.rightEyebrow || ""}</div>
-      <h3 class="toc-heading">${entry.tocTitle || "Themes in this guide"}</h3>
+      <h3 class="toc-heading">${entry.tocTitle || "Course Topics"}</h3>
       <div class="toc-list">
         ${tocItems.map(({ entry: tocEntry, index: tocIndex }, itemIndex) => `<button class="toc-item" type="button" data-target-index="${tocIndex}"><span class="toc-num">${String(itemIndex + 1).padStart(2, "0")}</span>${tocEntry.label || tocEntry.genre || `Category ${itemIndex + 1}`}</button>`).join("")}
       </div>
