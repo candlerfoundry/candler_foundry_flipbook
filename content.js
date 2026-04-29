@@ -52,18 +52,16 @@ window.FLIPBOOK_CONTENT = [
     },
     "supporting": [
       {
-        "title": "The Bible and Trauma",
-        "instructor": "Dr. Ryan Bonfiglio & Andrea Byer-Thomas",
-        "summary": "Reading Scripture alongside the realities of trauma — what biblical texts say, and don't say, about suffering, healing, and hope.",
-        "instructorUrl": "https://candlerfoundry.emory.edu/instructors/ryan-bonfiglio",
-        "headshot": "assets/headshots/ryan-bonfiglio.jpg"
+        "title": "Biblical Metaphors",
+        "instructor": "Dr. Ryan Bonfiglio",
+        "summary": "How biblical writers use metaphor to carry the deepest truths of Scripture, and how attending to those metaphors can transform our reading.",
+        "instructorUrl": "https://candlerfoundry.emory.edu/instructors/ryan-bonfiglio"
       },
       {
         "title": "Faith in the Wild",
         "instructor": "Dr. Elizabeth Arnold",
         "summary": "Wilderness as a recurring biblical setting and a recurring spiritual one — what it means to follow God through the wild.",
-        "instructorUrl": "https://candlerfoundry.emory.edu/instructors/elizabeth-arnold",
-        "headshot": "assets/headshots/elizabeth-arnold.jpg"
+        "instructorUrl": "https://candlerfoundry.emory.edu/instructors/elizabeth-arnold"
       },
       {
         "title": "How To Read the Bible for All Its Worth",
@@ -73,20 +71,19 @@ window.FLIPBOOK_CONTENT = [
       },
       {
         "title": "Desert Fathers and Mothers",
-        "instructor": "Brett Opalinski",
-        "summary": "Ancient Christian spirituality from the deserts of Egypt and Syria — what the Desert Fathers and Mothers can teach us today.",
-        "headshot": "assets/headshots/brett-opalinski.jpg"
+        "instructor": "Dr. Brett Opalinski",
+        "summary": "Ancient Christian spirituality from the deserts of Egypt and Syria — what the Desert Fathers and Mothers can teach us today."
       },
       {
-        "title": "The Lives and Stories of Biblical Women",
-        "instructor": "Mikayla Hamilton & Radiance Richardson",
-        "summary": "A close look at the women of Scripture whose stories often go unmentioned in Sunday's sermon."
+        "title": "Where Did My Bible Come From?",
+        "instructor": "Dr. Bo Adams",
+        "summary": "The history of how Scripture was assembled, copied, and translated into the Bible we read today."
       },
       {
         "title": "Blackness in the Bible",
         "instructor": "Dr. Joel Kemp",
         "summary": "African and African-descended people throughout the biblical text — and how faithful reading can recover what's been overlooked.",
-        "headshot": "assets/headshots/joel-kemp.jpg"
+        "instructorUrl": "https://candler.emory.edu/faculty-profiles/joel-b-kemp/"
       }
     ],
     "layout": {
@@ -184,7 +181,7 @@ window.FLIPBOOK_CONTENT = [
         "headshot": "assets/headshots/roger-nam.jpg"
       },
       {
-        "title": "Psalms: The Lamentable and the Praiseworthy",
+        "title": "Psalms of Lament and Praise",
         "instructor": "Dr. Don Saliers",
         "summary": "The full emotional range of the Psalter — grief, anger, praise, and the prayers that hold them together.",
         "instructorUrl": "https://candlerfoundry.emory.edu/instructors/don-saliers"
@@ -201,7 +198,7 @@ window.FLIPBOOK_CONTENT = [
       },
       {
         "title": "Ten Commandments",
-        "instructor": "Dr. Ryan Bonfiglio & Dr. Elizabeth Arnold",
+        "instructor": "Dr. Ryan Bonfiglio",
         "summary": "The Decalogue not as a list of rules but as a portrait of life lived in covenant.",
         "instructorUrl": "https://candlerfoundry.emory.edu/instructors/ryan-bonfiglio",
         "headshot": "assets/headshots/ryan-bonfiglio.jpg"
@@ -306,7 +303,8 @@ window.FLIPBOOK_CONTENT = [
         "title": "The Doctrine of the Trinity",
         "instructor": "Dr. Ian McFarland",
         "summary": "Why the church confesses one God in three persons — and why that grammar still matters.",
-        "headshot": "assets/headshots/ian-mcfarland.jpg"
+        "headshot": "assets/headshots/ian-mcfarland.jpg",
+        "instructorUrl": "https://candler.emory.edu/faculty-profiles/ian-a-mcfarland/"
       },
       {
         "title": "Paul's Letter to the Philippians",
@@ -420,7 +418,8 @@ window.FLIPBOOK_CONTENT = [
       {
         "title": "Rest is Resistance",
         "instructor": "Tricia Hersey",
-        "summary": "Tricia Hersey on the radical practice of rest — and why slowing down is itself a refusal."
+        "summary": "Tricia Hersey on the radical practice of rest — and why slowing down is itself a refusal.",
+        "instructorUrl": "http://www.triciahersey.com/"
       },
       {
         "title": "Spirituality for the Contemporary World",
@@ -429,9 +428,10 @@ window.FLIPBOOK_CONTENT = [
         "instructorUrl": "https://candlerfoundry.emory.edu/instructors/kwok-pui-lan"
       },
       {
-        "title": "Art and Spiritual Imagination",
-        "instructor": "Carlton Mackey & Andrew Westover",
-        "summary": "Looking at how art shapes — and is shaped by — the spiritual imagination."
+        "title": "Christian Ethics & Migration",
+        "instructor": "Bryan Ellrod",
+        "summary": "What does the Christian moral tradition have to say about migration, borders, and our responsibility to neighbors near and far?",
+        "instructorUrl": "https://humanities.wfu.edu/bryan-m-ellrod/"
       },
       {
         "title": "Notes of Rest",
@@ -541,14 +541,14 @@ window.FLIPBOOK_CONTENT = [
       },
       {
         "title": "UMC 101",
-        "instructor": "Dr. Brett Opalenski",
+        "instructor": "Dr. Brett Opalinski",
         "summary": "Rooted in faith, grounded in love: an accessible introduction to United Methodist history, theology, and identity."
       },
       {
-        "title": "Which way do we go next?",
-        "instructor": "Dr. Don Saliers & Dr. Amy Valdez-Barker",
-        "summary": "United Methodists navigating the future — the theology, the politics, and the practical questions.",
-        "instructorUrl": "https://candlerfoundry.emory.edu/instructors/don-saliers"
+        "title": "Spirituality and Health",
+        "instructor": "Dr. Lahronda Little",
+        "summary": "Where spiritual practice meets personal and communal wellbeing — pastoral care, ministry, and the shape of a healthy life.",
+        "instructorUrl": "https://drlahronda.com/"
       },
       {
         "title": "Trauma-Informed Care and Ministry",
@@ -557,10 +557,11 @@ window.FLIPBOOK_CONTENT = [
         "headshot": "assets/headshots/danielle-tummino-hansen.jpg"
       },
       {
-        "title": "Contexts, Contests, and Characters",
+        "title": "Tools for Biblical Exploration",
         "instructor": "Dr. Joel Kemp",
-        "summary": "Tools for biblical exploration: how the context of a passage shapes its meaning, and how to teach it well.",
-        "headshot": "assets/headshots/joel-kemp.jpg"
+        "summary": "Practical tools for reading any biblical passage in its full context — historical, literary, and theological.",
+        "headshot": "assets/headshots/joel-kemp.jpg",
+        "instructorUrl": "https://candler.emory.edu/faculty-profiles/joel-b-kemp/"
       }
     ],
     "layout": {
@@ -645,9 +646,10 @@ window.FLIPBOOK_CONTENT = [
     },
     "supporting": [
       {
-        "title": "Asian and Asian American Feminist Biblical Studies",
-        "instructor": "Maggie Low & Kwok Pui Lan",
-        "summary": "Reading Scripture from Asian and Asian American feminist perspectives."
+        "title": "Science and Faith: What does Athens have to do with Jerusalem?",
+        "instructor": "Dr. Ian McFarland",
+        "summary": "A theological exploration of the relationship between scientific inquiry and Christian faith — what they share, where they diverge, and how each shapes the other.",
+        "instructorUrl": "https://candler.emory.edu/faculty-profiles/ian-a-mcfarland/"
       },
       {
         "title": "AI and the Future of Christianity",
@@ -662,9 +664,9 @@ window.FLIPBOOK_CONTENT = [
         "instructorUrl": "https://candlerfoundry.emory.edu/instructors/ish-ruiz"
       },
       {
-        "title": "Reading the Bible Through a Transgender Lens",
-        "instructor": "Janine Warrington",
-        "summary": "Scripture re-read from a transgender perspective — what shifts when the question of gender is taken seriously."
+        "title": "Celtic Christianity",
+        "instructor": "Dr. Brett Opalinski",
+        "summary": "The distinctive theology, spirituality, and practices of the Celtic Christian tradition — and what it offers contemporary faith."
       },
       {
         "title": "Islam 101: Understanding Muslim Neighbors",
@@ -672,10 +674,11 @@ window.FLIPBOOK_CONTENT = [
         "summary": "An introduction to Islamic faith and practice for Christians who want to be better neighbors and better-informed."
       },
       {
-        "title": "The Stories We Tell",
+        "title": "Medievalism and White Supremacy",
         "instructor": "Sarah Bogue",
-        "summary": "Medievalism, white supremacy, and the stories Western Christianity continues to tell about its own past.",
-        "headshot": "assets/headshots/sarah-bogue.jpg"
+        "summary": "How medieval imagery and ideas have been used to underwrite white-supremacist movements — and how to read that history honestly.",
+        "headshot": "assets/headshots/sarah-bogue.jpg",
+        "instructorUrl": "https://candler.emory.edu/faculty-profiles/sarah-bogue/"
       }
     ],
     "layout": {
@@ -768,7 +771,8 @@ window.FLIPBOOK_CONTENT = [
       {
         "title": "Let's Talk About Immigration",
         "instructor": "Janelle Adams",
-        "summary": "An honest conversation about immigration, ethics, and the theology that should guide a Christian response."
+        "summary": "An honest conversation about immigration, ethics, and the theology that should guide a Christian response.",
+        "instructorUrl": "https://www.bethanylb.edu/dirbackend/recjqMGqXI7w9Fxnh"
       },
       {
         "title": "Queer and Catholic",
@@ -780,13 +784,15 @@ window.FLIPBOOK_CONTENT = [
         "title": "Ecology, Climate, and the Bible",
         "instructor": "Dr. Jennifer Ayres",
         "summary": "What Scripture says about creation care, and what climate crisis asks of Christian discipleship.",
-        "headshot": "assets/headshots/jennifer-ayres.jpg"
+        "headshot": "assets/headshots/jennifer-ayres.jpg",
+        "instructorUrl": "https://candler.emory.edu/faculty-profiles/jennifer-ayres/"
       },
       {
         "title": "Bible, Race, and Reception History",
         "instructor": "Dr. Joel Kemp",
         "summary": "How the Bible has been read across racial lines — and how the long history of reception still shapes our reading.",
-        "headshot": "assets/headshots/joel-kemp.jpg"
+        "headshot": "assets/headshots/joel-kemp.jpg",
+        "instructorUrl": "https://candler.emory.edu/faculty-profiles/joel-b-kemp/"
       },
       {
         "title": "Reclaiming the Body",
