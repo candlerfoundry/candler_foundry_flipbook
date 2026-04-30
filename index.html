@@ -1117,7 +1117,7 @@ button.meta-chip {
   background: var(--orange-red, #E8541A);
   color: #FFFFFF;
   font-family: "Montserrat", "Segoe UI", sans-serif;
-  font-size: 11px;
+  font-size: calc(var(--course-label-font-size, 11) * 1px);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   font-weight: 700;
@@ -1128,15 +1128,15 @@ button.meta-chip {
 /* Hero image band: full page width, 3:2 ratio (our native asset format).
    flex-shrink: 0 prevents the bottom grid from squishing it. */
 .featured-hero {
-  /* Shrunk ~15% from full width to give the bottom grid (title +
-     description, instructor card) more breathing room. Centered in the
-     page so the smaller graphic still reads as the spread's anchor. */
-  width: 85%;
+  /* Width and vertical offset are slider-driven so all spreads can be
+     fine-tuned from the master. Defaults preserve the prior look:
+     85% wide, no extra top margin. */
+  width: calc(var(--image-scale, 85) * 1%);
   aspect-ratio: 3 / 2;
   border-radius: 4px;
   box-shadow: 0 5px 16px rgba(0, 0, 0, 0.18);
   overflow: hidden;
-  margin: 0 auto 16px;
+  margin: calc(var(--image-y, 0) * 1%) auto 16px;
   flex-shrink: 0;
   background: var(--ivory);
 }
@@ -1145,6 +1145,7 @@ button.meta-chip {
   height: 100%;
   object-fit: cover;
   display: block;
+  filter: var(--image-shadow, none);
 }
 
 /* Bottom region: 2-column grid that fills the remaining space.
@@ -1205,8 +1206,8 @@ button.meta-chip {
   justify-content: center;
 }
 .featured-instructor-avatar {
-  width: 56px;
-  height: 56px;
+  width: calc(var(--faculty-avatar-size, 56) * 1px);
+  height: calc(var(--faculty-avatar-size, 56) * 1px);
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #FFFFFF;
@@ -1234,7 +1235,7 @@ button.meta-chip {
 }
 .featured-instructor-name {
   font-family: "Montserrat", "Segoe UI", sans-serif;
-  font-size: 13px;
+  font-size: calc(var(--faculty-name-size, 13) * 1px);
   font-weight: 700;
   color: #1A1A1A;
   line-height: 1.2;
@@ -1242,7 +1243,7 @@ button.meta-chip {
 }
 .featured-instructor-bio-link {
   font-family: "Montserrat", "Segoe UI", sans-serif;
-  font-size: 9px;
+  font-size: calc(var(--faculty-blurb-size, 9) * 1px);
   color: var(--orange-red, #E8541A);
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -2897,10 +2898,11 @@ function applyMasterSpreadTemplate(data) {
     // the first spread's heading.
     entry.supportTitle = entry.supportTitle || masterEntry.supportTitle || "Also in this theme";
     entry.layout = {
-      // Master layout supplies defaults for missing fields; the spread's
-      // own layout values win so per-spread slider customizations persist.
-      ...masterLayout,
-      ...(entry.layout || {})
+      // Master spread is the single source of truth for layout. Each
+      // category spread inherits the master's layout values so all
+      // 7 spreads remain visually identical -- edit one, update all.
+      ...(entry.layout || {}),
+      ...masterLayout
     };
     entry.feature = {
       ...(entry.feature || {}),
@@ -3164,6 +3166,18 @@ function renderFacultyCard(entry) {
   `;
 }
 
+function getImageShadowFilter(shadow) {
+  switch (shadow) {
+    case "none":
+      return "none";
+    case "strong":
+      return "drop-shadow(0 18px 28px rgba(30, 37, 48, 0.32))";
+    case "soft":
+    default:
+      return "drop-shadow(0 12px 18px rgba(30, 37, 48, 0.16))";
+  }
+}
+
 function renderSpread(entry, index) {
   const layout = {
     ...createDefaultSpreadLayout(),
@@ -3185,9 +3199,12 @@ function renderSpread(entry, index) {
   const rightIntroWidth = Math.max(35, Math.min(Number(layout.rightIntroWidthPercent) || 84, 100));
   const rightListWidth = Math.max(50, Math.min(Number(layout.rightListWidthPercent) || 100, 100));
   const rightAvatarSize = Math.max(28, Math.min(Number(layout.rightCardAvatarSizePx) || 52, 96));
+  const facultyAvatarSize = Math.max(36, Math.min(Number(layout.facultyAvatarSizePx) || 56, 200));
+  const facultyNameSize = Math.max(11, Math.min(Number(layout.facultyNameSizePx) || 13, 24));
+  const facultyBlurbSize = Math.max(8, Math.min(Number(layout.facultyBlurbSizePx) || 9, 18));
   const supporting = Array.isArray(entry.supporting) ? entry.supporting : [];
   return `
-    <div class="page page-left feature-left">
+    <div class="page page-left feature-left" style="--image-scale:${imageScale}; --image-y:${imageY}; --image-shadow:${getImageShadowFilter(layout.imageShadow)}; --course-label-font-size:${courseLabelFontSize}; --faculty-avatar-size:${facultyAvatarSize}; --faculty-name-size:${facultyNameSize}; --faculty-blurb-size:${facultyBlurbSize};">
       <div class="feature-canvas">
         <div class="feature-genre" style="--genre-font-size:${genreFontSize}px; --genre-font-family:${getEditorFontFamily(layout.genreFontFamily || "montserrat", "text")};">${entry.genre}</div>
         <span class="featured-eyebrow">★ ${feature.courseLabel || "Featured Course"}</span>

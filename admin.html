@@ -935,10 +935,11 @@ function applyMasterSpreadTemplate(data) {
   spreadEntries.forEach(({ entry }, spreadOrder) => {
     entry.supportTitle = entry.supportTitle || masterEntry.supportTitle || "Also in this theme";
     entry.layout = {
-      // Master layout supplies defaults for missing fields; the spread's
-      // own layout values win so per-spread slider customizations persist.
-      ...masterLayout,
-      ...(entry.layout || {})
+      // Master spread is the single source of truth for layout. Each
+      // category spread inherits the master's layout values so all
+      // 7 spreads remain visually identical -- edit one, update all.
+      ...(entry.layout || {}),
+      ...masterLayout
     };
     entry.feature = {
       ...(entry.feature || {}),
@@ -1500,8 +1501,6 @@ function renderSpreadEditor(entry, path, label) {
     persistWorkingData("Updated category font");
   }));
   categoryGrid.appendChild(createRangeField("Category size", entry.layout.genreFontSize, path.concat("layout", "genreFontSize"), { min: 10, max: 42, step: 1, suffix: "px", message: "Updated category size" }));
-  categoryGrid.appendChild(createRangeField("Category vertical position", entry.layout.genreY, path.concat("layout", "genreY"), { min: 0, max: 25, step: 1, suffix: "%", message: "Moved category label" }));
-  categoryGrid.appendChild(createRangeField("Category box width", entry.layout.genreWidthPercent, path.concat("layout", "genreWidthPercent"), { min: 24, max: 100, step: 1, suffix: "%", message: "Resized category width" }));
   categorySection.appendChild(categoryGrid);
   wrap.appendChild(categorySection);
 
@@ -1534,8 +1533,6 @@ function renderSpreadEditor(entry, path, label) {
     persistWorkingData("Updated course label font");
   }));
   courseLabelGrid.appendChild(createRangeField("Label size", entry.layout.courseLabelFontSize, path.concat("layout", "courseLabelFontSize"), { min: 10, max: 28, step: 1, suffix: "px", message: "Updated course label size" }));
-  courseLabelGrid.appendChild(createRangeField("Label vertical position", entry.layout.courseLabelY, path.concat("layout", "courseLabelY"), { min: 42, max: 78, step: 1, suffix: "%", message: "Moved course label" }));
-  courseLabelGrid.appendChild(createRangeField("Label box width", entry.layout.courseLabelWidthPercent, path.concat("layout", "courseLabelWidthPercent"), { min: 24, max: 100, step: 1, suffix: "%", message: "Resized course label width" }));
   courseLabelSection.appendChild(courseLabelGrid);
   wrap.appendChild(courseLabelSection);
 
@@ -1571,9 +1568,6 @@ function renderSpreadEditor(entry, path, label) {
     setByPath(workingData, path.concat("feature", "instructor"), nextValue);
     persistWorkingData("Updated instructor name");
   }));
-  facultyGrid.appendChild(createRangeField("Faculty card vertical position", entry.layout.facultyY, path.concat("layout", "facultyY"), { min: 60, max: 92, step: 1, suffix: "%", message: "Moved faculty card" }));
-  facultyGrid.appendChild(createRangeField("Faculty card scale", entry.layout.facultyScalePercent, path.concat("layout", "facultyScalePercent"), { min: 60, max: 140, step: 1, suffix: "%", message: "Resized faculty card" }));
-  facultyGrid.appendChild(createRangeField("Faculty box width", entry.layout.facultyWidthPercent, path.concat("layout", "facultyWidthPercent"), { min: 34, max: 120, step: 1, suffix: "%", message: "Resized faculty width" }));
   facultySection.appendChild(facultyGrid);
   facultySection.appendChild(createImageField("Instructor headshot", entry.feature?.headshot || "", path.concat("feature", "headshot")));
   facultySection.appendChild(createField("Faculty blurb (front of card)", entry.feature?.facultyBlurb || "", path.concat("feature", "facultyBlurb"), (nextValue) => {
