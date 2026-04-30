@@ -1153,10 +1153,13 @@ button.meta-chip {
    Left = fluid text block; right = fixed-width instructor card. */
 .featured-bottom {
   display: grid;
-  /* Wider right column (200px) gives the instructor card more presence
-     and gives the back-face bio more room before it has to scroll.
-     Wider gap (24px) creates a clear gutter between the two columns. */
-  grid-template-columns: 1fr 200px;
+  /* Right column width is slider-driven (--instructor-card-width, default
+     200px). Description column stays 1fr so it auto-fills any space the
+     faculty card gives back when it shrinks. align-items: stretch keeps
+     the previous behavior by default; individual cells opt out via
+     --description-align / --instructor-card-align when an explicit height
+     is set. */
+  grid-template-columns: 1fr calc(var(--instructor-card-width, 200) * 1px);
   gap: 24px;
   align-items: stretch;
   flex: 1;
@@ -1173,10 +1176,13 @@ button.meta-chip {
   padding-right: 12px;
   /* Slider-driven nudges. Translate keeps the grid layout stable; the
      element is shifted visually without reflowing the whole row.
-     --description-height drives an optional min-height in px; when 0 the
-     element keeps its natural height. */
+     --description-height-css is set inline by renderSpread to 'auto' (when
+     the slider is at 0) or '<n>px' (otherwise). When explicit, --description-align
+     is also set to 'start' so the cell breaks out of grid-stretch and can be
+     taller or shorter than the faculty card. */
   transform: translate(calc(var(--description-x, 0) * 1%), calc(var(--description-y, 0) * 1%));
-  min-height: calc(var(--description-height, 0) * 1px);
+  height: var(--description-height-css, auto);
+  align-self: var(--description-align, stretch);
 }
 .featured-title {
   font-family: Georgia, "Times New Roman", serif;
@@ -1356,13 +1362,16 @@ button.meta-chip {
   left: auto;
   top: auto;
   /* Slider-driven nudges via --instructor-card-x / --instructor-card-y.
-     Default 0 keeps the card in its natural grid-cell position. */
+     Width comes from the parent grid-template (--instructor-card-width).
+     --instructor-card-height-css is 'auto' by default (cell stretches to
+     row height) or '<n>px' when the slider is non-zero, in which case
+     --instructor-card-align flips to 'start' so the card can be shorter
+     than the description column. */
   transform: translate(calc(var(--instructor-card-x, 0) * 1%), calc(var(--instructor-card-y, 0) * 1%));
   width: 100%;
   perspective: 1400px;
-  align-self: stretch;
-  height: 100%;
-  min-height: calc(var(--instructor-card-height, 0) * 1px);
+  align-self: var(--instructor-card-align, stretch);
+  height: var(--instructor-card-height-css, 100%);
 }
 .featured-bottom .faculty-card.featured-instructor-card {
   min-height: 0;
@@ -2681,6 +2690,7 @@ function createDefaultSpreadLayout() {
     descriptionHeight: 0,
     instructorCardX: 0,
     instructorCardY: 0,
+    instructorCardWidth: 200,
     instructorCardHeight: 0,
     genreY: 4,
     genreFontSize: 24,
@@ -2871,6 +2881,7 @@ function normalizeContent(data) {
       nextEntry.layout.descriptionHeight = _clampSigned(nextEntry.layout.descriptionHeight, 0, 400, 0);
       nextEntry.layout.instructorCardX = _clampSigned(nextEntry.layout.instructorCardX, -20, 20, 0);
       nextEntry.layout.instructorCardY = _clampSigned(nextEntry.layout.instructorCardY, -20, 20, 0);
+      nextEntry.layout.instructorCardWidth = _clampSigned(nextEntry.layout.instructorCardWidth, 80, 300, 200);
       nextEntry.layout.instructorCardHeight = _clampSigned(nextEntry.layout.instructorCardHeight, 0, 400, 0);
       nextEntry.leftBlocks = templateVersion >= getSpreadTemplateVersion() && Array.isArray(nextEntry.leftBlocks) && nextEntry.leftBlocks.length
         ? nextEntry.leftBlocks
@@ -3237,12 +3248,17 @@ function renderSpread(entry, index) {
   const descriptionX = Math.max(-20, Math.min(_toNum(layout.descriptionX, 0), 20));
   const descriptionY = Math.max(-20, Math.min(_toNum(layout.descriptionY, 0), 20));
   const descriptionHeight = Math.max(0, Math.min(_toNum(layout.descriptionHeight, 0), 400));
+  const descriptionHeightCss = descriptionHeight > 0 ? `${descriptionHeight}px` : "auto";
+  const descriptionAlign = descriptionHeight > 0 ? "start" : "stretch";
   const instructorCardX = Math.max(-20, Math.min(_toNum(layout.instructorCardX, 0), 20));
   const instructorCardY = Math.max(-20, Math.min(_toNum(layout.instructorCardY, 0), 20));
+  const instructorCardWidth = Math.max(80, Math.min(_toNum(layout.instructorCardWidth, 200), 300));
   const instructorCardHeight = Math.max(0, Math.min(_toNum(layout.instructorCardHeight, 0), 400));
+  const instructorCardHeightCss = instructorCardHeight > 0 ? `${instructorCardHeight}px` : "100%";
+  const instructorCardAlign = instructorCardHeight > 0 ? "start" : "stretch";
   const supporting = Array.isArray(entry.supporting) ? entry.supporting : [];
   return `
-    <div class="page page-left feature-left" style="--image-scale:${imageScale}; --image-shadow:${getImageShadowFilter(layout.imageShadow)}; --course-label-font-size:${courseLabelFontSize}; --faculty-avatar-size:${facultyAvatarSize}; --faculty-name-size:${facultyNameSize}; --faculty-blurb-size:${facultyBlurbSize}; --description-x:${descriptionX}; --description-y:${descriptionY}; --description-height:${descriptionHeight}; --instructor-card-x:${instructorCardX}; --instructor-card-y:${instructorCardY}; --instructor-card-height:${instructorCardHeight};">
+    <div class="page page-left feature-left" style="--image-scale:${imageScale}; --image-shadow:${getImageShadowFilter(layout.imageShadow)}; --course-label-font-size:${courseLabelFontSize}; --faculty-avatar-size:${facultyAvatarSize}; --faculty-name-size:${facultyNameSize}; --faculty-blurb-size:${facultyBlurbSize}; --description-x:${descriptionX}; --description-y:${descriptionY}; --description-height-css:${descriptionHeightCss}; --description-align:${descriptionAlign}; --instructor-card-x:${instructorCardX}; --instructor-card-y:${instructorCardY}; --instructor-card-width:${instructorCardWidth}; --instructor-card-height-css:${instructorCardHeightCss}; --instructor-card-align:${instructorCardAlign};">
       <div class="feature-canvas">
         <div class="feature-genre" style="--genre-font-size:${genreFontSize}px; --genre-font-family:${getEditorFontFamily(layout.genreFontFamily || "montserrat", "text")};">${entry.genre}</div>
         <span class="featured-eyebrow">★ ${feature.courseLabel || "Featured Course"}</span>

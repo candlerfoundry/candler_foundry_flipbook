@@ -725,6 +725,7 @@ function createDefaultSpreadLayout() {
     descriptionHeight: 0,
     instructorCardX: 0,
     instructorCardY: 0,
+    instructorCardWidth: 200,
     instructorCardHeight: 0,
     genreY: 4,
     genreFontSize: 24,
@@ -897,6 +898,7 @@ function normalizeContent(data) {
       nextEntry.layout.descriptionHeight = _clampSigned(nextEntry.layout.descriptionHeight, 0, 400, 0);
       nextEntry.layout.instructorCardX = _clampSigned(nextEntry.layout.instructorCardX, -20, 20, 0);
       nextEntry.layout.instructorCardY = _clampSigned(nextEntry.layout.instructorCardY, -20, 20, 0);
+      nextEntry.layout.instructorCardWidth = _clampSigned(nextEntry.layout.instructorCardWidth, 80, 300, 200);
       nextEntry.layout.instructorCardHeight = _clampSigned(nextEntry.layout.instructorCardHeight, 0, 400, 0);
       nextEntry.leftBlocks = templateVersion >= getSpreadTemplateVersion() && Array.isArray(nextEntry.leftBlocks) && nextEntry.leftBlocks.length
         ? nextEntry.leftBlocks
@@ -1568,7 +1570,7 @@ function renderSpreadEditor(entry, path, label) {
   descriptionGrid.className = "field-grid";
   descriptionGrid.appendChild(createRangeField("Description horizontal position", entry.layout.descriptionX, path.concat("layout", "descriptionX"), { min: -20, max: 20, step: 1, suffix: "%", message: "Nudged description horizontally" }));
   descriptionGrid.appendChild(createRangeField("Description vertical position", entry.layout.descriptionY, path.concat("layout", "descriptionY"), { min: -20, max: 20, step: 1, suffix: "%", message: "Nudged description vertically" }));
-  descriptionGrid.appendChild(createRangeField("Description min height", entry.layout.descriptionHeight, path.concat("layout", "descriptionHeight"), { min: 0, max: 400, step: 4, suffix: "px", message: "Set description min height" }));
+  descriptionGrid.appendChild(createRangeField("Description height (0 = auto)", entry.layout.descriptionHeight, path.concat("layout", "descriptionHeight"), { min: 0, max: 400, step: 4, suffix: "px", message: "Set description height" }));
   descriptionSection.appendChild(descriptionGrid);
   wrap.appendChild(descriptionSection);
 
@@ -1595,7 +1597,8 @@ function renderSpreadEditor(entry, path, label) {
   cardPositionGrid.className = "field-grid";
   cardPositionGrid.appendChild(createRangeField("Instructor card horizontal position", entry.layout.instructorCardX, path.concat("layout", "instructorCardX"), { min: -20, max: 20, step: 1, suffix: "%", message: "Nudged instructor card horizontally" }));
   cardPositionGrid.appendChild(createRangeField("Instructor card vertical position", entry.layout.instructorCardY, path.concat("layout", "instructorCardY"), { min: -20, max: 20, step: 1, suffix: "%", message: "Nudged instructor card vertically" }));
-  cardPositionGrid.appendChild(createRangeField("Instructor card min height", entry.layout.instructorCardHeight, path.concat("layout", "instructorCardHeight"), { min: 0, max: 400, step: 4, suffix: "px", message: "Set instructor card min height" }));
+  cardPositionGrid.appendChild(createRangeField("Instructor card width", entry.layout.instructorCardWidth, path.concat("layout", "instructorCardWidth"), { min: 80, max: 300, step: 4, suffix: "px", message: "Resized instructor card width" }));
+  cardPositionGrid.appendChild(createRangeField("Instructor card height (0 = auto)", entry.layout.instructorCardHeight, path.concat("layout", "instructorCardHeight"), { min: 0, max: 400, step: 4, suffix: "px", message: "Set instructor card height" }));
   facultySection.appendChild(cardPositionGrid);
 
   // Size sliders for the instructor card and the right-page avatars.
