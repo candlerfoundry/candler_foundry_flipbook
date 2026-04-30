@@ -1261,14 +1261,19 @@ button.meta-chip {
    the support list rather than sitting at fixed Y like their absolute-
    positioned cousins on the left page. */
 .section-genre {
+  /* Consumes --right-heading-size and --right-heading-width from the
+     .feature-right inline style (set in renderSpread from layout.rightHeadingFontSize
+     and layout.rightHeadingWidthPercent). The legacy .section-title rule
+     below carried these vars but was display:none and never reached the DOM. */
   margin: 0;
   font-family: "DM Mono", monospace;
-  font-size: 24px;
+  font-size: var(--right-heading-size, 24px);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--orange-red);
   line-height: 1;
   align-self: flex-start;
+  width: min(calc(var(--right-heading-width, 100) * 1%), 100%);
 }
 .section-label {
   margin: 0;
