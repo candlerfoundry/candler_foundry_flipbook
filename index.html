@@ -1128,15 +1128,16 @@ button.meta-chip {
 /* Hero image band: full page width, 3:2 ratio (our native asset format).
    flex-shrink: 0 prevents the bottom grid from squishing it. */
 .featured-hero {
-  /* Width and vertical offset are slider-driven so all spreads can be
-     fine-tuned from the master. Defaults preserve the prior look:
-     85% wide, no extra top margin. */
+  /* Width is slider-driven (--image-scale). Vertical position is
+     determined by flex order on .feature-canvas, not by --image-y --
+     in the new flex layout there's no clean meaning for an absolute
+     vertical offset. */
   width: calc(var(--image-scale, 85) * 1%);
   aspect-ratio: 3 / 2;
   border-radius: 4px;
   box-shadow: 0 5px 16px rgba(0, 0, 0, 0.18);
   overflow: hidden;
-  margin: calc(var(--image-y, 0) * 1%) auto 16px;
+  margin: 0 auto 16px;
   flex-shrink: 0;
   background: var(--ivory);
 }
@@ -3204,7 +3205,7 @@ function renderSpread(entry, index) {
   const facultyBlurbSize = Math.max(8, Math.min(Number(layout.facultyBlurbSizePx) || 9, 18));
   const supporting = Array.isArray(entry.supporting) ? entry.supporting : [];
   return `
-    <div class="page page-left feature-left" style="--image-scale:${imageScale}; --image-y:${imageY}; --image-shadow:${getImageShadowFilter(layout.imageShadow)}; --course-label-font-size:${courseLabelFontSize}; --faculty-avatar-size:${facultyAvatarSize}; --faculty-name-size:${facultyNameSize}; --faculty-blurb-size:${facultyBlurbSize};">
+    <div class="page page-left feature-left" style="--image-scale:${imageScale}; --image-shadow:${getImageShadowFilter(layout.imageShadow)}; --course-label-font-size:${courseLabelFontSize}; --faculty-avatar-size:${facultyAvatarSize}; --faculty-name-size:${facultyNameSize}; --faculty-blurb-size:${facultyBlurbSize};">
       <div class="feature-canvas">
         <div class="feature-genre" style="--genre-font-size:${genreFontSize}px; --genre-font-family:${getEditorFontFamily(layout.genreFontFamily || "montserrat", "text")};">${entry.genre}</div>
         <span class="featured-eyebrow">★ ${feature.courseLabel || "Featured Course"}</span>

@@ -1508,7 +1508,6 @@ function renderSpreadEditor(entry, path, label) {
   graphicSection.appendChild(createImageField("Graphic image", entry.feature?.image || "", path.concat("feature", "image")));
   const graphicGrid = document.createElement("div");
   graphicGrid.className = "field-grid";
-  graphicGrid.appendChild(createRangeField("Graphic vertical position", entry.layout.imageY, path.concat("layout", "imageY"), { min: 0, max: 40, step: 1, suffix: "%", message: "Moved graphic" }));
   graphicGrid.appendChild(createRangeField("Graphic scale", entry.layout.imageScalePercent, path.concat("layout", "imageScalePercent"), { min: 40, max: 140, step: 1, suffix: "%", message: "Updated graphic scale" }));
   graphicGrid.appendChild(createSelectField("Graphic shadow", entry.layout.imageShadow || "soft", path.concat("layout", "imageShadow"), [
     { value: "none", label: "None" },
