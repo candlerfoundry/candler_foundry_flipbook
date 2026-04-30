@@ -933,10 +933,12 @@ function applyMasterSpreadTemplate(data) {
     : createDefaultLeftBlocks(masterEntry);
 
   spreadEntries.forEach(({ entry }, spreadOrder) => {
-    entry.supportTitle = masterEntry.supportTitle || entry.supportTitle || "Also in this theme";
+    entry.supportTitle = entry.supportTitle || masterEntry.supportTitle || "Also in this theme";
     entry.layout = {
-      ...(entry.layout || {}),
-      ...masterLayout
+      // Master layout supplies defaults for missing fields; the spread's
+      // own layout values win so per-spread slider customizations persist.
+      ...masterLayout,
+      ...(entry.layout || {})
     };
     entry.feature = {
       ...(entry.feature || {}),
@@ -1786,59 +1788,6 @@ function renderNode(value, path, label, depth) {
   });
 
   return wrap;
-}
-
-function renderEditor() {
-  editorRoot.innerHTML = "";
-  workingData.forEach((entry, index) => {
-    const label = entry.label ? `${index + 1}. ${entry.label}` : `Page ${index + 1}`;
-    const shell = document.createElement("section");
-    shell.className = "page-shell";
-    shell.setAttribute("data-page-index", String(index));
-
-    const toggle = document.createElement("div");
-    toggle.className = `page-toggle${index === activePageIndex ? " is-active" : ""}`;
-    const navButton = document.createElement("button");
-    navButton.type = "button";
-    navButton.className = "page-nav";
-
-    const indexPill = document.createElement("span");
-    indexPill.className = "page-index-pill";
-    indexPill.textContent = String(index + 1).padStart(2, "0");
-    navButton.appendChild(indexPill);
-
-    const titlePill = document.createElement("span");
-    titlePill.className = "page-title-pill";
-    titlePill.textContent = entry.label || entry.type || "Page";
-    navButton.appendChild(titlePill);
-
-    const expandButton = document.createElement("button");
-    expandButton.type = "button";
-    expandButton.className = "page-toggle-icon";
-    expandButton.setAttribute("aria-label", index === activePageIndex ? "Collapse page editor" : "Expand page editor");
-    expandButton.textContent = index === activePageIndex ? "−" : "+";
-
-    toggle.appendChild(indexPill);
-    toggle.appendChild(titlePill);
-    toggle.appendChild(expandButton);
-    shell.appendChild(toggle);
-
-    indexPill.addEventListener("click", () => activatePage(index, true));
-    titlePill.addEventListener("click", () => activatePage(index, true));
-    expandButton.addEventListener("click", (event) => {
-      event.stopPropagation();
-      togglePage(index);
-    });
-
-    if (index === activePageIndex) {
-      const body = document.createElement("div");
-      body.className = "page-body";
-      body.appendChild(renderNode(entry, [index], label, 0));
-      shell.appendChild(body);
-    }
-
-    editorRoot.appendChild(shell);
-  });
 }
 
 function renderEditor() {

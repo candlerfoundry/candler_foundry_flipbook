@@ -2897,8 +2897,10 @@ function applyMasterSpreadTemplate(data) {
     // the first spread's heading.
     entry.supportTitle = entry.supportTitle || masterEntry.supportTitle || "Also in this theme";
     entry.layout = {
-      ...(entry.layout || {}),
-      ...masterLayout
+      // Master layout supplies defaults for missing fields; the spread's
+      // own layout values win so per-spread slider customizations persist.
+      ...masterLayout,
+      ...(entry.layout || {})
     };
     entry.feature = {
       ...(entry.feature || {}),
