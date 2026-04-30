@@ -720,6 +720,12 @@ function createDefaultSpreadLayout() {
     imageY: 10,
     imageScalePercent: 84,
     imageShadow: "soft",
+    descriptionX: 0,
+    descriptionY: 0,
+    descriptionHeight: 0,
+    instructorCardX: 0,
+    instructorCardY: 0,
+    instructorCardHeight: 0,
     genreY: 4,
     genreFontSize: 24,
     genreFontFamily: "montserrat",
@@ -883,6 +889,15 @@ function normalizeContent(data) {
       nextEntry.layout.rightHeadingWidthPercent = Math.max(35, Math.min(Number(nextEntry.layout.rightHeadingWidthPercent) || 82, 100));
       nextEntry.layout.rightIntroWidthPercent = Math.max(35, Math.min(Number(nextEntry.layout.rightIntroWidthPercent) || 84, 100));
       nextEntry.layout.rightListWidthPercent = Math.max(50, Math.min(Number(nextEntry.layout.rightListWidthPercent) || 100, 100));
+      // Description + instructor card position/height knobs (new layout slots).
+      // Use Number.isFinite(...) so a legitimate 0 isn't reset by `||` falling back to a default.
+      const _clampSigned = (n, min, max, dflt) => { const v = Number(n); return Number.isFinite(v) ? Math.max(min, Math.min(v, max)) : dflt; };
+      nextEntry.layout.descriptionX = _clampSigned(nextEntry.layout.descriptionX, -20, 20, 0);
+      nextEntry.layout.descriptionY = _clampSigned(nextEntry.layout.descriptionY, -20, 20, 0);
+      nextEntry.layout.descriptionHeight = _clampSigned(nextEntry.layout.descriptionHeight, 0, 400, 0);
+      nextEntry.layout.instructorCardX = _clampSigned(nextEntry.layout.instructorCardX, -20, 20, 0);
+      nextEntry.layout.instructorCardY = _clampSigned(nextEntry.layout.instructorCardY, -20, 20, 0);
+      nextEntry.layout.instructorCardHeight = _clampSigned(nextEntry.layout.instructorCardHeight, 0, 400, 0);
       nextEntry.leftBlocks = templateVersion >= getSpreadTemplateVersion() && Array.isArray(nextEntry.leftBlocks) && nextEntry.leftBlocks.length
         ? nextEntry.leftBlocks
             .map((block, blockIndex) => normalizeLeftBlock(block, blockIndex))
@@ -1535,30 +1550,27 @@ function renderSpreadEditor(entry, path, label) {
   courseLabelSection.appendChild(courseLabelGrid);
   wrap.appendChild(courseLabelSection);
 
-  const blocksSection = createSection("Left-page text boxes", "These are ordered from top to bottom based on where they currently sit on the page.", "left");
-  const blockToolbar = document.createElement("div");
-  blockToolbar.className = "node-toolbar";
-  ["header", "text", "quote"].forEach((kind) => {
-    const addButton = document.createElement("button");
-    addButton.type = "button";
-    addButton.textContent = `Add ${kind}`;
-    addButton.addEventListener("click", () => {
-      const blocks = getByPath(workingData, path.concat("leftBlocks"));
-      blocks.push(createLeftBlockTemplate(kind, blocks.length));
-      renderEditor();
-      persistWorkingData(`Added ${kind} block`);
-    });
-    blockToolbar.appendChild(addButton);
-  });
-  blocksSection.appendChild(blockToolbar);
+  // [Disabled] Left-page text-box editor: the new flex/grid layout renders the
+  // course title and description from feature.title / feature.lede directly,
+  // not from entry.leftBlocks. The blocks section was producing zero visible
+  // effect, so it's hidden. The leftBlocks data is still maintained internally
+  // (master cascade rebuilds it) for back-compat, but no UI is exposed for it.
 
-  entry.leftBlocks
-    .map((block, index) => ({ block, index, yPercent: normalizeLeftBlock(block, index).yPercent }))
-    .sort((left, right) => left.yPercent - right.yPercent)
-    .forEach(({ block, index }, displayOrder) => {
-      blocksSection.appendChild(renderLeftBlockEditor(block, path.concat("leftBlocks", index), index, entry.leftBlocks.length, displayOrder));
-    });
-  wrap.appendChild(blocksSection);
+  // ====== New: Course description section ======
+  // Edits the actual rendered description (feature.lede) and gives slider
+  // control over its position + height in the new flex/grid layout.
+  const descriptionSection = createSection("Course description", "The body copy that sits below the course title on the left page. Edit the text here and use the sliders to nudge its position or set a minimum height.", "left");
+  descriptionSection.appendChild(createField("Description text", entry.feature?.lede || "", path.concat("feature", "lede"), (nextValue) => {
+    setByPath(workingData, path.concat("feature", "lede"), nextValue);
+    persistWorkingData("Updated course description");
+  }));
+  const descriptionGrid = document.createElement("div");
+  descriptionGrid.className = "field-grid";
+  descriptionGrid.appendChild(createRangeField("Description horizontal position", entry.layout.descriptionX, path.concat("layout", "descriptionX"), { min: -20, max: 20, step: 1, suffix: "%", message: "Nudged description horizontally" }));
+  descriptionGrid.appendChild(createRangeField("Description vertical position", entry.layout.descriptionY, path.concat("layout", "descriptionY"), { min: -20, max: 20, step: 1, suffix: "%", message: "Nudged description vertically" }));
+  descriptionGrid.appendChild(createRangeField("Description min height", entry.layout.descriptionHeight, path.concat("layout", "descriptionHeight"), { min: 0, max: 400, step: 4, suffix: "px", message: "Set description min height" }));
+  descriptionSection.appendChild(descriptionGrid);
+  wrap.appendChild(descriptionSection);
 
   const facultySection = createSection("Faculty card", "The centered instructor tile at the bottom of the left page — headshot, name, and a short blurb.", "left");
   const facultyGrid = document.createElement("div");
@@ -1577,6 +1589,14 @@ function renderSpreadEditor(entry, path, label) {
     setByPath(workingData, path.concat("feature", "facultyBio"), nextValue);
     persistWorkingData("Updated faculty bio");
   }));
+
+  // Position + height sliders for the instructor card slot itself.
+  const cardPositionGrid = document.createElement("div");
+  cardPositionGrid.className = "field-grid";
+  cardPositionGrid.appendChild(createRangeField("Instructor card horizontal position", entry.layout.instructorCardX, path.concat("layout", "instructorCardX"), { min: -20, max: 20, step: 1, suffix: "%", message: "Nudged instructor card horizontally" }));
+  cardPositionGrid.appendChild(createRangeField("Instructor card vertical position", entry.layout.instructorCardY, path.concat("layout", "instructorCardY"), { min: -20, max: 20, step: 1, suffix: "%", message: "Nudged instructor card vertically" }));
+  cardPositionGrid.appendChild(createRangeField("Instructor card min height", entry.layout.instructorCardHeight, path.concat("layout", "instructorCardHeight"), { min: 0, max: 400, step: 4, suffix: "px", message: "Set instructor card min height" }));
+  facultySection.appendChild(cardPositionGrid);
 
   // Size sliders for the instructor card and the right-page avatars.
   const sizeGrid = document.createElement("div");

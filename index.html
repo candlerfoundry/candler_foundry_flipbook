@@ -1171,6 +1171,12 @@ button.meta-chip {
      the left or the instructor card on the right. */
   padding-left: 16px;
   padding-right: 12px;
+  /* Slider-driven nudges. Translate keeps the grid layout stable; the
+     element is shifted visually without reflowing the whole row.
+     --description-height drives an optional min-height in px; when 0 the
+     element keeps its natural height. */
+  transform: translate(calc(var(--description-x, 0) * 1%), calc(var(--description-y, 0) * 1%));
+  min-height: calc(var(--description-height, 0) * 1px);
 }
 .featured-title {
   font-family: Georgia, "Times New Roman", serif;
@@ -1349,11 +1355,14 @@ button.meta-chip {
   position: relative;
   left: auto;
   top: auto;
-  transform: none;
+  /* Slider-driven nudges via --instructor-card-x / --instructor-card-y.
+     Default 0 keeps the card in its natural grid-cell position. */
+  transform: translate(calc(var(--instructor-card-x, 0) * 1%), calc(var(--instructor-card-y, 0) * 1%));
   width: 100%;
   perspective: 1400px;
   align-self: stretch;
   height: 100%;
+  min-height: calc(var(--instructor-card-height, 0) * 1px);
 }
 .featured-bottom .faculty-card.featured-instructor-card {
   min-height: 0;
@@ -2667,6 +2676,12 @@ function createDefaultSpreadLayout() {
     imageY: 10,
     imageScalePercent: 84,
     imageShadow: "soft",
+    descriptionX: 0,
+    descriptionY: 0,
+    descriptionHeight: 0,
+    instructorCardX: 0,
+    instructorCardY: 0,
+    instructorCardHeight: 0,
     genreY: 4,
     genreFontSize: 24,
     genreFontFamily: "montserrat",
@@ -2848,6 +2863,15 @@ function normalizeContent(data) {
       nextEntry.layout.rightHeadingWidthPercent = Math.max(35, Math.min(Number(nextEntry.layout.rightHeadingWidthPercent) || 82, 100));
       nextEntry.layout.rightIntroWidthPercent = Math.max(35, Math.min(Number(nextEntry.layout.rightIntroWidthPercent) || 84, 100));
       nextEntry.layout.rightListWidthPercent = Math.max(50, Math.min(Number(nextEntry.layout.rightListWidthPercent) || 100, 100));
+      // Description + instructor card position/height knobs (new layout slots).
+      // Use Number.isFinite(...) so a legitimate 0 isn't reset by `||` falling back to a default.
+      const _clampSigned = (n, min, max, dflt) => { const v = Number(n); return Number.isFinite(v) ? Math.max(min, Math.min(v, max)) : dflt; };
+      nextEntry.layout.descriptionX = _clampSigned(nextEntry.layout.descriptionX, -20, 20, 0);
+      nextEntry.layout.descriptionY = _clampSigned(nextEntry.layout.descriptionY, -20, 20, 0);
+      nextEntry.layout.descriptionHeight = _clampSigned(nextEntry.layout.descriptionHeight, 0, 400, 0);
+      nextEntry.layout.instructorCardX = _clampSigned(nextEntry.layout.instructorCardX, -20, 20, 0);
+      nextEntry.layout.instructorCardY = _clampSigned(nextEntry.layout.instructorCardY, -20, 20, 0);
+      nextEntry.layout.instructorCardHeight = _clampSigned(nextEntry.layout.instructorCardHeight, 0, 400, 0);
       nextEntry.leftBlocks = templateVersion >= getSpreadTemplateVersion() && Array.isArray(nextEntry.leftBlocks) && nextEntry.leftBlocks.length
         ? nextEntry.leftBlocks
             .map((block, blockIndex) => normalizeLeftBlock(block, blockIndex))
@@ -3208,9 +3232,17 @@ function renderSpread(entry, index) {
   const facultyAvatarSize = Math.max(36, Math.min(Number(layout.facultyAvatarSizePx) || 56, 200));
   const facultyNameSize = Math.max(11, Math.min(Number(layout.facultyNameSizePx) || 13, 24));
   const facultyBlurbSize = Math.max(8, Math.min(Number(layout.facultyBlurbSizePx) || 9, 18));
+  // New layout-slot knobs. Number.isFinite preserves legitimate 0 (no offset / no min-height).
+  const _toNum = (v, dflt) => { const n = Number(v); return Number.isFinite(n) ? n : dflt; };
+  const descriptionX = Math.max(-20, Math.min(_toNum(layout.descriptionX, 0), 20));
+  const descriptionY = Math.max(-20, Math.min(_toNum(layout.descriptionY, 0), 20));
+  const descriptionHeight = Math.max(0, Math.min(_toNum(layout.descriptionHeight, 0), 400));
+  const instructorCardX = Math.max(-20, Math.min(_toNum(layout.instructorCardX, 0), 20));
+  const instructorCardY = Math.max(-20, Math.min(_toNum(layout.instructorCardY, 0), 20));
+  const instructorCardHeight = Math.max(0, Math.min(_toNum(layout.instructorCardHeight, 0), 400));
   const supporting = Array.isArray(entry.supporting) ? entry.supporting : [];
   return `
-    <div class="page page-left feature-left" style="--image-scale:${imageScale}; --image-shadow:${getImageShadowFilter(layout.imageShadow)}; --course-label-font-size:${courseLabelFontSize}; --faculty-avatar-size:${facultyAvatarSize}; --faculty-name-size:${facultyNameSize}; --faculty-blurb-size:${facultyBlurbSize};">
+    <div class="page page-left feature-left" style="--image-scale:${imageScale}; --image-shadow:${getImageShadowFilter(layout.imageShadow)}; --course-label-font-size:${courseLabelFontSize}; --faculty-avatar-size:${facultyAvatarSize}; --faculty-name-size:${facultyNameSize}; --faculty-blurb-size:${facultyBlurbSize}; --description-x:${descriptionX}; --description-y:${descriptionY}; --description-height:${descriptionHeight}; --instructor-card-x:${instructorCardX}; --instructor-card-y:${instructorCardY}; --instructor-card-height:${instructorCardHeight};">
       <div class="feature-canvas">
         <div class="feature-genre" style="--genre-font-size:${genreFontSize}px; --genre-font-family:${getEditorFontFamily(layout.genreFontFamily || "montserrat", "text")};">${entry.genre}</div>
         <span class="featured-eyebrow">★ ${feature.courseLabel || "Featured Course"}</span>
