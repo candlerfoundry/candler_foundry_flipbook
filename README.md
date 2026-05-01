@@ -164,13 +164,13 @@ Local files can drift from the repo state for a few reasons specific to this mac
 
 ### Content schema (`content.js`)
 
-`window.FLIPBOOK_CONTENT` is an array of page entries. Five entry `type` values: `cover`, `note` (Foundry intro page with themes), `spread` (a category spread &mdash; this is the bulk of the flipbook), `close` (back cover). Each spread has:
+`window.FLIPBOOK_CONTENT` is an array of page entries. Four entry `type` values: `cover`, `note` (Foundry intro page with themes), `spread` (a category spread &mdash; this is the bulk of the flipbook), `close` (back cover). Each spread has:
 
-- `genre`, `intro`, `supportTitle` &mdash; right-page heading bits
-- `feature.{title, instructor, image, lede, quote, courseLabel, headshot, facultyBlurb, facultyBio}` &mdash; left-page featured course
-- `supporting[]` &mdash; right-page accordion list, each with `{title, instructor, summary, headshot?}`
-- `leftBlocks[]` &mdash; positioned text blocks (header / text / quote) on the left page
-- `layout{}` &mdash; per-spread sizing knobs (font sizes, % positions, scale factors)
+- `genre`, `intro`, `supportTitle` &mdash; right-page heading bits (`intro` is optional; `.support-intro` is rendered conditionally)
+- `feature.{title, instructor, image, lede, quote, courseLabel, headshot, facultyBlurb, facultyBio}` &mdash; left-page featured course. The visible title and description on the rendered page come from `feature.title` and `feature.lede`. `feature.facultyBlurb` is no longer rendered on the front face of the faculty card under the current design (kept for back-compat).
+- `supporting[]` &mdash; right-page accordion list, each with `{title, instructor, summary, headshot?, instructorUrl?}`
+- `leftBlocks[]` &mdash; **internal only.** Positioned text blocks from the previous absolutely-positioned left-page design. The new flex/grid layout does not render these and the editor does not expose UI for them. The data is still maintained so master cascade can keep it consistent.
+- `layout{}` &mdash; sizing/position knobs (font sizes, %/px positions, scale factors). Read [Master spread cascade](#master-spread-cascade-important--read-before-changing-layout-code) before editing this object &mdash; only the master spread's `layout` actually drives rendering.
 
 ### Faculty card flip
 
@@ -187,16 +187,53 @@ Each spread's left page renders a **3D flip card** for the featured instructor:
 
 The book renders at fixed **design dimensions of 1500&times;780** inside a `.book-scaler` element. JS computes `scale = min(stage.offsetWidth / 1500, stage.offsetHeight / 780)` and applies it via `--book-scale` on `.book-scaler`. **Important:** use `offsetWidth`/`offsetHeight` (layout box), not `getBoundingClientRect` (rendered box) &mdash; the editor's preview iframe applies its own ancestor `transform: scale`, and `getBoundingClientRect` would compound the two and double-shrink the book. There's no `Math.min(..., 1)` cap; the book scales up beyond 1.0 on big monitors.
 
+### Master spread cascade (important — read before changing layout code)
+
+The seven category spreads are designed to look identical. Spread 0 (currently **Scripture & Theology**) is the **master** and is the single source of truth for `layout`. Inside `applyMasterSpreadTemplate()` (defined identically in both `admin.html` and `index.html`), each non-master spread's `layout` is rebuilt as `{...entry.layout, ...masterLayout}` &mdash; i.e. the master's values win. This runs every time the editor calls `persistWorkingData`, and again on the iframe side when it receives a `flipbook:update` postMessage, so any per-spread layout customization is silently overwritten.
+
+**This is intentional.** Editing a slider on the master spread propagates to all 7 spreads automatically. Editing on any other spread looks like nothing happened (because the change is reverted within milliseconds). If a future change makes you want to flip the merge order to `{...masterLayout, ...entry.layout}`, **don't** &mdash; that breaks the design intent and was already tried and reverted in late April 2026.
+
+The same function also unifies `supportTitle` and `feature.courseLabel` across spreads, but `feature.title`, `feature.lede`, `feature.image`, etc. stay per-spread.
+
 ### Editor sliders for layout knobs
 
-`admin.html` exposes per-spread range sliders bound to keys in the `layout` object:
-- Image: `imageY`, `imageScalePercent`, `imageMaxHeight`, `imageWidthPercent`, `imageX`, `imageAlign`, `imageShadow`
-- Genre/category: `genreY`, `genreFontSize`, `genreFontFamily`, `genreWidthPercent`
-- Course label: `courseLabelY`, `courseLabelFontSize`, `courseLabelFontFamily`, `courseLabelWidthPercent`
-- Faculty card: `facultyY`, `facultyWidthPercent`, `facultyAvatarSizePx`, `facultyNameSizePx`, `facultyBlurbSizePx`
-- Right page: `rightHeadingFontSize`, `rightIntroFontSize`, `rightCardTitleFontSize`, `rightCardMetaFontSize`, `rightCardSummaryFontSize`, `rightListWidthPercent`, `rightCardAvatarSizePx`
+`admin.html` exposes range sliders that all write to `master.layout` and cascade to every spread. Only sliders that have a visible effect under the current Option-2 flex/grid layout are exposed. Working sliders, with the CSS class they ultimately style:
 
-Defaults are wired into `createDefaultSpreadLayout()` and `applyMasterSpreadTemplate()`. New layout fields fall through to defaults if missing on a spread.
+| Slider label | `layout` key | CSS target | Notes |
+| --- | --- | --- | --- |
+| Category size | `genreFontSize` | `.feature-genre` | left-page orange uppercase header |
+| Graphic scale | `imageScalePercent` | `.featured-hero` width | hero image (3:2) |
+| Graphic shadow | `imageShadow` | `.featured-hero img` filter | `none` / `soft` / `strong` |
+| Label size | `courseLabelFontSize` | `.featured-eyebrow` | "★ Featured Course" pill |
+| Description horizontal position | `descriptionX` | `.featured-text-block` translateX | &plusmn;20% nudge |
+| Description vertical position | `descriptionY` | `.featured-text-block` translateY | &plusmn;20% nudge |
+| Description height (0 = auto) | `descriptionHeight` | `.featured-text-block` height | when &gt; 0, breaks out of grid stretch |
+| Instructor card horizontal position | `instructorCardX` | `.faculty-card-slot.featured-instructor-slot` translateX | &plusmn;20% |
+| Instructor card vertical position | `instructorCardY` | same translateY | &plusmn;20% |
+| Instructor card width | `instructorCardWidth` | `.featured-bottom` grid column 2 | 80&ndash;300px (default 200) |
+| Instructor card height (0 = auto) | `instructorCardHeight` | slot height | when &gt; 0, breaks out of grid stretch |
+| Instructor headshot size | `facultyAvatarSizePx` | `.featured-instructor-avatar` | |
+| Instructor name size | `facultyNameSizePx` | `.featured-instructor-name` | |
+| Instructor blurb size | `facultyBlurbSizePx` | `.featured-instructor-bio-link` | actually styles "Tap for Bio" link &mdash; the `feature.facultyBlurb` data field doesn't render anywhere on the front face under the current design |
+| Heading size | `rightHeadingFontSize` | `.section-genre` font-size | right-page genre header |
+| Heading box width | `rightHeadingWidthPercent` | `.section-genre` width | |
+| Intro size | `rightIntroFontSize` | `.support-intro` | only renders if `entry.intro` is non-empty |
+| Intro box width | `rightIntroWidthPercent` | `.support-intro` width | same |
+| Right-page headshot size | `rightCardAvatarSizePx` | `.support-avatar` | |
+| Course title size | `rightCardTitleFontSize` | `.support-text strong` | |
+| Course list instructor name size | `rightCardMetaFontSize` | `.support-text span` | (label says "Instructor name size" but it's the right-page one) |
+| Course summary size | `rightCardSummaryFontSize` | `.support-panel p` | only visible after expanding a supporting course |
+| Course stack width | `rightListWidthPercent` | `.support-list` width | |
+
+Plus a dedicated **Course description** textarea that writes `feature.lede` directly (the visible `<p class="featured-desc">` is rendered from this field).
+
+Sliders that were intentionally removed because they have no clean meaning in the new flex/grid layout: `imageY`, `genreY`, `genreWidthPercent`, `courseLabelY`, `courseLabelWidthPercent`, `facultyY`, `facultyScalePercent`, `facultyWidthPercent`. The fields still exist in the schema for back-compat but no UI is exposed.
+
+The `entry.leftBlocks` system (positioned text blocks) is fully **dead** in the new layout &mdash; the data is still maintained internally so master cascade keeps it consistent, but `renderSpread` no longer renders it and the editor no longer exposes any UI for it. Course title/description live on `feature.title` / `feature.lede` and are rendered as `<h2 class="featured-title">` / `<p class="featured-desc">` inside `.featured-text-block`.
+
+Defaults are wired into `createDefaultSpreadLayout()`. New layout fields fall through to defaults if missing on a spread.
+
+**Clamp pattern:** all `normalizeContent` clamps for layout fields use `Number.isFinite(v)` rather than `Number(v) || default` &mdash; this matters because `Number(0) || 10` evaluates to `10` (since `0` is falsy), which silently rewrites a legitimate 0 to the default. We hit this when `imageY: 0` got persistently rewritten to `10` during slider testing.
 
 ### Netlify Function: `save-content`
 
@@ -211,6 +248,12 @@ When Claude writes a large file to the mount, the resulting file on the Windows 
 ### Editor `localStorage` shadowing
 
 `admin.html` loads `content.js` as the bundled baseline, then overlays any draft saved in `localStorage`. If the deployed `content.js` changes (e.g., schema migration, or someone else publishes), the editor will keep showing the in-browser draft until **Discard saved draft** is clicked, an incognito window is used, or DevTools clears site data. Hard refresh does **not** clear `localStorage`. Add a brief `Discard saved draft` reminder when shipping any schema change.
+
+### Class-name drift between sliders and rendered DOM
+
+The left page went through an "Option-2" redesign that swapped many class names: `.feature-image-card` &rarr; `.featured-hero`, `.feature-course-label` &rarr; `.featured-eyebrow`, `.faculty-avatar-large` &rarr; `.featured-instructor-avatar`, `.faculty-name` &rarr; `.featured-instructor-name`, `.faculty-blurb` &rarr; `.featured-instructor-bio-link`. Old CSS rules still exist for the legacy classes, and several of them carry CSS-variable consumers (`var(--image-y, ...)`, `var(--course-label-font-size, ...)`, etc.) but their selectors don't match anything in the rendered DOM anymore. When wiring a new editor slider, look at the **live** rendered class with DevTools, not at the CSS rules &mdash; a `var()` reference in a stylesheet doesn't mean the variable reaches the page.
+
+Same situation on the right page: `.section-title` (legacy, `display: none`) consumed `--right-heading-size`/`--right-heading-width`, but the live `.section-genre` had hardcoded values until those vars were retargeted onto it.
 
 ### `Dr. ian McFarland` typo
 
