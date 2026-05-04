@@ -436,30 +436,31 @@ button.meta-chip {
   pointer-events: none;
   z-index: 4;
   background:
-    /* Soft inward page curve toward the gutter: each page dips slightly
-       as it approaches the spine, with a tight dark valley right at the
-       binding seam. Reads as the natural depression of a magazine spine. */
+    /* Deeper inward page curve toward the gutter — the valley is now
+       darker and slightly wider so the cover and back read as a real
+       bound book rather than a flat pair of pages. May 2026 redesign. */
     linear-gradient(
       90deg,
-      transparent 30%,
-      rgba(0, 0, 0, 0.06) 38%,
-      rgba(0, 0, 0, 0.14) 44%,
-      rgba(0, 0, 0, 0.26) 48%,
-      rgba(0, 0, 0, 0.34) 50%,
-      rgba(0, 0, 0, 0.26) 52%,
-      rgba(0, 0, 0, 0.14) 56%,
-      rgba(0, 0, 0, 0.06) 62%,
-      transparent 70%
+      transparent 28%,
+      rgba(0, 0, 0, 0.10) 36%,
+      rgba(0, 0, 0, 0.22) 43%,
+      rgba(0, 0, 0, 0.42) 48%,
+      rgba(0, 0, 0, 0.55) 50%,
+      rgba(0, 0, 0, 0.42) 52%,
+      rgba(0, 0, 0, 0.22) 57%,
+      rgba(0, 0, 0, 0.10) 64%,
+      transparent 72%
     ),
-    /* A whisper of brightness on the page sides of the valley -- the
-       glossy paper catches a little ambient light on the rising edge. */
+    /* Highlight on the rising paper edge on each side of the valley —
+       a touch brighter than before so the new deeper valley doesn't
+       read as a smudge. */
     linear-gradient(
       90deg,
       transparent 36%,
-      rgba(255, 253, 244, 0.06) 44%,
+      rgba(255, 253, 244, 0.10) 44%,
       transparent 47%,
       transparent 53%,
-      rgba(255, 253, 244, 0.06) 56%,
+      rgba(255, 253, 244, 0.10) 56%,
       transparent 64%
     ),
     /* Outer-edge darkening at the far left/right of the spread, slightly
@@ -2398,6 +2399,280 @@ body.preview-embed .app-shell {
   transform: perspective(2800px) rotateY(0deg) translateZ(8px);
 }
 
+/* ============================================================
+   Cover C + Back C — May 2026 redesign.
+   Cover C: photo full-bleed left, cream right, single orange band
+   crossing the spread carrying the tagline + knocked-out wordmark.
+   Back C: photo left + frosted footer band; right page is a 2x2
+   audience grid (visit / contact / newsletter / donate).
+   ============================================================ */
+
+/* ---------- Cover C ---------- */
+.cover-c-left {
+  padding: 0;
+  background: var(--navy);
+  color: var(--ivory);
+  overflow: hidden;
+}
+.cover-c-left .cover-c-photo {
+  position: absolute;
+  inset: 0;
+  background: url("assets/student_photos/Master Class Student Talking 4.jpg") center/cover;
+  z-index: 0;
+}
+.cover-c-left .cover-c-shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(20, 25, 33, 0.10) 0%, rgba(20, 25, 33, 0.0) 30%, rgba(20, 25, 33, 0.0) 70%, rgba(20, 25, 33, 0.45) 100%),
+    linear-gradient(90deg, transparent 70%, rgba(10, 12, 16, 0.40) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+.cover-c-footline {
+  position: absolute;
+  left: 36px;
+  bottom: 34px;
+  z-index: 2;
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(250, 250, 242, 0.85);
+}
+.cover-c-right {
+  background: linear-gradient(180deg, #faf6e8, #f0ead8);
+  padding: 54px 60px 56px;
+  display: flex;
+  flex-direction: column;
+}
+.cover-c-right-eyebrow {
+  font-family: "DM Mono", monospace;
+  font-size: 12px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--orange-red);
+  margin-bottom: auto;
+}
+.cover-c-title {
+  margin: 200px 0 28px;
+  font-family: "DM Serif Display", serif;
+  font-weight: 400;
+  font-size: clamp(2.6rem, 4.4vw, 4.4rem);
+  line-height: 1.0;
+  color: var(--navy);
+  max-width: 11ch;
+}
+.cover-c-subline {
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(30, 37, 48, 0.6);
+  max-width: 32ch;
+  line-height: 1.55;
+}
+/* Band spans both pages. Positioned absolutely against the spread.
+   z-index 3 sits above the page content but below the gusset (z 4-6)
+   so the spine shadow still cuts across cleanly. */
+.cover-c-band {
+  position: absolute;
+  left: 0; right: 0;
+  top: 38%;
+  height: 14%;
+  display: flex;
+  background: linear-gradient(90deg, #cc4a23, #e26330);
+  box-shadow: 0 12px 30px rgba(200, 72, 38, 0.45), 0 -2px 0 rgba(0, 0, 0, 0.05);
+  z-index: 3;
+  pointer-events: none;
+}
+.cover-c-band-left,
+.cover-c-band-right {
+  flex: 1 1 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 36px;
+  min-width: 0;
+}
+.cover-c-band-left span {
+  color: #fff;
+  font-family: "DM Serif Display", serif;
+  font-style: italic;
+  font-size: clamp(1.4rem, 2vw, 2.1rem);
+  letter-spacing: 0.01em;
+  text-shadow: 0 2px 6px rgba(80, 20, 10, 0.28);
+  text-align: center;
+  line-height: 1.15;
+}
+.cover-c-band-right img {
+  width: clamp(220px, 22vw, 340px);
+  height: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+/* ---------- Back C ---------- */
+.close-c-left {
+  padding: 0;
+  background: var(--navy);
+  color: var(--ivory);
+  overflow: hidden;
+}
+.close-c-left .close-c-photo {
+  position: absolute;
+  inset: 0;
+  background: url("assets/student_photos/Master Class Student Talking 5.jpg") center/cover;
+  z-index: 0;
+}
+.close-c-left .close-c-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(20, 25, 33, 0) 50%, rgba(20, 25, 33, 0.7) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+.close-c-footer {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  z-index: 2;
+  background: rgba(20, 25, 33, 0.78);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  color: var(--ivory);
+  padding: 26px 48px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.close-c-footer-mark {
+  width: 48px;
+  height: auto;
+  filter: brightness(0) invert(1);
+  flex: 0 0 auto;
+}
+.close-c-footer-text {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.close-c-footer-line {
+  font-family: "DM Serif Display", serif;
+  font-style: italic;
+  font-size: clamp(1rem, 1.5vw, 1.4rem);
+  line-height: 1.15;
+}
+.close-c-footer-sub {
+  font-family: "DM Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+}
+.close-c-right {
+  background: linear-gradient(180deg, #faf6e8, #f0ead8);
+  padding: 50px 56px 40px;
+  display: flex;
+  flex-direction: column;
+}
+.close-c-logo {
+  width: 220px;
+  height: auto;
+  margin: 0 0 22px;
+  align-self: flex-start;
+  object-fit: contain;
+}
+.close-c-title {
+  margin: 0 0 8px;
+  font-family: "DM Serif Display", serif;
+  font-weight: 400;
+  font-size: clamp(2rem, 3vw, 2.9rem);
+  line-height: 1.0;
+  color: var(--navy);
+}
+.close-c-subtitle {
+  margin: 0 0 22px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: rgba(30, 37, 48, 0.7);
+  max-width: 36ch;
+}
+.close-c-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.close-c-cell {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(30, 37, 48, 0.10);
+  border-radius: 14px;
+  padding: 18px 18px 16px;
+  min-height: 152px;
+  display: flex;
+  flex-direction: column;
+}
+.close-c-cell-eyebrow {
+  font-family: "DM Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--orange-red);
+  margin-bottom: 8px;
+}
+.close-c-cell-title {
+  margin: 0 0 6px;
+  font-family: "DM Serif Display", serif;
+  font-weight: 400;
+  font-size: 20px;
+  line-height: 1.15;
+  color: var(--navy);
+}
+.close-c-cell-copy {
+  margin: 0 0 12px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: rgba(30, 37, 48, 0.72);
+  flex: 1 1 auto;
+}
+.close-c-link {
+  font-family: "DM Mono", monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--orange-red);
+  text-decoration: none;
+  align-self: flex-start;
+  border-bottom: 1px solid transparent;
+  transition: border-color 120ms ease;
+}
+.close-c-link:hover { border-bottom-color: currentColor; }
+.close-c-cell-featured {
+  background: linear-gradient(180deg, var(--orange-red), #b53b1c);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 12px 28px rgba(200, 72, 38, 0.32);
+}
+.close-c-cell-featured .close-c-cell-eyebrow { color: rgba(255, 255, 255, 0.78); }
+.close-c-cell-featured .close-c-cell-title { color: #fff; }
+.close-c-cell-featured .close-c-cell-copy { color: rgba(255, 255, 255, 0.85); }
+.close-c-cell-featured .close-c-link { color: #fff; }
+.close-c-meta {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(30, 37, 48, 0.10);
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  font-family: "DM Mono", monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(30, 37, 48, 0.66);
+}
+
 /* 3D curl-along-spine animation. Replaces the flat linear transition
    with @keyframes that vary perspective + translateZ + filter through
    the rotation, so the page reads as a flexible sheet curling around
@@ -3030,23 +3305,34 @@ function getCoursePages() {
 
 function renderCover(index) {
   const entry = BOOK[index];
-  // Cover spread: hero photo on the left, title block on the right.
-  // The TOC moves to the intro spread (page 2, .note-right).
+  // Cover C — Symmetric spread tied together by a horizontal orange
+  // band. Photo full-bleed on the left; cream paper with serif title
+  // and small kicker on the right; band carries the tagline + a
+  // knocked-out white version of the wordmark across both pages.
+  const tagline = entry.tagline || "";
+  const title = entry.title || "";
+  const rightEyebrow = entry.rightEyebrow || "";
+  const rightSubline = entry.rightSubline || "";
+  const leftFootline = entry.leftFootline || "";
   return `
-    <div class="page page-left cover-left">
-      <div class="cover-photo" aria-hidden="true"></div>
-      <div class="cover-photo-shade" aria-hidden="true"></div>
-      ${entry.photoCaption ? `<div class="cover-photo-caption"><span>${entry.photoCaption}</span></div>` : ""}
+    <div class="page page-left cover-c-left">
+      <div class="cover-c-photo" aria-hidden="true"></div>
+      <div class="cover-c-shade" aria-hidden="true"></div>
+      ${leftFootline ? `<div class="cover-c-footline"><span>${leftFootline}</span></div>` : ""}
     </div>
-    <div class="page page-right cover-right">
-      <div class="cover-title-block">
-        <img class="cover-logo" src="assets/branding/foundry-logomark-orange.png" alt="">
-        <div class="eyebrow cover-eyebrow">${entry.eyebrow || ""}</div>
-        <h1 class="cover-title">${entry.title || ""}</h1>
-        <p class="cover-subtitle">${entry.subtitle || ""}</p>
-        ${entry.kicker ? `<div class="cover-kicker">${entry.kicker}</div>` : ""}
-      </div>
+    <div class="page page-right cover-c-right">
+      ${rightEyebrow ? `<div class="cover-c-right-eyebrow">${rightEyebrow}</div>` : ""}
+      <h1 class="cover-c-title">${title}</h1>
+      ${rightSubline ? `<div class="cover-c-subline">${rightSubline}</div>` : ""}
       <div class="paper-grain"></div>
+    </div>
+    <!-- Orange band sits above both pages and is z-indexed under the
+         StPageFlip 3D context so the spread reads as one composition.
+         Tagline lives on the left half, knocked-out white wordmark on
+         the right half. -->
+    <div class="cover-c-band" aria-hidden="true">
+      <div class="cover-c-band-left"><span>${tagline}</span></div>
+      <div class="cover-c-band-right"><img src="assets/branding/foundry-logo-orange.png" alt=""></div>
     </div>
   `;
 }
@@ -3308,27 +3594,55 @@ function renderSpread(entry, index) {
 
 function renderClose(index) {
   const entry = BOOK[index];
-  const marks = Array.isArray(entry.marks) ? entry.marks : [];
+  // Back C — 2x2 audience grid. Left page is photo-led with a frosted
+  // black footer band carrying the small logomark and a one-line value
+  // statement. Right page has the wordmark, a 'Ready to get started?'
+  // headline, and four cells (visit / contact / newsletter / donate).
+  // The donate cell is filled orange as the visual anchor.
+  const cells = Array.isArray(entry.cells) ? entry.cells : [];
+  const renderCell = (cell) => {
+    const eyebrow = cell.eyebrow || "";
+    const ctitle = cell.title || "";
+    const copy = cell.copy || "";
+    const url = cell.linkUrl || "";
+    const linkLabel = cell.linkLabel || "Open \u2192";
+    const featured = cell.featured ? " close-c-cell-featured" : "";
+    const isExternal = url && !url.startsWith("mailto:") && !url.startsWith("#");
+    const linkAttrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
+    const linkEl = url
+      ? `<a class="close-c-link" href="${url}"${linkAttrs}>${linkLabel}</a>`
+      : "";
+    return `
+      <article class="close-c-cell${featured}">
+        ${eyebrow ? `<div class="close-c-cell-eyebrow">${eyebrow}</div>` : ""}
+        ${ctitle ? `<h3 class="close-c-cell-title">${ctitle}</h3>` : ""}
+        ${copy ? `<p class="close-c-cell-copy">${copy}</p>` : ""}
+        ${linkEl}
+      </article>
+    `;
+  };
   return `
-    <div class="page page-left close-left">
-      <div class="eyebrow close-kicker">${entry.eyebrow || ""}</div>
-      <h2 class="close-title">${entry.title || ""}</h2>
-      <p class="close-copy">${entry.copy || ""}</p>
-      <div class="close-marks">
-        ${marks.map((mark) => `<span>${mark}</span>`).join("")}
+    <div class="page page-left close-c-left">
+      <div class="close-c-photo" aria-hidden="true"></div>
+      <div class="close-c-shade" aria-hidden="true"></div>
+      <div class="close-c-footer">
+        <img class="close-c-footer-mark" src="assets/branding/foundry-logomark-orange.png" alt="">
+        <div class="close-c-footer-text">
+          <span class="close-c-footer-line">${entry.leftValueLine || ""}</span>
+          ${entry.leftSubline ? `<span class="close-c-footer-sub">${entry.leftSubline}</span>` : ""}
+        </div>
       </div>
-      <div class="paper-grain"></div>
     </div>
-    <div class="page page-right close-right">
-      <div class="closing-card">
-        <img src="assets/branding/foundry-logo-orange.png" alt="The Candler Foundry">
-        <div class="eyebrow close-kicker">${entry.cardEyebrow || ""}</div>
-        <p class="close-copy" style="color: rgba(30, 37, 48, 0.8); margin-top: 0;">${entry.cardCopy || ""}</p>
+    <div class="page page-right close-c-right">
+      <img class="close-c-logo" src="assets/branding/foundry-logo-orange.png" alt="The Candler Foundry">
+      ${entry.title ? `<h2 class="close-c-title">${entry.title}</h2>` : ""}
+      ${entry.subtitle ? `<p class="close-c-subtitle">${entry.subtitle}</p>` : ""}
+      <div class="close-c-grid">
+        ${cells.map(renderCell).join("")}
       </div>
-      <div class="closing-list">
-        <article><strong>Featured faculty</strong>${entry.facultyCopy || ""}</article>
-        <article><strong>Additional instructors</strong>${entry.additionalCopy || ""}</article>
-        <article><strong>About the Foundry</strong>${entry.aboutCopy || ""}</article>
+      <div class="close-c-meta">
+        ${entry.metaLeft ? `<span>${entry.metaLeft}</span>` : ""}
+        ${entry.metaRight ? `<span>${entry.metaRight}</span>` : ""}
       </div>
       <div class="paper-grain"></div>
     </div>

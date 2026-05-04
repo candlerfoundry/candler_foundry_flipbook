@@ -2,11 +2,11 @@ window.FLIPBOOK_CONTENT = [
   {
     "type": "cover",
     "label": "Cover",
-    "eyebrow": "The Candler Foundry at Emory",
     "title": "Courses in the Community",
-    "subtitle": "A field guide to the Foundry's open courses and partner-church classes — prepared for donors, deans, and curious congregations.",
-    "kicker": "Field Guide · 2026",
-    "photoCaption": "Foundry classroom · Atlanta"
+    "tagline": "Scholar-Led. Accessible. Transformative.",
+    "rightEyebrow": "Field Guide \u00b7 2026",
+    "rightSubline": "A continuing-education initiative of Candler School of Theology",
+    "leftFootline": "Candler Foundry \u00b7 Atlanta \u00b7 2026"
   },
   {
     "type": "note",
@@ -867,19 +867,42 @@ window.FLIPBOOK_CONTENT = [
   {
     "type": "close",
     "label": "Back Cover",
-    "eyebrow": "The Candler Foundry at Emory",
-    "title": "Rigorous learning, warmly delivered.",
-    "copy": "The Candler Foundry brings the scholarship of Candler School of Theology to a broader community - offering courses that are serious, accessible, and shaped by some of the finest theological minds in the country.",
-    "marks": [
-      "Biblical Studies",
-      "Ministry Formation",
-      "Spiritual Practice",
-      "Public Theology"
+    "leftValueLine": "Theology for all who are curious.",
+    "leftSubline": "The Candler Foundry \u00b7 Atlanta \u00b7 2026",
+    "title": "Ready to get started?",
+    "subtitle": "Pick the door that fits \u2014 we\u2019ll meet you there.",
+    "cells": [
+      {
+        "eyebrow": "Visit",
+        "title": "Our website",
+        "copy": "Programs, courses, and the latest from the Foundry.",
+        "linkLabel": "Open \u2192",
+        "linkUrl": "https://candlerfoundry.emory.edu/"
+      },
+      {
+        "eyebrow": "Contact",
+        "title": "Get in touch",
+        "copy": "Partner-church planning, press, or anything else \u2014 just write.",
+        "linkLabel": "Email \u2192",
+        "linkUrl": "mailto:candlerfoundry@emory.edu"
+      },
+      {
+        "eyebrow": "Newsletter",
+        "title": "Stay in the loop",
+        "copy": "A short, occasional note about new courses and gatherings.",
+        "linkLabel": "Subscribe \u2192",
+        "linkUrl": "https://mailchi.mp/c260323fc0e1/candler_foundry"
+      },
+      {
+        "eyebrow": "Support",
+        "title": "Support our work",
+        "copy": "Open these courses to every learner who wants to come.",
+        "linkLabel": "Donate \u2192",
+        "linkUrl": "https://give.emory.edu/",
+        "featured": true
+      }
     ],
-    "cardEyebrow": "Courses featured in this guide",
-    "cardCopy": "Each spread highlights one course in depth alongside a curated library of related offerings in the same theme - an invitation to explore the full range of what the Foundry makes possible.",
-    "facultyCopy": "Dr. Elizabeth Arnold, Dr. Ryan Bonfiglio, Dr. Teresa Fry Brown.",
-    "additionalCopy": "Dr. Luke Timothy Johnson, Dr. Noel Erskine, Dr. Dominic Erdozain, Dr. Brent Strawn, and others.",
-    "aboutCopy": "A continuing education initiative of Candler School of Theology at Emory University, welcoming learners from all backgrounds and traditions."
+    "metaLeft": "candlerfoundry@emory.edu",
+    "metaRight": "candlerfoundry.emory.edu"
   }
 ];
