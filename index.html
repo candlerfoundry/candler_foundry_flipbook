@@ -2407,11 +2407,14 @@ body.preview-embed .app-shell {
    audience grid (visit / contact / newsletter / donate).
    ============================================================ */
 
-/* ---------- Cover (May 2026 refinement) ----------
-   Left page: photo as low-opacity tonal backdrop over cream paper,
-   italicized serif tagline centered on top with the last word accented
-   in orange. Right page: centered wordmark + serif title + orange rule.
-   No mono eyebrows / footlines / datelines.                           */
+/* ---------- Cover (May 2026 refinement v2) ----------
+   Left page: photo as low-opacity tonal backdrop over cream paper.
+   Italic serif tagline anchored bottom-left, left-aligned, with the
+   last word in orange (Cover B mockup composition).
+   Right page: Penguin-Classic split. Wordmark logo at the TOP of the
+   page; serif title + orange rule locked to the BOTTOM via
+   margin-top:auto on the title block. Reads as a deliberate two-pole
+   composition rather than a centered floating clump.                  */
 .cover-c-left {
   padding: 0;
   background: linear-gradient(180deg, #faf6e8, #f0ead8);
@@ -2429,8 +2432,6 @@ body.preview-embed .app-shell {
 .cover-c-left .cover-c-shade {
   position: absolute;
   inset: 0;
-  /* Cream wash that lifts highlights and unifies tone with the right
-     page. Plus a subtle gutter darkening so the spine still reads. */
   background:
     linear-gradient(180deg, rgba(250, 246, 232, 0.30), rgba(240, 234, 216, 0.55)),
     linear-gradient(90deg, transparent 70%, rgba(30, 37, 48, 0.10) 100%);
@@ -2439,24 +2440,25 @@ body.preview-embed .app-shell {
 }
 .cover-c-tagline {
   position: absolute;
-  inset: 0;
+  left: 56px;
+  right: 56px;
+  bottom: 64px;
   z-index: 2;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 60px;
-  text-align: center;
+  align-items: flex-start;
+  text-align: left;
+  gap: 0;
 }
 .cover-c-tagline-line {
+  display: block;
   font-family: "DM Serif Display", serif;
   font-style: italic;
   font-weight: 400;
-  font-size: clamp(2.4rem, 5vw, 4.8rem);
-  line-height: 1.0;
+  font-size: clamp(2.6rem, 5.2vw, 5rem);
+  line-height: 0.98;
   color: var(--navy);
-  text-shadow: 0 2px 14px rgba(255, 248, 230, 0.55);
+  margin: 0;
 }
 .cover-c-tagline-accent {
   color: var(--orange-red);
@@ -2464,28 +2466,37 @@ body.preview-embed .app-shell {
 
 .cover-c-right {
   background: linear-gradient(180deg, #faf6e8, #f0ead8);
-  padding: 80px 70px;
+  padding: 70px 60px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   text-align: center;
+  /* No justify-content:center on purpose. The logo sits at the top by
+     default flow; the title-block uses margin-top:auto to slide to the
+     bottom of the available space. */
 }
 .cover-c-logo {
-  width: 320px;
+  width: 280px;
   max-width: 70%;
   height: auto;
-  margin: 0 0 48px;
+  margin: 0;
   object-fit: contain;
 }
+.cover-c-title-block {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 .cover-c-title {
-  margin: 0 0 32px;
+  margin: 0 0 22px;
   font-family: "DM Serif Display", serif;
   font-weight: 400;
-  font-size: clamp(2.6rem, 4vw, 4rem);
+  font-size: clamp(2.6rem, 4.2vw, 4.2rem);
   line-height: 1.02;
   color: var(--navy);
-  max-width: 12ch;
+  max-width: 14ch;
+  text-wrap: balance;
 }
 .cover-c-rule {
   width: 60px;
@@ -3286,11 +3297,12 @@ function getCoursePages() {
 
 function renderCover(index) {
   const entry = BOOK[index];
-  // Cover (May 2026 refinement): photo on the left at low opacity acts
-  // as a tonal backdrop; the italicized tagline is the focal element,
-  // stacked centered with the final word in orange. Right page is
-  // centered: full wordmark + serif title + thin orange rule, nothing
-  // else. No mono eyebrow/footline/dateline anywhere.
+  // Cover (May 2026 refinement v2): photo on the left at low opacity is a
+  // tonal backdrop; italicized serif tagline anchored bottom-left with
+  // the final word in orange (Cover B mockup composition). Right page is
+  // a Penguin-style top/bottom split: wordmark logo at the top, serif
+  // title + orange rule locked to the bottom of the page via margin-top:
+  // auto. No mono eyebrow / footline / dateline anywhere.
   const tagline = entry.tagline || "";
   const title = entry.title || "";
   const taglineLines = tagline.split(/\.\s*/).filter(Boolean);
@@ -3307,8 +3319,10 @@ function renderCover(index) {
     </div>
     <div class="page page-right cover-c-right">
       <img class="cover-c-logo" src="assets/branding/foundry-logo-orange.png" alt="The Candler Foundry">
-      ${title ? `<h1 class="cover-c-title">${title}</h1>` : ""}
-      <div class="cover-c-rule" aria-hidden="true"></div>
+      <div class="cover-c-title-block">
+        ${title ? `<h1 class="cover-c-title">${title}</h1>` : ""}
+        <div class="cover-c-rule" aria-hidden="true"></div>
+      </div>
       <div class="paper-grain"></div>
     </div>
   `;
