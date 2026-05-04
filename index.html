@@ -2436,102 +2436,33 @@ body.preview-embed .app-shell {
    audience grid (visit / contact / newsletter / donate).
    ============================================================ */
 
-/* ---------- Cover (May 2026 v4 — single-page magazine cover) ----------
-   Emits ONE .page element which StPageFlip with showCover:true renders
-   as the closed-magazine front cover. The reader never sees a left
-   page until they flip past the cover into the first inside spread.
-
-   Composition on this single page:
-   - cream paper base, washed-out photo (0.32 opacity) painted on top
-   - foundry wordmark masthead at top-left
-   - FIELD GUIDE pill at top-right
-   - 3-line serif title anchored bottom-left ('Courses / in the /
-     Community' via white-space:pre-line)
-   - italic-serif "The Candler Foundry" imprint right below the title
-   .cover-c-back is gone (no longer rendered with showCover:true).      */
+/* ---------- Cover (May 2026 v5 — flat image) ----------
+   Cover is now a single composed image (designed in Canva, stored at
+   entry.coverImage). The renderer lays it down full-bleed via an <img>
+   element with object-fit:cover so any tiny aspect mismatch crops to
+   center rather than letterboxing. All previous decorative elements
+   (masthead, FIELD GUIDE pill, title, imprint) are baked into the
+   image, so we only need three short rules.                          */
 
 .cover-c-front {
   padding: 0;
-  background: linear-gradient(180deg, #faf6e8, #f0ead8);
+  background: #15191f;
   position: relative;
   overflow: hidden;
 }
-.cover-c-front .cover-c-front-photo {
+.cover-c-image {
   position: absolute;
   inset: 0;
-  background: url("assets/student_photos/Master Class Student Talking 4.jpg") center/cover;
-  opacity: 0.32;
-  filter: saturate(0.85) contrast(0.95);
-  z-index: 0;
-}
-.cover-c-front .cover-c-front-shade {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(180deg, rgba(250, 246, 232, 0.30), rgba(240, 234, 216, 0.55)),
-    /* slight darken behind the bottom-left title block for contrast */
-    radial-gradient(ellipse 60% 40% at 18% 100%, rgba(20, 25, 33, 0.10), transparent 70%);
-  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  /* Disable the default image drag-ghost; the page-flip library handles
+     pointer events and we don't want a drag-image to flicker over a flip. */
+  -webkit-user-drag: none;
+  user-select: none;
   pointer-events: none;
-}
-.cover-c-front-top {
-  position: absolute;
-  top: 48px;
-  left: 56px;
-  right: 56px;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-}
-.cover-c-masthead {
-  width: 280px;
-  max-width: 70%;
-  height: auto;
-  object-fit: contain;
-}
-.cover-c-pill {
-  font-family: "DM Mono", monospace;
-  font-size: 11px;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--orange-red);
-  background: rgba(255, 255, 255, 0.62);
-  border: 1px solid rgba(232, 101, 31, 0.40);
-  padding: 8px 16px;
-  border-radius: 999px;
-  flex: 0 0 auto;
-}
-.cover-c-front-bottom {
-  position: absolute;
-  bottom: 56px;
-  left: 56px;
-  right: 56px;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  gap: 18px;
-}
-.cover-c-title {
-  margin: 0;
-  font-family: "DM Serif Display", serif;
-  font-weight: 400;
-  font-size: clamp(3rem, 6vw, 5.6rem);
-  line-height: 0.96;
-  color: var(--navy);
-  white-space: pre-line;
-  max-width: 14ch;
-}
-.cover-c-imprint {
-  font-family: "DM Serif Display", serif;
-  font-style: italic;
-  font-weight: 400;
-  font-size: clamp(1.2rem, 2vw, 1.7rem);
-  line-height: 1.0;
-  color: var(--orange-red);
+  z-index: 0;
 }
 
 /* ---------- Back cover (May 2026 v4 — single-page audience grid) ----------
@@ -3303,28 +3234,21 @@ function getCoursePages() {
 
 function renderCover(index) {
   const entry = BOOK[index];
-  // Cover (May 2026 v4 — true single-page magazine cover). Emits ONE
-  // .page element (no .page-left / .page-right) so that StPageFlip with
-  // showCover:true treats it as the cover-of-a-closed-magazine that the
-  // reader sees on first load — like the front of a real magazine
-  // sitting on the desk. The reader never sees a left page until they
-  // flip past the cover into the first inside spread.
-  const title = entry.title || "";
-  const imprint = entry.imprint || "";
-  const pillLabel = entry.pillLabel || "";
+  // Cover (May 2026 v5 — flat image). The cover composition is baked
+  // into a single PNG/JPG produced in Canva (or wherever) and stored
+  // in entry.coverImage. The renderer just lays it down full-bleed
+  // into the cover page. With showCover:true + soft density (set in
+  // buildBookPageFlip) the cover behaves as a single closed-magazine
+  // front that flips with a paper curl. entry.title is preserved as
+  // the alt text and page label.
+  const src = entry.coverImage || "";
+  const alt = entry.title || "Cover";
+  // URL-encode spaces in the path so filenames like "Cover Image.png"
+  // resolve cleanly without requiring on-disk renames.
+  const safeSrc = src.replace(/ /g, "%20");
   return `
     <div class="page cover-c-front">
-      <div class="cover-c-front-photo" aria-hidden="true"></div>
-      <div class="cover-c-front-shade" aria-hidden="true"></div>
-      <div class="cover-c-front-top">
-        <img class="cover-c-masthead" src="assets/branding/foundry-logo-orange.png" alt="The Candler Foundry">
-        ${pillLabel ? `<div class="cover-c-pill">${pillLabel}</div>` : ""}
-      </div>
-      <div class="cover-c-front-bottom">
-        ${title ? `<h1 class="cover-c-title">${title}</h1>` : ""}
-        ${imprint ? `<div class="cover-c-imprint">${imprint}</div>` : ""}
-      </div>
-      <div class="paper-grain"></div>
+      ${safeSrc ? `<img class="cover-c-image" src="${safeSrc}" alt="${alt}" draggable="false">` : ""}
     </div>
   `;
 }

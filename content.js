@@ -2,9 +2,8 @@ window.FLIPBOOK_CONTENT = [
   {
     "type": "cover",
     "label": "Cover",
-    "title": "Courses\nin the\nCommunity",
-    "imprint": "The Candler Foundry",
-    "pillLabel": "Field Guide"
+    "title": "Courses in the Community",
+    "coverImage": "assets/branding/Cover Image.png"
   },
   {
     "type": "note",
