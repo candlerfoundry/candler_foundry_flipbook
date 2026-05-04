@@ -2407,109 +2407,90 @@ body.preview-embed .app-shell {
    audience grid (visit / contact / newsletter / donate).
    ============================================================ */
 
-/* ---------- Cover C ---------- */
+/* ---------- Cover (May 2026 refinement) ----------
+   Left page: photo as low-opacity tonal backdrop over cream paper,
+   italicized serif tagline centered on top with the last word accented
+   in orange. Right page: centered wordmark + serif title + orange rule.
+   No mono eyebrows / footlines / datelines.                           */
 .cover-c-left {
   padding: 0;
-  background: var(--navy);
-  color: var(--ivory);
+  background: linear-gradient(180deg, #faf6e8, #f0ead8);
+  color: var(--navy);
   overflow: hidden;
 }
 .cover-c-left .cover-c-photo {
   position: absolute;
   inset: 0;
   background: url("assets/student_photos/Master Class Student Talking 4.jpg") center/cover;
+  opacity: 0.32;
+  filter: saturate(0.85) contrast(0.95);
   z-index: 0;
 }
 .cover-c-left .cover-c-shade {
   position: absolute;
   inset: 0;
+  /* Cream wash that lifts highlights and unifies tone with the right
+     page. Plus a subtle gutter darkening so the spine still reads. */
   background:
-    linear-gradient(180deg, rgba(20, 25, 33, 0.10) 0%, rgba(20, 25, 33, 0.0) 30%, rgba(20, 25, 33, 0.0) 70%, rgba(20, 25, 33, 0.45) 100%),
-    linear-gradient(90deg, transparent 70%, rgba(10, 12, 16, 0.40) 100%);
+    linear-gradient(180deg, rgba(250, 246, 232, 0.30), rgba(240, 234, 216, 0.55)),
+    linear-gradient(90deg, transparent 70%, rgba(30, 37, 48, 0.10) 100%);
   z-index: 1;
   pointer-events: none;
 }
-.cover-c-footline {
+.cover-c-tagline {
   position: absolute;
-  left: 36px;
-  bottom: 34px;
+  inset: 0;
   z-index: 2;
-  font-family: "DM Mono", monospace;
-  font-size: 11px;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: rgba(250, 250, 242, 0.85);
-}
-.cover-c-right {
-  background: linear-gradient(180deg, #faf6e8, #f0ead8);
-  padding: 54px 60px 56px;
   display: flex;
   flex-direction: column;
-}
-.cover-c-right-eyebrow {
-  font-family: "DM Mono", monospace;
-  font-size: 12px;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--orange-red);
-  margin-bottom: auto;
-}
-.cover-c-title {
-  margin: 200px 0 28px;
-  font-family: "DM Serif Display", serif;
-  font-weight: 400;
-  font-size: clamp(2.6rem, 4.4vw, 4.4rem);
-  line-height: 1.0;
-  color: var(--navy);
-  max-width: 11ch;
-}
-.cover-c-subline {
-  font-family: "DM Mono", monospace;
-  font-size: 11px;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: rgba(30, 37, 48, 0.6);
-  max-width: 32ch;
-  line-height: 1.55;
-}
-/* Band spans both pages. Positioned absolutely against the spread.
-   z-index 3 sits above the page content but below the gusset (z 4-6)
-   so the spine shadow still cuts across cleanly. */
-.cover-c-band {
-  position: absolute;
-  left: 0; right: 0;
-  top: 38%;
-  height: 14%;
-  display: flex;
-  background: linear-gradient(90deg, #cc4a23, #e26330);
-  box-shadow: 0 12px 30px rgba(200, 72, 38, 0.45), 0 -2px 0 rgba(0, 0, 0, 0.05);
-  z-index: 3;
-  pointer-events: none;
-}
-.cover-c-band-left,
-.cover-c-band-right {
-  flex: 1 1 50%;
-  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 36px;
-  min-width: 0;
+  gap: 6px;
+  padding: 60px;
+  text-align: center;
 }
-.cover-c-band-left span {
-  color: #fff;
+.cover-c-tagline-line {
   font-family: "DM Serif Display", serif;
   font-style: italic;
-  font-size: clamp(1.4rem, 2vw, 2.1rem);
-  letter-spacing: 0.01em;
-  text-shadow: 0 2px 6px rgba(80, 20, 10, 0.28);
-  text-align: center;
-  line-height: 1.15;
+  font-weight: 400;
+  font-size: clamp(2.4rem, 5vw, 4.8rem);
+  line-height: 1.0;
+  color: var(--navy);
+  text-shadow: 0 2px 14px rgba(255, 248, 230, 0.55);
 }
-.cover-c-band-right img {
-  width: clamp(220px, 22vw, 340px);
+.cover-c-tagline-accent {
+  color: var(--orange-red);
+}
+
+.cover-c-right {
+  background: linear-gradient(180deg, #faf6e8, #f0ead8);
+  padding: 80px 70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.cover-c-logo {
+  width: 320px;
+  max-width: 70%;
   height: auto;
+  margin: 0 0 48px;
   object-fit: contain;
-  filter: brightness(0) invert(1);
+}
+.cover-c-title {
+  margin: 0 0 32px;
+  font-family: "DM Serif Display", serif;
+  font-weight: 400;
+  font-size: clamp(2.6rem, 4vw, 4rem);
+  line-height: 1.02;
+  color: var(--navy);
+  max-width: 12ch;
+}
+.cover-c-rule {
+  width: 60px;
+  height: 2px;
+  background: var(--orange-red);
 }
 
 /* ---------- Back C ---------- */
@@ -3305,34 +3286,30 @@ function getCoursePages() {
 
 function renderCover(index) {
   const entry = BOOK[index];
-  // Cover C — Symmetric spread tied together by a horizontal orange
-  // band. Photo full-bleed on the left; cream paper with serif title
-  // and small kicker on the right; band carries the tagline + a
-  // knocked-out white version of the wordmark across both pages.
+  // Cover (May 2026 refinement): photo on the left at low opacity acts
+  // as a tonal backdrop; the italicized tagline is the focal element,
+  // stacked centered with the final word in orange. Right page is
+  // centered: full wordmark + serif title + thin orange rule, nothing
+  // else. No mono eyebrow/footline/dateline anywhere.
   const tagline = entry.tagline || "";
   const title = entry.title || "";
-  const rightEyebrow = entry.rightEyebrow || "";
-  const rightSubline = entry.rightSubline || "";
-  const leftFootline = entry.leftFootline || "";
+  const taglineLines = tagline.split(/\.\s*/).filter(Boolean);
+  const renderLine = (line, idx) => {
+    const isLast = idx === taglineLines.length - 1;
+    const cls = "cover-c-tagline-line" + (isLast ? " cover-c-tagline-accent" : "");
+    return `<span class="${cls}">${line}.</span>`;
+  };
   return `
     <div class="page page-left cover-c-left">
       <div class="cover-c-photo" aria-hidden="true"></div>
       <div class="cover-c-shade" aria-hidden="true"></div>
-      ${leftFootline ? `<div class="cover-c-footline"><span>${leftFootline}</span></div>` : ""}
+      ${tagline ? `<div class="cover-c-tagline">${taglineLines.map(renderLine).join("")}</div>` : ""}
     </div>
     <div class="page page-right cover-c-right">
-      ${rightEyebrow ? `<div class="cover-c-right-eyebrow">${rightEyebrow}</div>` : ""}
-      <h1 class="cover-c-title">${title}</h1>
-      ${rightSubline ? `<div class="cover-c-subline">${rightSubline}</div>` : ""}
+      <img class="cover-c-logo" src="assets/branding/foundry-logo-orange.png" alt="The Candler Foundry">
+      ${title ? `<h1 class="cover-c-title">${title}</h1>` : ""}
+      <div class="cover-c-rule" aria-hidden="true"></div>
       <div class="paper-grain"></div>
-    </div>
-    <!-- Orange band sits above both pages and is z-indexed under the
-         StPageFlip 3D context so the spread reads as one composition.
-         Tagline lives on the left half, knocked-out white wordmark on
-         the right half. -->
-    <div class="cover-c-band" aria-hidden="true">
-      <div class="cover-c-band-left"><span>${tagline}</span></div>
-      <div class="cover-c-band-right"><img src="assets/branding/foundry-logo-orange.png" alt=""></div>
     </div>
   `;
 }

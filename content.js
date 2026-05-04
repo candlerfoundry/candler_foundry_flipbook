@@ -3,10 +3,7 @@ window.FLIPBOOK_CONTENT = [
     "type": "cover",
     "label": "Cover",
     "title": "Courses in the Community",
-    "tagline": "Scholar-Led. Accessible. Transformative.",
-    "rightEyebrow": "Field Guide \u00b7 2026",
-    "rightSubline": "A continuing-education initiative of Candler School of Theology",
-    "leftFootline": "Candler Foundry \u00b7 Atlanta \u00b7 2026"
+    "tagline": "Scholar-Led. Accessible. Transformative."
   },
   {
     "type": "note",
