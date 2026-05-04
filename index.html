@@ -2407,21 +2407,51 @@ body.preview-embed .app-shell {
    audience grid (visit / contact / newsletter / donate).
    ============================================================ */
 
-/* ---------- Cover (May 2026 refinement v2) ----------
-   Left page: photo as low-opacity tonal backdrop over cream paper.
-   Italic serif tagline anchored bottom-left, left-aligned, with the
-   last word in orange (Cover B mockup composition).
-   Right page: Penguin-Classic split. Wordmark logo at the TOP of the
-   page; serif title + orange rule locked to the BOTTOM via
-   margin-top:auto on the title block. Reads as a deliberate two-pole
-   composition rather than a centered floating clump.                  */
-.cover-c-left {
+/* ---------- Cover (May 2026 v3 — magazine cover) ----------
+   Single-page magazine layout. The whole cover composition lives on
+   the right page; the left page is a quiet cream frontispiece with a
+   small Foundry mark in the center.
+
+   Right page (the cover proper):
+   - cream paper background with the photo painted on top at low opacity
+     (filter desaturated slightly) so the photo reads as a tonal wash.
+   - foundry wordmark masthead at top-left
+   - FIELD GUIDE pill at top-right
+   - bottom-left block: 3-line serif title (uses white-space:pre-line so
+     the \n separators in entry.title render as line breaks) plus an
+     italic orange-serif imprint right below it.                       */
+
+.cover-c-back {
   padding: 0;
   background: linear-gradient(180deg, #faf6e8, #f0ead8);
-  color: var(--navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cover-c-back-mark {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  border: 1px solid rgba(30, 37, 48, 0.12);
+  background: rgba(255, 255, 255, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.55;
+}
+.cover-c-back-mark img {
+  width: 56px;
+  height: auto;
+  opacity: 0.85;
+}
+
+.cover-c-front {
+  padding: 0;
+  background: linear-gradient(180deg, #faf6e8, #f0ead8);
+  position: relative;
   overflow: hidden;
 }
-.cover-c-left .cover-c-photo {
+.cover-c-front .cover-c-front-photo {
   position: absolute;
   inset: 0;
   background: url("assets/student_photos/Master Class Student Talking 4.jpg") center/cover;
@@ -2429,79 +2459,74 @@ body.preview-embed .app-shell {
   filter: saturate(0.85) contrast(0.95);
   z-index: 0;
 }
-.cover-c-left .cover-c-shade {
+.cover-c-front .cover-c-front-shade {
   position: absolute;
   inset: 0;
   background:
     linear-gradient(180deg, rgba(250, 246, 232, 0.30), rgba(240, 234, 216, 0.55)),
-    linear-gradient(90deg, transparent 70%, rgba(30, 37, 48, 0.10) 100%);
+    /* slight darken behind the bottom-left title block for contrast */
+    radial-gradient(ellipse 60% 40% at 18% 100%, rgba(20, 25, 33, 0.10), transparent 70%);
   z-index: 1;
   pointer-events: none;
 }
-.cover-c-tagline {
+.cover-c-front-top {
   position: absolute;
+  top: 48px;
   left: 56px;
   right: 56px;
-  bottom: 64px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+.cover-c-masthead {
+  width: 280px;
+  max-width: 70%;
+  height: auto;
+  object-fit: contain;
+}
+.cover-c-pill {
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--orange-red);
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(232, 101, 31, 0.40);
+  padding: 8px 16px;
+  border-radius: 999px;
+  flex: 0 0 auto;
+}
+.cover-c-front-bottom {
+  position: absolute;
+  bottom: 56px;
+  left: 56px;
+  right: 56px;
   z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   text-align: left;
-  gap: 0;
+  gap: 18px;
 }
-.cover-c-tagline-line {
-  display: block;
+.cover-c-title {
+  margin: 0;
+  font-family: "DM Serif Display", serif;
+  font-weight: 400;
+  font-size: clamp(3rem, 6vw, 5.6rem);
+  line-height: 0.96;
+  color: var(--navy);
+  white-space: pre-line;
+  max-width: 14ch;
+}
+.cover-c-imprint {
   font-family: "DM Serif Display", serif;
   font-style: italic;
   font-weight: 400;
-  font-size: clamp(2.6rem, 5.2vw, 5rem);
-  line-height: 0.98;
-  color: var(--navy);
-  margin: 0;
-}
-.cover-c-tagline-accent {
+  font-size: clamp(1.2rem, 2vw, 1.7rem);
+  line-height: 1.0;
   color: var(--orange-red);
-}
-
-.cover-c-right {
-  background: linear-gradient(180deg, #faf6e8, #f0ead8);
-  padding: 70px 60px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  /* No justify-content:center on purpose. The logo sits at the top by
-     default flow; the title-block uses margin-top:auto to slide to the
-     bottom of the available space. */
-}
-.cover-c-logo {
-  width: 280px;
-  max-width: 70%;
-  height: auto;
-  margin: 0;
-  object-fit: contain;
-}
-.cover-c-title-block {
-  margin-top: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.cover-c-title {
-  margin: 0 0 22px;
-  font-family: "DM Serif Display", serif;
-  font-weight: 400;
-  font-size: clamp(2.6rem, 4.2vw, 4.2rem);
-  line-height: 1.02;
-  color: var(--navy);
-  max-width: 14ch;
-  text-wrap: balance;
-}
-.cover-c-rule {
-  width: 60px;
-  height: 2px;
-  background: var(--orange-red);
 }
 
 /* ---------- Back C ---------- */
@@ -3297,31 +3322,39 @@ function getCoursePages() {
 
 function renderCover(index) {
   const entry = BOOK[index];
-  // Cover (May 2026 refinement v2): photo on the left at low opacity is a
-  // tonal backdrop; italicized serif tagline anchored bottom-left with
-  // the final word in orange (Cover B mockup composition). Right page is
-  // a Penguin-style top/bottom split: wordmark logo at the top, serif
-  // title + orange rule locked to the bottom of the page via margin-top:
-  // auto. No mono eyebrow / footline / dateline anywhere.
-  const tagline = entry.tagline || "";
+  // Cover (May 2026 v3 — single-page magazine layout). The whole cover
+  // composition lives on the right page, like the front of a real
+  // magazine. Left page is a quiet cream frontispiece with a small
+  // Foundry mark — what the reader sees as the inside of the front
+  // cover when the book is open.
+  //
+  // Right page, top to bottom:
+  //  - foundry-logo-orange wordmark (masthead, top-left)
+  //  - FIELD GUIDE pill (top-right)
+  //  - washed-out photo as background
+  //  - title as 3 stacked lines (uses \n + white-space:pre-line)
+  //    anchored bottom-left
+  //  - italic-serif "The Candler Foundry" imprint right below the title
   const title = entry.title || "";
-  const taglineLines = tagline.split(/\.\s*/).filter(Boolean);
-  const renderLine = (line, idx) => {
-    const isLast = idx === taglineLines.length - 1;
-    const cls = "cover-c-tagline-line" + (isLast ? " cover-c-tagline-accent" : "");
-    return `<span class="${cls}">${line}.</span>`;
-  };
+  const imprint = entry.imprint || "";
+  const pillLabel = entry.pillLabel || "";
   return `
-    <div class="page page-left cover-c-left">
-      <div class="cover-c-photo" aria-hidden="true"></div>
-      <div class="cover-c-shade" aria-hidden="true"></div>
-      ${tagline ? `<div class="cover-c-tagline">${taglineLines.map(renderLine).join("")}</div>` : ""}
+    <div class="page page-left cover-c-back">
+      <div class="cover-c-back-mark" aria-hidden="true">
+        <img src="assets/branding/foundry-logomark-orange.png" alt="">
+      </div>
+      <div class="paper-grain"></div>
     </div>
-    <div class="page page-right cover-c-right">
-      <img class="cover-c-logo" src="assets/branding/foundry-logo-orange.png" alt="The Candler Foundry">
-      <div class="cover-c-title-block">
+    <div class="page page-right cover-c-front">
+      <div class="cover-c-front-photo" aria-hidden="true"></div>
+      <div class="cover-c-front-shade" aria-hidden="true"></div>
+      <div class="cover-c-front-top">
+        <img class="cover-c-masthead" src="assets/branding/foundry-logo-orange.png" alt="The Candler Foundry">
+        ${pillLabel ? `<div class="cover-c-pill">${pillLabel}</div>` : ""}
+      </div>
+      <div class="cover-c-front-bottom">
         ${title ? `<h1 class="cover-c-title">${title}</h1>` : ""}
-        <div class="cover-c-rule" aria-hidden="true"></div>
+        ${imprint ? `<div class="cover-c-imprint">${imprint}</div>` : ""}
       </div>
       <div class="paper-grain"></div>
     </div>
