@@ -1128,11 +1128,11 @@ button.meta-chip {
 /* Hero image band: full page width, 3:2 ratio (our native asset format).
    flex-shrink: 0 prevents the bottom grid from squishing it. */
 .featured-hero {
-  /* Width is slider-driven (--image-scale). Vertical position is
-     determined by flex order on .feature-canvas, not by --image-y --
-     in the new flex layout there's no clean meaning for an absolute
-     vertical offset. */
+  /* Width is slider-driven (--image-scale). The Q2 2026 "Graphic vertical
+     position" slider drives a translateY nudge via --image-offset-y
+     (-20%..+20%) — the legacy absolute --image-y is left inert. */
   width: calc(var(--image-scale, 85) * 1%);
+  transform: translateY(calc(var(--image-offset-y, 0) * 1%));
   aspect-ratio: 3 / 2;
   border-radius: 4px;
   box-shadow: 0 5px 16px rgba(0, 0, 0, 0.18);
@@ -1160,7 +1160,7 @@ button.meta-chip {
      --description-align / --instructor-card-align when an explicit height
      is set. */
   grid-template-columns: 1fr calc(var(--instructor-card-width, 200) * 1px);
-  gap: 24px;
+  gap: var(--card-gap, 24px);
   align-items: stretch;
   flex: 1;
   min-height: 0;
@@ -1169,11 +1169,17 @@ button.meta-chip {
 .featured-text-block {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  /* When height is auto (slider 0), centering keeps text vertically balanced
+     in the row. When an explicit height is set, renderSpread switches
+     --description-justify to 'flex-start' so growing the box doesn't slide
+     text downward via re-centering. */
+  justify-content: var(--description-justify, center);
   /* Internal padding so the description doesn't touch the page edge on
      the left or the instructor card on the right. */
   padding-left: 16px;
   padding-right: 12px;
+  /* Slider-driven width (50-100%). At 100% the cell stretches as before. */
+  width: var(--description-width-css, 100%);
   /* Slider-driven nudges. Translate keeps the grid layout stable; the
      element is shifted visually without reflowing the whole row.
      --description-height-css is set inline by renderSpread to 'auto' (when
@@ -1186,7 +1192,7 @@ button.meta-chip {
 }
 .featured-title {
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 22px;
+  font-size: var(--description-title-font-size, 22px);
   font-weight: 700;
   color: #1A1A1A;
   margin: 0 0 8px 0;
@@ -1194,7 +1200,7 @@ button.meta-chip {
 }
 .featured-desc {
   font-family: "Montserrat", "Segoe UI", sans-serif;
-  font-size: 14px;
+  font-size: var(--description-font-size, 14px);
   line-height: 1.55;
   color: #3A3128;
   margin: 0;
@@ -2688,6 +2694,11 @@ function createDefaultSpreadLayout() {
     descriptionX: 0,
     descriptionY: 0,
     descriptionHeight: 0,
+    descriptionWidthPercent: 100,
+    descriptionFontSize: 14,
+    descriptionTitleFontSize: 24,
+    cardGapPx: 24,
+    imageOffsetY: 0,
     instructorCardX: 0,
     instructorCardY: 0,
     instructorCardWidth: 200,
@@ -2883,6 +2894,11 @@ function normalizeContent(data) {
       nextEntry.layout.instructorCardY = _clampSigned(nextEntry.layout.instructorCardY, -20, 20, 0);
       nextEntry.layout.instructorCardWidth = _clampSigned(nextEntry.layout.instructorCardWidth, 80, 300, 200);
       nextEntry.layout.instructorCardHeight = _clampSigned(nextEntry.layout.instructorCardHeight, 0, 400, 0);
+      nextEntry.layout.imageOffsetY = _clampSigned(nextEntry.layout.imageOffsetY, -20, 20, 0);
+      nextEntry.layout.descriptionWidthPercent = _clampSigned(nextEntry.layout.descriptionWidthPercent, 50, 100, 100);
+      nextEntry.layout.descriptionFontSize = _clampSigned(nextEntry.layout.descriptionFontSize, 12, 28, 14);
+      nextEntry.layout.descriptionTitleFontSize = _clampSigned(nextEntry.layout.descriptionTitleFontSize, 24, 60, 24);
+      nextEntry.layout.cardGapPx = _clampSigned(nextEntry.layout.cardGapPx, 8, 80, 24);
       nextEntry.leftBlocks = templateVersion >= getSpreadTemplateVersion() && Array.isArray(nextEntry.leftBlocks) && nextEntry.leftBlocks.length
         ? nextEntry.leftBlocks
             .map((block, blockIndex) => normalizeLeftBlock(block, blockIndex))
@@ -3256,9 +3272,16 @@ function renderSpread(entry, index) {
   const instructorCardHeight = Math.max(0, Math.min(_toNum(layout.instructorCardHeight, 0), 400));
   const instructorCardHeightCss = instructorCardHeight > 0 ? `${instructorCardHeight}px` : "100%";
   const instructorCardAlign = instructorCardHeight > 0 ? "start" : "stretch";
+  // New layout knobs (Q2 2026): graphic Y, description width/font/title-font, faculty-card gap.
+  const imageOffsetY = Math.max(-20, Math.min(_toNum(layout.imageOffsetY, 0), 20));
+  const descriptionWidth = Math.max(50, Math.min(_toNum(layout.descriptionWidthPercent, 100), 100));
+  const descriptionFontSize = Math.max(12, Math.min(_toNum(layout.descriptionFontSize, 14), 28));
+  const descriptionTitleFontSize = Math.max(24, Math.min(_toNum(layout.descriptionTitleFontSize, 24), 60));
+  const cardGapPx = Math.max(8, Math.min(_toNum(layout.cardGapPx, 24), 80));
+  const descriptionJustify = descriptionHeight > 0 ? "flex-start" : "center";
   const supporting = Array.isArray(entry.supporting) ? entry.supporting : [];
   return `
-    <div class="page page-left feature-left" style="--image-scale:${imageScale}; --image-shadow:${getImageShadowFilter(layout.imageShadow)}; --course-label-font-size:${courseLabelFontSize}; --faculty-avatar-size:${facultyAvatarSize}; --faculty-name-size:${facultyNameSize}; --faculty-blurb-size:${facultyBlurbSize}; --description-x:${descriptionX}; --description-y:${descriptionY}; --description-height-css:${descriptionHeightCss}; --description-align:${descriptionAlign}; --instructor-card-x:${instructorCardX}; --instructor-card-y:${instructorCardY}; --instructor-card-width:${instructorCardWidth}; --instructor-card-height-css:${instructorCardHeightCss}; --instructor-card-align:${instructorCardAlign};">
+    <div class="page page-left feature-left" style="--image-scale:${imageScale}; --image-shadow:${getImageShadowFilter(layout.imageShadow)}; --course-label-font-size:${courseLabelFontSize}; --faculty-avatar-size:${facultyAvatarSize}; --faculty-name-size:${facultyNameSize}; --faculty-blurb-size:${facultyBlurbSize}; --description-x:${descriptionX}; --description-y:${descriptionY}; --description-height-css:${descriptionHeightCss}; --description-align:${descriptionAlign}; --description-justify:${descriptionJustify}; --description-width-css:${descriptionWidth}%; --description-font-size:${descriptionFontSize}px; --description-title-font-size:${descriptionTitleFontSize}px; --card-gap:${cardGapPx}px; --image-offset-y:${imageOffsetY}; --instructor-card-x:${instructorCardX}; --instructor-card-y:${instructorCardY}; --instructor-card-width:${instructorCardWidth}; --instructor-card-height-css:${instructorCardHeightCss}; --instructor-card-align:${instructorCardAlign};">
       <div class="feature-canvas">
         <div class="feature-genre" style="--genre-font-size:${genreFontSize}px; --genre-font-family:${getEditorFontFamily(layout.genreFontFamily || "montserrat", "text")};">${entry.genre}</div>
         <span class="featured-eyebrow">★ ${feature.courseLabel || "Featured Course"}</span>

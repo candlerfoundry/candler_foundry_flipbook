@@ -723,6 +723,11 @@ function createDefaultSpreadLayout() {
     descriptionX: 0,
     descriptionY: 0,
     descriptionHeight: 0,
+    descriptionWidthPercent: 100,
+    descriptionFontSize: 14,
+    descriptionTitleFontSize: 24,
+    cardGapPx: 24,
+    imageOffsetY: 0,
     instructorCardX: 0,
     instructorCardY: 0,
     instructorCardWidth: 200,
@@ -900,6 +905,11 @@ function normalizeContent(data) {
       nextEntry.layout.instructorCardY = _clampSigned(nextEntry.layout.instructorCardY, -20, 20, 0);
       nextEntry.layout.instructorCardWidth = _clampSigned(nextEntry.layout.instructorCardWidth, 80, 300, 200);
       nextEntry.layout.instructorCardHeight = _clampSigned(nextEntry.layout.instructorCardHeight, 0, 400, 0);
+      nextEntry.layout.imageOffsetY = _clampSigned(nextEntry.layout.imageOffsetY, -20, 20, 0);
+      nextEntry.layout.descriptionWidthPercent = _clampSigned(nextEntry.layout.descriptionWidthPercent, 50, 100, 100);
+      nextEntry.layout.descriptionFontSize = _clampSigned(nextEntry.layout.descriptionFontSize, 12, 28, 14);
+      nextEntry.layout.descriptionTitleFontSize = _clampSigned(nextEntry.layout.descriptionTitleFontSize, 24, 60, 24);
+      nextEntry.layout.cardGapPx = _clampSigned(nextEntry.layout.cardGapPx, 8, 80, 24);
       nextEntry.leftBlocks = templateVersion >= getSpreadTemplateVersion() && Array.isArray(nextEntry.leftBlocks) && nextEntry.leftBlocks.length
         ? nextEntry.leftBlocks
             .map((block, blockIndex) => normalizeLeftBlock(block, blockIndex))
@@ -1526,6 +1536,7 @@ function renderSpreadEditor(entry, path, label) {
   const graphicGrid = document.createElement("div");
   graphicGrid.className = "field-grid";
   graphicGrid.appendChild(createRangeField("Graphic scale", entry.layout.imageScalePercent, path.concat("layout", "imageScalePercent"), { min: 40, max: 140, step: 1, suffix: "%", message: "Updated graphic scale" }));
+  graphicGrid.appendChild(createRangeField("Graphic vertical position", entry.layout.imageOffsetY, path.concat("layout", "imageOffsetY"), { min: -20, max: 20, step: 1, suffix: "%", message: "Nudged graphic vertically" }));
   graphicGrid.appendChild(createSelectField("Graphic shadow", entry.layout.imageShadow || "soft", path.concat("layout", "imageShadow"), [
     { value: "none", label: "None" },
     { value: "soft", label: "Soft" },
@@ -1571,6 +1582,10 @@ function renderSpreadEditor(entry, path, label) {
   descriptionGrid.appendChild(createRangeField("Description horizontal position", entry.layout.descriptionX, path.concat("layout", "descriptionX"), { min: -20, max: 20, step: 1, suffix: "%", message: "Nudged description horizontally" }));
   descriptionGrid.appendChild(createRangeField("Description vertical position", entry.layout.descriptionY, path.concat("layout", "descriptionY"), { min: -20, max: 20, step: 1, suffix: "%", message: "Nudged description vertically" }));
   descriptionGrid.appendChild(createRangeField("Description height (0 = auto)", entry.layout.descriptionHeight, path.concat("layout", "descriptionHeight"), { min: 0, max: 400, step: 4, suffix: "px", message: "Set description height" }));
+  descriptionGrid.appendChild(createRangeField("Description width", entry.layout.descriptionWidthPercent, path.concat("layout", "descriptionWidthPercent"), { min: 50, max: 100, step: 1, suffix: "%", message: "Resized description width" }));
+  descriptionGrid.appendChild(createRangeField("Description text size", entry.layout.descriptionFontSize, path.concat("layout", "descriptionFontSize"), { min: 12, max: 28, step: 1, suffix: "px", message: "Updated description text size" }));
+  descriptionGrid.appendChild(createRangeField("Description title size", entry.layout.descriptionTitleFontSize, path.concat("layout", "descriptionTitleFontSize"), { min: 24, max: 60, step: 1, suffix: "px", message: "Updated description title size" }));
+  descriptionGrid.appendChild(createRangeField("Description \u2194 faculty card gap", entry.layout.cardGapPx, path.concat("layout", "cardGapPx"), { min: 8, max: 80, step: 1, suffix: "px", message: "Adjusted gap between description and faculty card" }));
   descriptionSection.appendChild(descriptionGrid);
   wrap.appendChild(descriptionSection);
 
