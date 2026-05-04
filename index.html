@@ -2407,43 +2407,19 @@ body.preview-embed .app-shell {
    audience grid (visit / contact / newsletter / donate).
    ============================================================ */
 
-/* ---------- Cover (May 2026 v3 — magazine cover) ----------
-   Single-page magazine layout. The whole cover composition lives on
-   the right page; the left page is a quiet cream frontispiece with a
-   small Foundry mark in the center.
+/* ---------- Cover (May 2026 v4 — single-page magazine cover) ----------
+   Emits ONE .page element which StPageFlip with showCover:true renders
+   as the closed-magazine front cover. The reader never sees a left
+   page until they flip past the cover into the first inside spread.
 
-   Right page (the cover proper):
-   - cream paper background with the photo painted on top at low opacity
-     (filter desaturated slightly) so the photo reads as a tonal wash.
+   Composition on this single page:
+   - cream paper base, washed-out photo (0.32 opacity) painted on top
    - foundry wordmark masthead at top-left
    - FIELD GUIDE pill at top-right
-   - bottom-left block: 3-line serif title (uses white-space:pre-line so
-     the \n separators in entry.title render as line breaks) plus an
-     italic orange-serif imprint right below it.                       */
-
-.cover-c-back {
-  padding: 0;
-  background: linear-gradient(180deg, #faf6e8, #f0ead8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.cover-c-back-mark {
-  width: 96px;
-  height: 96px;
-  border-radius: 50%;
-  border: 1px solid rgba(30, 37, 48, 0.12);
-  background: rgba(255, 255, 255, 0.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.55;
-}
-.cover-c-back-mark img {
-  width: 56px;
-  height: auto;
-  opacity: 0.85;
-}
+   - 3-line serif title anchored bottom-left ('Courses / in the /
+     Community' via white-space:pre-line)
+   - italic-serif "The Candler Foundry" imprint right below the title
+   .cover-c-back is gone (no longer rendered with showCover:true).      */
 
 .cover-c-front {
   padding: 0;
@@ -2529,68 +2505,42 @@ body.preview-embed .app-shell {
   color: var(--orange-red);
 }
 
-/* ---------- Back C ---------- */
-.close-c-left {
+/* ---------- Back cover (May 2026 v4 — single-page audience grid) ----------
+   Emits ONE .page that StPageFlip with showCover:true treats as the
+   closed-magazine back cover. The audience grid sits on cream paper
+   with the (Master Class Student Talking 5) photo painted at low
+   opacity behind it as a soft tonal watermark — same tonal language
+   as the front cover. The old two-page Back C (.close-c-left photo +
+   .close-c-right grid) is gone.                                     */
+
+.close-c-single {
   padding: 0;
-  background: var(--navy);
-  color: var(--ivory);
+  background: linear-gradient(180deg, #faf6e8, #f0ead8);
+  position: relative;
   overflow: hidden;
 }
-.close-c-left .close-c-photo {
+.close-c-single .close-c-photo {
   position: absolute;
   inset: 0;
   background: url("assets/student_photos/Master Class Student Talking 5.jpg") center/cover;
+  opacity: 0.18;
+  filter: saturate(0.85);
   z-index: 0;
 }
-.close-c-left .close-c-shade {
+.close-c-single .close-c-shade {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(20, 25, 33, 0) 50%, rgba(20, 25, 33, 0.7) 100%);
+  background:
+    linear-gradient(180deg, rgba(250, 246, 232, 0.55), rgba(240, 234, 216, 0.78)),
+    radial-gradient(ellipse 70% 50% at 50% 95%, rgba(20, 25, 33, 0.06), transparent 70%);
   z-index: 1;
   pointer-events: none;
 }
-.close-c-footer {
-  position: absolute;
-  left: 0; right: 0; bottom: 0;
+.close-c-content {
+  position: relative;
   z-index: 2;
-  background: rgba(20, 25, 33, 0.78);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-  color: var(--ivory);
-  padding: 26px 48px;
-  display: flex;
-  align-items: center;
-  gap: 18px;
-}
-.close-c-footer-mark {
-  width: 48px;
-  height: auto;
-  filter: brightness(0) invert(1);
-  flex: 0 0 auto;
-}
-.close-c-footer-text {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-}
-.close-c-footer-line {
-  font-family: "DM Serif Display", serif;
-  font-style: italic;
-  font-size: clamp(1rem, 1.5vw, 1.4rem);
-  line-height: 1.15;
-}
-.close-c-footer-sub {
-  font-family: "DM Mono", monospace;
-  font-size: 10px;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.7);
-}
-.close-c-right {
-  background: linear-gradient(180deg, #faf6e8, #f0ead8);
   padding: 50px 56px 40px;
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -2598,8 +2548,8 @@ body.preview-embed .app-shell {
   width: 220px;
   height: auto;
   margin: 0 0 22px;
-  align-self: flex-start;
   object-fit: contain;
+  align-self: flex-start;
 }
 .close-c-title {
   margin: 0 0 8px;
@@ -2614,7 +2564,7 @@ body.preview-embed .app-shell {
   font-family: "DM Sans", sans-serif;
   font-size: 13.5px;
   line-height: 1.55;
-  color: rgba(30, 37, 48, 0.7);
+  color: rgba(30, 37, 48, 0.72);
   max-width: 36ch;
 }
 .close-c-grid {
@@ -2623,13 +2573,15 @@ body.preview-embed .app-shell {
   gap: 14px;
 }
 .close-c-cell {
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.82);
   border: 1px solid rgba(30, 37, 48, 0.10);
   border-radius: 14px;
   padding: 18px 18px 16px;
   min-height: 152px;
   display: flex;
   flex-direction: column;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 .close-c-cell-eyebrow {
   font-family: "DM Mono", monospace;
@@ -3322,30 +3274,17 @@ function getCoursePages() {
 
 function renderCover(index) {
   const entry = BOOK[index];
-  // Cover (May 2026 v3 — single-page magazine layout). The whole cover
-  // composition lives on the right page, like the front of a real
-  // magazine. Left page is a quiet cream frontispiece with a small
-  // Foundry mark — what the reader sees as the inside of the front
-  // cover when the book is open.
-  //
-  // Right page, top to bottom:
-  //  - foundry-logo-orange wordmark (masthead, top-left)
-  //  - FIELD GUIDE pill (top-right)
-  //  - washed-out photo as background
-  //  - title as 3 stacked lines (uses \n + white-space:pre-line)
-  //    anchored bottom-left
-  //  - italic-serif "The Candler Foundry" imprint right below the title
+  // Cover (May 2026 v4 — true single-page magazine cover). Emits ONE
+  // .page element (no .page-left / .page-right) so that StPageFlip with
+  // showCover:true treats it as the cover-of-a-closed-magazine that the
+  // reader sees on first load — like the front of a real magazine
+  // sitting on the desk. The reader never sees a left page until they
+  // flip past the cover into the first inside spread.
   const title = entry.title || "";
   const imprint = entry.imprint || "";
   const pillLabel = entry.pillLabel || "";
   return `
-    <div class="page page-left cover-c-back">
-      <div class="cover-c-back-mark" aria-hidden="true">
-        <img src="assets/branding/foundry-logomark-orange.png" alt="">
-      </div>
-      <div class="paper-grain"></div>
-    </div>
-    <div class="page page-right cover-c-front">
+    <div class="page cover-c-front">
       <div class="cover-c-front-photo" aria-hidden="true"></div>
       <div class="cover-c-front-shade" aria-hidden="true"></div>
       <div class="cover-c-front-top">
@@ -3618,11 +3557,12 @@ function renderSpread(entry, index) {
 
 function renderClose(index) {
   const entry = BOOK[index];
-  // Back C — 2x2 audience grid. Left page is photo-led with a frosted
-  // black footer band carrying the small logomark and a one-line value
-  // statement. Right page has the wordmark, a 'Ready to get started?'
-  // headline, and four cells (visit / contact / newsletter / donate).
-  // The donate cell is filled orange as the visual anchor.
+  // Back cover (May 2026 v4 — single-page audience grid). Same
+  // single-page treatment as the front cover so showCover:true makes
+  // the closed-book back read as a real magazine back cover. The
+  // photo (Master Class Student Talking 5) sits as a soft cream-washed
+  // watermark behind the audience grid — same tonal language as the
+  // front cover.
   const cells = Array.isArray(entry.cells) ? entry.cells : [];
   const renderCell = (cell) => {
     const eyebrow = cell.eyebrow || "";
@@ -3646,27 +3586,20 @@ function renderClose(index) {
     `;
   };
   return `
-    <div class="page page-left close-c-left">
+    <div class="page close-c-single">
       <div class="close-c-photo" aria-hidden="true"></div>
       <div class="close-c-shade" aria-hidden="true"></div>
-      <div class="close-c-footer">
-        <img class="close-c-footer-mark" src="assets/branding/foundry-logomark-orange.png" alt="">
-        <div class="close-c-footer-text">
-          <span class="close-c-footer-line">${entry.leftValueLine || ""}</span>
-          ${entry.leftSubline ? `<span class="close-c-footer-sub">${entry.leftSubline}</span>` : ""}
+      <div class="close-c-content">
+        <img class="close-c-logo" src="assets/branding/foundry-logo-orange.png" alt="The Candler Foundry">
+        ${entry.title ? `<h2 class="close-c-title">${entry.title}</h2>` : ""}
+        ${entry.subtitle ? `<p class="close-c-subtitle">${entry.subtitle}</p>` : ""}
+        <div class="close-c-grid">
+          ${cells.map(renderCell).join("")}
         </div>
-      </div>
-    </div>
-    <div class="page page-right close-c-right">
-      <img class="close-c-logo" src="assets/branding/foundry-logo-orange.png" alt="The Candler Foundry">
-      ${entry.title ? `<h2 class="close-c-title">${entry.title}</h2>` : ""}
-      ${entry.subtitle ? `<p class="close-c-subtitle">${entry.subtitle}</p>` : ""}
-      <div class="close-c-grid">
-        ${cells.map(renderCell).join("")}
-      </div>
-      <div class="close-c-meta">
-        ${entry.metaLeft ? `<span>${entry.metaLeft}</span>` : ""}
-        ${entry.metaRight ? `<span>${entry.metaRight}</span>` : ""}
+        <div class="close-c-meta">
+          ${entry.metaLeft ? `<span>${entry.metaLeft}</span>` : ""}
+          ${entry.metaRight ? `<span>${entry.metaRight}</span>` : ""}
+        </div>
       </div>
       <div class="paper-grain"></div>
     </div>
@@ -3695,7 +3628,15 @@ function buildBookPageFlip() {
 
   const tempWrapper = document.createElement('div');
   const pageEls = [];
+  // Per-page entry mapping: pageToEntry[pageIndex] -> entry index, and
+  // entryFirstPage[entryIndex] -> first pageIndex for that entry.
+  // These let entries emit either 1 or 2 .page elements (1 for cover
+  // and back-cover singles, 2 for normal spreads) without breaking the
+  // onFlip / goTo math.
+  const pageToEntry = [];
+  const entryFirstPage = [];
   BOOK.forEach((entry, index) => {
+    entryFirstPage[index] = pageEls.length;
     tempWrapper.innerHTML = renderEntry(entry, index);
     const leftPage = tempWrapper.querySelector('.page-left');
     const rightPage = tempWrapper.querySelector('.page-right');
@@ -3713,6 +3654,7 @@ function buildBookPageFlip() {
       lc.appendChild(leftPage);
       lw.appendChild(lc);
       pageEls.push(lw);
+      pageToEntry.push(index);
       const rw = document.createElement('div');
       rw.className = 'spf-page';
       rw.dataset.entryIndex = String(index);
@@ -3722,10 +3664,32 @@ function buildBookPageFlip() {
       rc.appendChild(rightPage);
       rw.appendChild(rc);
       pageEls.push(rw);
+      pageToEntry.push(index);
+    } else {
+      // Single-page entry (cover / back cover). Emits ONE .page that
+      // becomes the closed-magazine cover or back when paired with
+      // showCover:true.
+      const singlePage = tempWrapper.querySelector('.page');
+      if (singlePage) {
+        const sw = document.createElement('div');
+        sw.className = 'spf-page';
+        sw.dataset.entryIndex = String(index);
+        sw.dataset.side = 'single';
+        const sc = document.createElement('div');
+        sc.className = 'spf-page-clip';
+        sc.appendChild(singlePage);
+        sw.appendChild(sc);
+        pageEls.push(sw);
+        pageToEntry.push(index);
+      }
     }
     tempWrapper.innerHTML = '';
   });
   pageEls.forEach((p) => container.appendChild(p));
+  // Stash maps on the function object so the flip-handler and goTo()
+  // can read them without us threading them through closures.
+  buildBookPageFlip._pageToEntry = pageToEntry;
+  buildBookPageFlip._entryFirstPage = entryFirstPage;
 
   // Compute per-page dimensions from the current bookStage size.
   // Use offsetWidth/offsetHeight (layout box, not rendered box) so this
@@ -3759,7 +3723,7 @@ function buildBookPageFlip() {
     autoSize: false,
     drawShadow: true,
     flippingTime: 950,
-    showCover: false,
+    showCover: true,
     usePortrait: false,
     mobileScrollSupport: true,
     swipeDistance: 30,
@@ -3786,7 +3750,7 @@ function buildBookPageFlip() {
     useMouseEvents: false,
     showPageCorners: false,
     maxShadowOpacity: 0.5,
-    startPage: Math.max(0, currentIndex * 2),
+    startPage: Math.max(0, (buildBookPageFlip._entryFirstPage && buildBookPageFlip._entryFirstPage[currentIndex]) || 0),
   });
 
   pageFlipInstance.loadFromHTML(container.querySelectorAll('.spf-page'));
@@ -3993,7 +3957,8 @@ function buildBookPageFlip() {
   // Update UI when the user (or our nav buttons) flips a page.
   pageFlipInstance.on('flip', (e) => {
     const pageNum = e.data;
-    const entryIndex = Math.floor(pageNum / 2);
+    const map = buildBookPageFlip._pageToEntry;
+    const entryIndex = (map && map[pageNum] !== undefined) ? map[pageNum] : Math.floor(pageNum / 2);
     if (entryIndex !== currentIndex) {
       currentIndex = entryIndex;
       updateBook(false);
@@ -4210,7 +4175,10 @@ function goTo(index) {
   if (pageFlipInstance) {
     // Delegate to the library; the 'flip' event handler updates state.
     try {
-      pageFlipInstance.flip(index * 2, 'bottom');
+      const targetPage = (buildBookPageFlip._entryFirstPage && buildBookPageFlip._entryFirstPage[index] !== undefined)
+        ? buildBookPageFlip._entryFirstPage[index]
+        : (index * 2);
+      pageFlipInstance.flip(targetPage, 'bottom');
     } catch (_) {
       // If flip fails (e.g. mid-animation), ignore -- library queues are
       // per-instance and re-clicks while flipping are handled internally.
