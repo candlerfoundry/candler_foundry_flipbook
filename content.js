@@ -10,7 +10,8 @@ window.FLIPBOOK_CONTENT = [
     "type": "note",
     "label": "Foundry Note",
     "leftEyebrow": "",
-    "title": "Theology for All",
+    "title": "Theology.",
+    "bannerAccent": "For All.",
     "copy": "Through Courses in the Community, The Foundry brings the best of Candler to living rooms and fellowship halls around the world. Taught by Candler faculty and other scholars, our courses make theological learning easy and affordable for curious learners everywhere.",
     "points": [
       {

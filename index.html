@@ -871,6 +871,35 @@ button.meta-chip {
   max-width: 88%;
 }
 
+/* Note banner title: optional accent half drops in italic when the
+   reader flips to the note entry. The static half ("Theology.") stays
+   put; .note-banner-title-anim ("For All.") starts hidden + raised and
+   animates to its resting place when the .note-banner element gains
+   the .is-active class. The class is toggled in the StPageFlip flip
+   handler so the animation re-triggers every time the user lands on
+   the note page (not just on first load). */
+.note-banner-title { display: inline-block; }
+.note-banner-title-static {
+  display: inline;
+}
+.note-banner-title-anim {
+  display: inline-block;
+  margin-left: 0.34em;
+  font-style: italic;
+  /* Resting state. .is-active animates these toward 0/1. */
+  opacity: 0;
+  transform: translateY(-34px);
+  will-change: opacity, transform;
+}
+.note-banner.is-active .note-banner-title-anim {
+  animation: note-banner-dropin 0.85s 0.32s cubic-bezier(0.34, 1.42, 0.64, 1) forwards;
+}
+@keyframes note-banner-dropin {
+  0%   { opacity: 0; transform: translateY(-34px); }
+  62%  { opacity: 1; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
 /* Cap the body paragraph + footnote to a comfortable measure so they
    don't run edge-to-edge on a wide page. */
 /* User asked to remove the orange "Courses in the Community" eyebrow
@@ -3316,7 +3345,7 @@ function renderNote(index) {
   return `
     <div class="page page-left note-left">
       <div class="note-banner">
-        ${entry.title ? `<h1 class="note-banner-title">${entry.title}</h1>` : ""}
+        ${(entry.title || entry.bannerAccent) ? `<h1 class="note-banner-title">${entry.title ? `<span class="note-banner-title-static">${entry.title}</span>` : ""}${entry.bannerAccent ? `<span class="note-banner-title-anim">${entry.bannerAccent}</span>` : ""}</h1>` : ""}
       </div>
       <div class="eyebrow note-kicker">${entry.leftEyebrow || ""}</div>
       <h2 class="note-title">${entry.title || ""}</h2>
@@ -3755,6 +3784,23 @@ function buildBookPageFlip() {
 
   pageFlipInstance.loadFromHTML(container.querySelectorAll('.spf-page'));
 
+  // -- Override StPageFlip's hard-density-on-cover behavior. With
+  // showCover:true the library calls setDensity("hard") on the first
+  // page (and on the last page too if pageCount makes it a single
+  // back-cover spread). That makes the cover and back-cover flip
+  // stiffly like a hardcover book. We want them to curl like the
+  // rest of the pages, so reach into the page collection right after
+  // loadFromHTML and force soft density on the cover and back.
+  try {
+    const _pageCol = pageFlipInstance.getPageCollection && pageFlipInstance.getPageCollection();
+    if (_pageCol && Array.isArray(_pageCol.pages)) {
+      const _pgs = _pageCol.pages;
+      if (_pgs.length > 0 && typeof _pgs[0].setDensity === 'function') _pgs[0].setDensity('soft');
+      if (_pgs.length > 1 && typeof _pgs[_pgs.length - 1].setDensity === 'function') _pgs[_pgs.length - 1].setDensity('soft');
+    }
+  } catch (_) { /* if the internal API ever changes, fall back to default behavior */ }
+
+
   // Scale the fixed design-size (750×780) .page content to exactly fill its
   // wrapper, which the library sized to pageWidth×pageHeight. Without this
   // the content stays at design pixels: too large on small screens (clipped)
@@ -3963,6 +4009,22 @@ function buildBookPageFlip() {
       currentIndex = entryIndex;
       updateBook(false);
     }
+    // Retrigger the note-banner drop-in animation whenever the reader
+    // lands on the note entry. Force a reflow between class removal
+    // and re-add so the keyframes restart even if the user goes
+    // backward into the note page.
+    try {
+      const noteBanner = container.querySelector('[data-entry-index="1"] .note-banner');
+      if (noteBanner) {
+        if (entryIndex === 1) {
+          noteBanner.classList.remove('is-active');
+          void noteBanner.offsetWidth;
+          noteBanner.classList.add('is-active');
+        } else {
+          noteBanner.classList.remove('is-active');
+        }
+      }
+    } catch (_) {}
     playFlipSound();
   });
 }
