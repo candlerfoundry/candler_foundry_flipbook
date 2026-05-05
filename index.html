@@ -1171,6 +1171,41 @@ button.meta-chip {
   flex-shrink: 0;
   background: var(--ivory);
 }
+.featured-hero { position: relative; }
+.featured-hero-play {
+  position: absolute;
+  bottom: 14px; right: 14px;
+  width: 56px; height: 56px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center; justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.0);
+  text-decoration: none;
+  box-shadow:
+    0 12px 28px rgba(200, 72, 38, 0.45),
+    0 4px 10px rgba(200, 72, 38, 0.30);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+  /* Subtle pulse so the easter egg is discoverable without being loud. */
+  animation: featured-hero-play-pulse 2.6s ease-in-out infinite;
+}
+.featured-hero-play:hover,
+.featured-hero-play:focus-visible {
+  transform: scale(1.08);
+  box-shadow:
+    0 18px 36px rgba(200, 72, 38, 0.55),
+    0 6px 14px rgba(200, 72, 38, 0.36);
+  animation-play-state: paused;
+}
+.featured-hero-play svg {
+  width: 100%; height: 100%; display: block;
+  filter: drop-shadow(0 2px 4px rgba(120, 30, 10, 0.35));
+}
+@keyframes featured-hero-play-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.04); }
+}
+
 .featured-hero img {
   width: 100%;
   height: 100%;
@@ -2212,6 +2247,102 @@ a.meta-chip {
 }
 
 /* Bottom-center status pill */
+/* ---- Sections jump menu (in the bottom status overlay) ----
+   Click the "Sections" button to open a small popover listing every
+   spread; click any item to goTo() that entry. The current section is
+   highlighted in orange. The whole component is keyboard-accessible
+   (Esc closes; arrow keys move focus). */
+.sections-menu {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.sections-toggle {
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(240, 234, 216, 0.90);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  padding: 6px 10px 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 140ms ease, border-color 140ms ease;
+}
+.sections-toggle:hover,
+.sections-toggle[aria-expanded="true"] {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+.sections-toggle .sections-caret {
+  width: 10px; height: 10px;
+  transition: transform 180ms ease;
+  color: rgba(240, 234, 216, 0.78);
+}
+.sections-toggle[aria-expanded="true"] .sections-caret { transform: rotate(180deg); }
+.sections-panel {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  min-width: 220px;
+  max-width: 280px;
+  padding: 8px;
+  background: rgba(20, 25, 33, 0.96);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  box-shadow: 0 22px 44px rgba(0, 0, 0, 0.55), 0 6px 14px rgba(0, 0, 0, 0.35);
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 140ms ease, transform 160ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+.sections-menu.is-open .sections-panel {
+  display: flex;
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+.sections-panel-item {
+  all: unset;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  color: rgba(240, 234, 216, 0.85);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+.sections-panel-item:hover,
+.sections-panel-item:focus-visible {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--ivory, #fafaf2);
+}
+.sections-panel-item .sp-num {
+  font-family: "DM Mono", monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  color: rgba(240, 234, 216, 0.55);
+  min-width: 22px;
+}
+.sections-panel-item.is-current {
+  background: rgba(200, 72, 38, 0.18);
+  color: #fff;
+}
+.sections-panel-item.is-current .sp-num { color: rgba(232, 101, 31, 0.95); }
+
 .status-overlay {
   position: absolute;
   bottom: 14px;
@@ -2855,6 +2986,14 @@ body.preview-embed .app-shell {
     <div class="page-status" id="page-status">01 / 08</div>
     <span class="status-divider" aria-hidden="true">&middot;</span>
     <div class="meta-chip status-chip" id="theme-chip">Cover</div>
+    <span class="status-divider" aria-hidden="true">&middot;</span>
+    <div class="sections-menu">
+      <button class="sections-toggle" id="sections-toggle" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="sections-panel">
+        <span>Sections</span>
+        <svg viewBox="0 0 12 12" aria-hidden="true" class="sections-caret"><path d="M2 4 L6 8 L10 4" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="sections-panel" id="sections-panel" role="menu" aria-hidden="true"></div>
+    </div>
     <span class="status-divider status-divider-quiet" aria-hidden="true">&middot;</span>
     <div class="hint">Arrow keys turn pages</div>
   </div>
@@ -3505,7 +3644,7 @@ function renderSpread(entry, index) {
       <div class="feature-canvas">
         <div class="feature-genre" style="--genre-font-size:${genreFontSize}px; --genre-font-family:${getEditorFontFamily(layout.genreFontFamily || "montserrat", "text")};">${entry.genre}</div>
         <span class="featured-eyebrow">★ ${feature.courseLabel || "Featured Course"}</span>
-        ${feature.image ? `<div class="featured-hero"><img src="${feature.image}" alt="${feature.title || entry.label || entry.genre || ""}"></div>` : `<div class="featured-hero" aria-hidden="true"></div>`}
+        ${feature.image ? `<div class="featured-hero">${feature.onDemandUrl ? `<a class="featured-hero-play" href="${feature.onDemandUrl}" target="_blank" rel="noopener noreferrer" aria-label="Watch the on-demand version of ${feature.title || ""}" title="Watch on-demand"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#c84826"/><path d="M13 10 L23 16 L13 22 Z" fill="#fff"/></svg></a>` : ""}<img src="${feature.image}" alt="${feature.title || entry.label || entry.genre || ""}"></div>` : `<div class="featured-hero" aria-hidden="true"></div>`}
         <div class="featured-bottom">
           <div class="featured-text-block">
             <h2 class="featured-title">${feature.title || ""}</h2>
@@ -3976,7 +4115,101 @@ function buildBook() {
     bookStage.innerHTML = `<div class="book-scaler"><article class="spread current" style="opacity:1;"><div class="page page-left note-left"><div class="eyebrow note-kicker">Content error</div><h2 class="note-title">No flipbook content loaded.</h2><p class="note-copy">Check <code>content.js</code> or clear local browser overrides in <a href="admin.html">admin.html</a>.</p></div><div class="page page-right note-right"><div class="paper-grain"></div></div></article></div>`;
     return;
   }
-  // Use StPageFlip for the live viewer (true mesh-based corner peel).
+  // ---- Sections jump menu wiring ----
+// Builds the popover's <button> list from BOOK[] on every render so a
+// schema change to a label / new spread automatically shows up. Click
+// or Enter on a section calls goTo(); the menu closes on selection,
+// click-outside, or Escape.
+const sectionsMenu = document.querySelector('.sections-menu');
+const sectionsToggle = document.getElementById('sections-toggle');
+const sectionsPanel = document.getElementById('sections-panel');
+function renderSectionsPanel() {
+  if (!sectionsPanel) return;
+  sectionsPanel.innerHTML = '';
+  BOOK.forEach((entry, idx) => {
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.className = 'sections-panel-item' + (idx === currentIndex ? ' is-current' : '');
+    item.setAttribute('role', 'menuitem');
+    item.dataset.targetIndex = String(idx);
+    const num = document.createElement('span');
+    num.className = 'sp-num';
+    num.textContent = String(idx + 1).padStart(2, '0');
+    const label = document.createElement('span');
+    label.className = 'sp-label';
+    label.textContent = entry.label || entry.genre || `Page ${idx + 1}`;
+    item.appendChild(num);
+    item.appendChild(label);
+    item.addEventListener('click', () => {
+      closeSectionsMenu();
+      goTo(idx);
+    });
+    sectionsPanel.appendChild(item);
+  });
+}
+function openSectionsMenu() {
+  if (!sectionsMenu) return;
+  renderSectionsPanel();
+  sectionsMenu.classList.add('is-open');
+  sectionsToggle.setAttribute('aria-expanded', 'true');
+  sectionsPanel.setAttribute('aria-hidden', 'false');
+}
+function closeSectionsMenu() {
+  if (!sectionsMenu) return;
+  sectionsMenu.classList.remove('is-open');
+  sectionsToggle.setAttribute('aria-expanded', 'false');
+  sectionsPanel.setAttribute('aria-hidden', 'true');
+}
+if (sectionsToggle) {
+  sectionsToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (sectionsMenu.classList.contains('is-open')) closeSectionsMenu();
+    else openSectionsMenu();
+  });
+  document.addEventListener('click', (e) => {
+    if (!sectionsMenu.contains(e.target)) closeSectionsMenu();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sectionsMenu.classList.contains('is-open')) {
+      closeSectionsMenu();
+      sectionsToggle.focus();
+    }
+  });
+}
+
+// ---- Native swipe-to-flip on touch ----
+// StPageFlip's own pointer handlers are off (useMouseEvents:false) so
+// we wire native touchstart/touchend on the book stage. Triggers goTo()
+// only on a meaningful horizontal swipe (>50px, mostly horizontal,
+// faster than ~800ms). Doesn't interfere with vertical scroll, doesn't
+// fire if the touch starts on an interactive element (TOC item, faculty
+// card, accordion, link).
+let _swipeTouch = null;
+const _interactiveSelector = 'button, a, .toc-item, .support-toggle, .faculty-card, .sections-panel-item';
+bookStage.addEventListener('touchstart', (e) => {
+  if (e.touches.length !== 1) { _swipeTouch = null; return; }
+  const t = e.touches[0];
+  // Don't capture swipes that start on inner interactive elements —
+  // those should behave as taps for their own handlers.
+  if (e.target.closest(_interactiveSelector)) { _swipeTouch = null; return; }
+  _swipeTouch = { x: t.clientX, y: t.clientY, time: Date.now() };
+}, { passive: true });
+bookStage.addEventListener('touchend', (e) => {
+  if (!_swipeTouch) return;
+  const t = e.changedTouches[0];
+  const dx = t.clientX - _swipeTouch.x;
+  const dy = t.clientY - _swipeTouch.y;
+  const dt = Date.now() - _swipeTouch.time;
+  _swipeTouch = null;
+  if (Math.abs(dx) < 50) return;                   // not a swipe
+  if (Math.abs(dy) > Math.abs(dx) * 0.6) return;   // mostly vertical
+  if (dt > 800) return;                             // too slow
+  if (dx < 0) goTo(Math.min(BOOK.length - 1, currentIndex + 1));
+  else        goTo(Math.max(0, currentIndex - 1));
+}, { passive: true });
+bookStage.addEventListener('touchcancel', () => { _swipeTouch = null; }, { passive: true });
+
+// Use StPageFlip for the live viewer (true mesh-based corner peel).
   // Fall back to the legacy spread renderer in editor preview-embed mode
   // and any case where the library script didn't load.
   if (typeof St !== 'undefined' && St.PageFlip && !isPreviewEmbed) {

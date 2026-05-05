@@ -399,6 +399,7 @@ window.FLIPBOOK_CONTENT = [
       "headshot": "assets/headshots/ryan-bonfiglio.jpg",
       "facultyBlurb": "",
       "title": "Sabbath as Rest and Resistance",
+      "onDemandUrl": "https://candlerfoundry.emory.edu/foundry-gift",
       "instructor": "Dr. Ryan Bonfiglio",
       "image": "assets/graphics/sabbath-as-rest-and-resistance.png",
       "lede": "What if rest is more than a luxury — what if it's a faithful refusal? In this course, Ryan Bonfiglio looks at the biblical practice of Sabbath as both a gift of grace and an act of resistance against a culture of unending production.",
