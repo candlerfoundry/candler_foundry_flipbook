@@ -103,9 +103,7 @@ select {
   position: relative;
   width: 100%;
   height: 100%;
-  /* Extra bottom padding so the reserved status-overlay channel below
-     the book has its own real estate. */
-  padding: 8px 8px 56px;
+  padding: 8px;
   display: grid;
   place-items: center;
   /* Single centered cell. The book-frame absorbs the full viewport at the
@@ -258,7 +256,7 @@ button.meta-chip {
   /* Width is the smallest of: parent width, hard cap 1700px, OR the width
      that keeps the book within the viewport height. The third term means
      the book never overflows vertically -- the bottom cannot be cut off. */
-  width: min(100%, 1700px, calc((100dvh - 16px - 56px) * 1500 / 780));
+  width: min(100%, 1700px, calc((100dvh - 16px) * 1500 / 780));
   aspect-ratio: 1500 / 780;
   perspective: 2800px;
 }
@@ -1180,36 +1178,33 @@ button.meta-chip {
    target). Designed to read as a sticker pasted to the corner of
    the course image, not as a play button. */
 .featured-hero-gift {
+  /* Sticker sits ON the hero graphic (bottom-right corner inside the
+     image), not hanging off the edge. Straight (no rotation) per
+     donor-publication style — no childish skew or sway. */
   position: absolute;
-  bottom: -10px; right: 10px;
+  bottom: 14px; right: 14px;
   z-index: 4;
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 14px 8px 12px;
+  padding: 9px 14px 9px 12px;
   background: #fbf6e3;
-  border: 1px solid rgba(200, 72, 38, 0.40);
+  border: 1px solid rgba(200, 72, 38, 0.45);
   border-radius: 10px;
   text-decoration: none;
-  transform: rotate(-3deg);
   box-shadow:
-    0 14px 28px rgba(20, 25, 33, 0.22),
-    0 4px 10px rgba(20, 25, 33, 0.10),
-    inset 0 0 0 3px rgba(255, 255, 255, 0.55);
-  transition: transform 200ms ease, box-shadow 200ms ease;
-  /* Slow lazy "tape" sway so the easter egg invites a click without
-     demanding it. */
-  animation: featured-hero-gift-sway 5.4s ease-in-out infinite;
-  transform-origin: 70% 30%;
+    0 12px 26px rgba(20, 25, 33, 0.30),
+    0 3px 8px rgba(20, 25, 33, 0.18),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.50);
+  transition: transform 180ms ease, box-shadow 180ms ease;
 }
 .featured-hero-gift:hover,
 .featured-hero-gift:focus-visible {
-  transform: rotate(-1deg) translateY(-3px);
+  transform: translateY(-2px);
   box-shadow:
-    0 20px 38px rgba(20, 25, 33, 0.28),
-    0 6px 14px rgba(20, 25, 33, 0.14),
-    inset 0 0 0 3px rgba(255, 255, 255, 0.65);
-  animation-play-state: paused;
+    0 16px 32px rgba(20, 25, 33, 0.36),
+    0 5px 12px rgba(20, 25, 33, 0.22),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.62);
 }
 .featured-hero-gift .hero-gift-icon {
   width: 28px; height: 28px;
@@ -1236,12 +1231,8 @@ button.meta-chip {
   font-weight: 600;
   color: var(--navy);
   white-space: nowrap;
+  margin-top: 1px;
 }
-@keyframes featured-hero-gift-sway {
-  0%, 100% { transform: rotate(-3deg); }
-  50%      { transform: rotate(-1.5deg); }
-}
-
 .featured-hero img {
   width: 100%;
   height: 100%;
@@ -3672,7 +3663,7 @@ function renderSpread(entry, index) {
       <div class="feature-canvas">
         <div class="feature-genre" style="--genre-font-size:${genreFontSize}px; --genre-font-family:${getEditorFontFamily(layout.genreFontFamily || "montserrat", "text")};">${entry.genre}</div>
         <span class="featured-eyebrow">★ ${feature.courseLabel || "Featured Course"}</span>
-        ${feature.image ? `<div class="featured-hero">${feature.onDemandUrl ? `<a class="featured-hero-gift" href="${feature.onDemandUrl}" target="_blank" rel="noopener noreferrer" aria-label="Visit the free on-demand version of ${feature.title || ""}" title="Free donor on-demand version"><svg class="hero-gift-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9 H21 V20 H3 Z"/><path d="M3 9 L3 13 L21 13 L21 9"/><path d="M12 9 V20"/><path d="M8.5 9 C7 9 6.2 7.5 7 6.2 C7.8 5 9.5 5 10.5 6.2 L12 9 L13.5 6.2 C14.5 5 16.2 5 17 6.2 C17.8 7.5 17 9 15.5 9"/></svg><span class="hero-gift-label"><span class="hero-gift-eyebrow">Free \u00b7 Donor Gift</span><span class="hero-gift-detail">On-demand version &rarr;</span></span></a>` : ""}<img src="${feature.image}" alt="${feature.title || entry.label || entry.genre || ""}"></div>` : `<div class="featured-hero" aria-hidden="true"></div>`}
+        ${feature.image ? `<div class="featured-hero">${feature.onDemandUrl ? `<a class="featured-hero-gift" href="${feature.onDemandUrl}" target="_blank" rel="noopener noreferrer" aria-label="Try the free on-demand version of ${feature.title || ""}" title="Free Gift — Try the on-demand version"><svg class="hero-gift-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9 H21 V20 H3 Z"/><path d="M3 9 L3 13 L21 13 L21 9"/><path d="M12 9 V20"/><path d="M8.5 9 C7 9 6.2 7.5 7 6.2 C7.8 5 9.5 5 10.5 6.2 L12 9 L13.5 6.2 C14.5 5 16.2 5 17 6.2 C17.8 7.5 17 9 15.5 9"/></svg><span class="hero-gift-label"><span class="hero-gift-eyebrow">Free Gift</span><span class="hero-gift-detail">${feature.onDemandLabel || "Try Sabbath On-Demand &rarr;"}</span></span></a>` : ""}<img src="${feature.image}" alt="${feature.title || entry.label || entry.genre || ""}"></div>` : `<div class="featured-hero" aria-hidden="true"></div>`}
         <div class="featured-bottom">
           <div class="featured-text-block">
             <h2 class="featured-title">${feature.title || ""}</h2>
