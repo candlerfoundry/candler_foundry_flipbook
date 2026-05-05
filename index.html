@@ -1324,6 +1324,10 @@ button.meta-chip {
   border: 2px solid #FFFFFF;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
   margin: 0 auto 10px;
+  /* Force native-DPR layer composition so the avatar isn't rendered
+     at the .book-scaler's pre-transform resolution on big monitors. */
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 .featured-instructor-avatar.is-fallback {
   background: #FDFAF0;
@@ -1337,7 +1341,8 @@ button.meta-chip {
 }
 .featured-instructor-label {
   font-family: "Montserrat", "Segoe UI", sans-serif;
-  font-size: 9px;
+  /* +20% per Emily so the kicker scales with the rest of the card. */
+  font-size: 11px;
   letter-spacing: 0.18em;
   color: #888888;
   text-transform: uppercase;
@@ -1584,6 +1589,15 @@ button.meta-chip {
   object-fit: cover;
   object-position: top center;
   display: block;
+  /* See note above .faculty-avatar-large — these two hints push the
+     img onto its own compositor layer rasterized at the screen's
+     actual pixel density, rather than at the .book-scaler's
+     pre-transform layer resolution. Resolves the pixelation that
+     showed up on big-monitor / high-DPR setups despite the source
+     PNGs being plenty large. */
+  image-rendering: auto;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .faculty-avatar-large.faculty-card-mark img {
@@ -1595,7 +1609,8 @@ button.meta-chip {
   display: block;
   margin-bottom: 4px;
   font-family: "DM Mono", monospace;
-  font-size: 10px;
+  /* +20% per Emily — back-face "ABOUT <NAME>" header. */
+  font-size: 12px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: rgba(50, 75, 105, 0.78);
@@ -1626,7 +1641,9 @@ button.meta-chip {
   margin: 0;
   flex: 1;
   min-height: 0;
-  font-size: calc(var(--faculty-bio-size, 12) * 1px);
+  /* Default raised from 12px -> 14px (+~17% rounded), per Emily's
+     +20% across all faculty-card text. */
+  font-size: calc(var(--faculty-bio-size, 14) * 1px);
   line-height: 1.55;
   color: rgba(30, 37, 48, 0.86);
   overflow-y: auto;
@@ -1776,6 +1793,10 @@ button.meta-chip {
     0 6px 14px rgba(30, 37, 48, 0.18),
     0 1px 3px rgba(30, 37, 48, 0.10);
   background: rgba(255, 255, 255, 0.80);
+  /* Force native-DPR layer composition (same fix as
+     .faculty-avatar-large img). */
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .support-avatar-mark {
@@ -2276,13 +2297,13 @@ a.meta-chip {
 }
 .sections-toggle {
   font-family: "DM Mono", monospace;
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: rgba(240, 234, 216, 0.90);
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.16);
-  padding: 6px 10px 6px 12px;
+  padding: 4px 9px 4px 11px;
   border-radius: 999px;
   cursor: pointer;
   display: inline-flex;
@@ -2362,16 +2383,17 @@ a.meta-chip {
 
 .status-overlay {
   position: absolute;
-  /* Sits in the reserved 56px channel below the book-frame so it
-     never overlaps page content, even on small viewports. */
-  bottom: 8px;
+  /* Lowered to bottom:4px and shrunk ~20% in height (padding 5->4,
+     font 0.66rem -> 0.59rem). Sits as a thin sliver near the very
+     bottom edge of the viewport. */
+  bottom: 4px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 12;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 5px 12px;
+  padding: 4px 11px;
   border-radius: 999px;
   background: rgba(20, 25, 33, 0.50);
   border: 1px solid rgba(240, 234, 216, 0.10);
@@ -2380,16 +2402,16 @@ a.meta-chip {
   color: rgba(240, 234, 216, 0.84);
   pointer-events: auto;
   font-family: "DM Mono", monospace;
-  font-size: 0.66rem;
+  font-size: 0.59rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   white-space: nowrap;
 }
 
 .status-overlay .page-status {
-  min-width: 76px;
+  min-width: 64px;
   text-align: center;
-  font-size: 0.72rem;
+  font-size: 0.62rem;
   letter-spacing: 0.18em;
   color: var(--ivory);
 }
@@ -2399,7 +2421,7 @@ a.meta-chip {
   border: 0;
   padding: 0;
   letter-spacing: 0.16em;
-  font-size: 0.68rem;
+  font-size: 0.60rem;
   color: rgba(246, 168, 93, 0.92);
 }
 

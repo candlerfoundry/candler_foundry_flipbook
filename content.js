@@ -113,10 +113,10 @@ window.FLIPBOOK_CONTENT = [
       "imageAlign": "center",
       "blockGap": 12,
       "genreX": 0,
-      "facultyAvatarSizePx": 56,
-      "facultyNameSizePx": 13,
+      "facultyAvatarSizePx": 70,
+      "facultyNameSizePx": 16,
       "rightCardAvatarSizePx": 70,
-      "facultyBlurbSizePx": 9
+      "facultyBlurbSizePx": 11
     },
     "leftBlocks": [
       {
@@ -231,10 +231,10 @@ window.FLIPBOOK_CONTENT = [
       "imageAlign": "center",
       "blockGap": 12,
       "genreX": 0,
-      "facultyAvatarSizePx": 56,
-      "facultyNameSizePx": 13,
+      "facultyAvatarSizePx": 70,
+      "facultyNameSizePx": 16,
       "rightCardAvatarSizePx": 70,
-      "facultyBlurbSizePx": 9
+      "facultyBlurbSizePx": 11
     },
     "leftBlocks": [
       {
@@ -355,10 +355,10 @@ window.FLIPBOOK_CONTENT = [
       "imageAlign": "center",
       "blockGap": 12,
       "genreX": 0,
-      "facultyAvatarSizePx": 56,
-      "facultyNameSizePx": 13,
+      "facultyAvatarSizePx": 70,
+      "facultyNameSizePx": 16,
       "rightCardAvatarSizePx": 70,
-      "facultyBlurbSizePx": 9
+      "facultyBlurbSizePx": 11
     },
     "leftBlocks": [
       {
@@ -472,10 +472,10 @@ window.FLIPBOOK_CONTENT = [
       "imageAlign": "center",
       "blockGap": 12,
       "genreX": 0,
-      "facultyAvatarSizePx": 56,
-      "facultyNameSizePx": 13,
+      "facultyAvatarSizePx": 70,
+      "facultyNameSizePx": 16,
       "rightCardAvatarSizePx": 70,
-      "facultyBlurbSizePx": 9
+      "facultyBlurbSizePx": 11
     },
     "leftBlocks": [
       {
@@ -592,10 +592,10 @@ window.FLIPBOOK_CONTENT = [
       "imageAlign": "center",
       "blockGap": 12,
       "genreX": 0,
-      "facultyAvatarSizePx": 56,
-      "facultyNameSizePx": 13,
+      "facultyAvatarSizePx": 70,
+      "facultyNameSizePx": 16,
       "rightCardAvatarSizePx": 70,
-      "facultyBlurbSizePx": 9
+      "facultyBlurbSizePx": 11
     },
     "leftBlocks": [
       {
@@ -709,10 +709,10 @@ window.FLIPBOOK_CONTENT = [
       "imageAlign": "center",
       "blockGap": 12,
       "genreX": 0,
-      "facultyAvatarSizePx": 56,
-      "facultyNameSizePx": 13,
+      "facultyAvatarSizePx": 70,
+      "facultyNameSizePx": 16,
       "rightCardAvatarSizePx": 70,
-      "facultyBlurbSizePx": 9
+      "facultyBlurbSizePx": 11
     },
     "leftBlocks": [
       {
@@ -829,10 +829,10 @@ window.FLIPBOOK_CONTENT = [
       "imageAlign": "center",
       "blockGap": 12,
       "genreX": 0,
-      "facultyAvatarSizePx": 56,
-      "facultyNameSizePx": 13,
+      "facultyAvatarSizePx": 70,
+      "facultyNameSizePx": 16,
       "rightCardAvatarSizePx": 70,
-      "facultyBlurbSizePx": 9
+      "facultyBlurbSizePx": 11
     },
     "leftBlocks": [
       {
