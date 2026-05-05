@@ -103,7 +103,9 @@ select {
   position: relative;
   width: 100%;
   height: 100%;
-  padding: 8px;
+  /* Extra bottom padding so the reserved status-overlay channel below
+     the book has its own real estate. */
+  padding: 8px 8px 56px;
   display: grid;
   place-items: center;
   /* Single centered cell. The book-frame absorbs the full viewport at the
@@ -256,7 +258,7 @@ button.meta-chip {
   /* Width is the smallest of: parent width, hard cap 1700px, OR the width
      that keeps the book within the viewport height. The third term means
      the book never overflows vertically -- the bottom cannot be cut off. */
-  width: min(100%, 1700px, calc((100dvh - 16px) * 1500 / 780));
+  width: min(100%, 1700px, calc((100dvh - 16px - 56px) * 1500 / 780));
   aspect-ratio: 1500 / 780;
   perspective: 2800px;
 }
@@ -1172,38 +1174,72 @@ button.meta-chip {
   background: var(--ivory);
 }
 .featured-hero { position: relative; }
-.featured-hero-play {
+/* "Donor freebie" sticker on a hero image whose feature has
+   an onDemandUrl. Differentiates the live Zoom course (in this
+   lookbook) from the asynchronous on-demand version (the link
+   target). Designed to read as a sticker pasted to the corner of
+   the course image, not as a play button. */
+.featured-hero-gift {
   position: absolute;
-  bottom: 14px; right: 14px;
-  width: 56px; height: 56px;
+  bottom: -10px; right: 10px;
   z-index: 4;
   display: inline-flex;
-  align-items: center; justify-content: center;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.0);
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px 8px 12px;
+  background: #fbf6e3;
+  border: 1px solid rgba(200, 72, 38, 0.40);
+  border-radius: 10px;
   text-decoration: none;
+  transform: rotate(-3deg);
   box-shadow:
-    0 12px 28px rgba(200, 72, 38, 0.45),
-    0 4px 10px rgba(200, 72, 38, 0.30);
-  transition: transform 180ms ease, box-shadow 180ms ease;
-  /* Subtle pulse so the easter egg is discoverable without being loud. */
-  animation: featured-hero-play-pulse 2.6s ease-in-out infinite;
+    0 14px 28px rgba(20, 25, 33, 0.22),
+    0 4px 10px rgba(20, 25, 33, 0.10),
+    inset 0 0 0 3px rgba(255, 255, 255, 0.55);
+  transition: transform 200ms ease, box-shadow 200ms ease;
+  /* Slow lazy "tape" sway so the easter egg invites a click without
+     demanding it. */
+  animation: featured-hero-gift-sway 5.4s ease-in-out infinite;
+  transform-origin: 70% 30%;
 }
-.featured-hero-play:hover,
-.featured-hero-play:focus-visible {
-  transform: scale(1.08);
+.featured-hero-gift:hover,
+.featured-hero-gift:focus-visible {
+  transform: rotate(-1deg) translateY(-3px);
   box-shadow:
-    0 18px 36px rgba(200, 72, 38, 0.55),
-    0 6px 14px rgba(200, 72, 38, 0.36);
+    0 20px 38px rgba(20, 25, 33, 0.28),
+    0 6px 14px rgba(20, 25, 33, 0.14),
+    inset 0 0 0 3px rgba(255, 255, 255, 0.65);
   animation-play-state: paused;
 }
-.featured-hero-play svg {
-  width: 100%; height: 100%; display: block;
-  filter: drop-shadow(0 2px 4px rgba(120, 30, 10, 0.35));
+.featured-hero-gift .hero-gift-icon {
+  width: 28px; height: 28px;
+  color: var(--orange-red);
+  flex-shrink: 0;
 }
-@keyframes featured-hero-play-pulse {
-  0%, 100% { transform: scale(1); }
-  50%      { transform: scale(1.04); }
+.hero-gift-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.0;
+}
+.hero-gift-eyebrow {
+  font-family: "DM Mono", monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.20em;
+  text-transform: uppercase;
+  color: var(--orange-red);
+  font-weight: 500;
+}
+.hero-gift-detail {
+  font-family: "Inter", "DM Sans", sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--navy);
+  white-space: nowrap;
+}
+@keyframes featured-hero-gift-sway {
+  0%, 100% { transform: rotate(-3deg); }
+  50%      { transform: rotate(-1.5deg); }
 }
 
 .featured-hero img {
@@ -1557,11 +1593,6 @@ button.meta-chip {
   object-fit: cover;
   object-position: top center;
   display: block;
-  /* Force the high-quality downscaler. Auto often picks the fast
-     path under heavy CSS-transform scaling; explicit hint keeps the
-     small headshot crisp. */
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: high-quality;
 }
 
 .faculty-avatar-large.faculty-card-mark img {
@@ -1748,17 +1779,12 @@ button.meta-chip {
   /* Crisp white inner border + thin warm outline = magazine-clipping feel. */
   border: 1px solid rgba(255, 255, 255, 0.96);
   outline: 1px solid rgba(30, 37, 48, 0.10);
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: high-quality;
+
   outline-offset: 0;
   box-shadow:
     0 6px 14px rgba(30, 37, 48, 0.18),
     0 1px 3px rgba(30, 37, 48, 0.10);
   background: rgba(255, 255, 255, 0.80);
-  /* Force the high-quality scaler when downsampling so JPEG artifacts
-     in the source don't show as color bands at small sizes. */
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: high-quality;
 }
 
 .support-avatar-mark {
@@ -2345,25 +2371,28 @@ a.meta-chip {
 
 .status-overlay {
   position: absolute;
-  bottom: 14px;
+  /* Sits in the reserved 56px channel below the book-frame so it
+     never overlaps page content, even on small viewports. */
+  bottom: 8px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 12;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 7px 16px;
+  gap: 8px;
+  padding: 5px 12px;
   border-radius: 999px;
-  background: rgba(20, 25, 33, 0.42);
+  background: rgba(20, 25, 33, 0.50);
   border: 1px solid rgba(240, 234, 216, 0.10);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   color: rgba(240, 234, 216, 0.84);
   pointer-events: auto;
   font-family: "DM Mono", monospace;
-  font-size: 0.7rem;
-  letter-spacing: 0.16em;
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .status-overlay .page-status {
@@ -2994,8 +3023,7 @@ body.preview-embed .app-shell {
       </button>
       <div class="sections-panel" id="sections-panel" role="menu" aria-hidden="true"></div>
     </div>
-    <span class="status-divider status-divider-quiet" aria-hidden="true">&middot;</span>
-    <div class="hint">Arrow keys turn pages</div>
+
   </div>
 </div>
 
@@ -3644,7 +3672,7 @@ function renderSpread(entry, index) {
       <div class="feature-canvas">
         <div class="feature-genre" style="--genre-font-size:${genreFontSize}px; --genre-font-family:${getEditorFontFamily(layout.genreFontFamily || "montserrat", "text")};">${entry.genre}</div>
         <span class="featured-eyebrow">★ ${feature.courseLabel || "Featured Course"}</span>
-        ${feature.image ? `<div class="featured-hero">${feature.onDemandUrl ? `<a class="featured-hero-play" href="${feature.onDemandUrl}" target="_blank" rel="noopener noreferrer" aria-label="Watch the on-demand version of ${feature.title || ""}" title="Watch on-demand"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#c84826"/><path d="M13 10 L23 16 L13 22 Z" fill="#fff"/></svg></a>` : ""}<img src="${feature.image}" alt="${feature.title || entry.label || entry.genre || ""}"></div>` : `<div class="featured-hero" aria-hidden="true"></div>`}
+        ${feature.image ? `<div class="featured-hero">${feature.onDemandUrl ? `<a class="featured-hero-gift" href="${feature.onDemandUrl}" target="_blank" rel="noopener noreferrer" aria-label="Visit the free on-demand version of ${feature.title || ""}" title="Free donor on-demand version"><svg class="hero-gift-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9 H21 V20 H3 Z"/><path d="M3 9 L3 13 L21 13 L21 9"/><path d="M12 9 V20"/><path d="M8.5 9 C7 9 6.2 7.5 7 6.2 C7.8 5 9.5 5 10.5 6.2 L12 9 L13.5 6.2 C14.5 5 16.2 5 17 6.2 C17.8 7.5 17 9 15.5 9"/></svg><span class="hero-gift-label"><span class="hero-gift-eyebrow">Free \u00b7 Donor Gift</span><span class="hero-gift-detail">On-demand version &rarr;</span></span></a>` : ""}<img src="${feature.image}" alt="${feature.title || entry.label || entry.genre || ""}"></div>` : `<div class="featured-hero" aria-hidden="true"></div>`}
         <div class="featured-bottom">
           <div class="featured-text-block">
             <h2 class="featured-title">${feature.title || ""}</h2>
