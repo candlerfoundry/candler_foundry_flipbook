@@ -507,8 +507,8 @@ window.FLIPBOOK_CONTENT = [
   },
   {
     "type": "spread",
-    "label": "Ministry Skills & Leadership",
-    "genre": "MINISTRY SKILLS & LEADERSHIP",
+    "label": "Ministry & Leadership",
+    "genre": "MINISTRY & LEADERSHIP",
     "intro": "",
     "feature": {
       "courseLabel": "Featured Course",
@@ -622,7 +622,7 @@ window.FLIPBOOK_CONTENT = [
         "lineHeight": 1.52
       }
     ],
-    "supportTitle": "Other Ministry Skills & Leadership Courses",
+    "supportTitle": "Other Ministry & Leadership Courses",
     "templateVersion": 2
   },
   {
@@ -896,7 +896,7 @@ window.FLIPBOOK_CONTENT = [
         "title": "Support our work",
         "copy": "Open these courses to every learner who wants to come.",
         "linkLabel": "Donate \u2192",
-        "linkUrl": "https://give.emory.edu/",
+        "linkUrl": "https://giving.emory.edu/products/the-candler-foundry-theoed",
         "featured": true
       }
     ],

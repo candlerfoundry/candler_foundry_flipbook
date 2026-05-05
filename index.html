@@ -1438,7 +1438,10 @@ button.meta-chip {
   cursor: pointer;
   position: relative;
   min-height: calc(var(--faculty-card-height, 190) * 1px);
-  transform-style: preserve-3d;
+  /* preserve-3d intentionally NOT here — it lives on .faculty-card-inner.
+     Having it on both elements creates redundant 3D contexts that, combined
+     with .book-scaler's CSS transform: scale(...), can cause Chromium to
+     rasterize the front face's text and avatar at sub-native DPI. */
 }
 
 .faculty-card:focus-visible {
@@ -1473,6 +1476,14 @@ button.meta-chip {
     0 14px 28px rgba(30, 60, 100, 0.10),
     0 4px 8px rgba(30, 60, 100, 0.06);
   overflow: hidden;
+  /* Crispness pass for the 3D-flipped text. Without these, Chromium
+     rasterizes the back-face layer at the parent's compositor scale
+     (which is already <1.0 because of book-scaler), so the bio reads
+     blurry compared to the rest of the page. */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  will-change: transform;
 }
 
 .faculty-card-front {
@@ -1511,6 +1522,11 @@ button.meta-chip {
   object-fit: cover;
   object-position: top center;
   display: block;
+  /* Force the high-quality downscaler. Auto often picks the fast
+     path under heavy CSS-transform scaling; explicit hint keeps the
+     small headshot crisp. */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: high-quality;
 }
 
 .faculty-avatar-large.faculty-card-mark img {
@@ -1697,6 +1713,8 @@ button.meta-chip {
   /* Crisp white inner border + thin warm outline = magazine-clipping feel. */
   border: 1px solid rgba(255, 255, 255, 0.96);
   outline: 1px solid rgba(30, 37, 48, 0.10);
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: high-quality;
   outline-offset: 0;
   box-shadow:
     0 6px 14px rgba(30, 37, 48, 0.18),
