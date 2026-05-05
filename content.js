@@ -3,7 +3,7 @@ window.FLIPBOOK_CONTENT = [
     "type": "cover",
     "label": "Cover",
     "title": "Courses in the Community",
-    "coverImage": "assets/branding/Cover Image.png"
+    "coverImage": "assets/branding/Flipbook Cover v2.png"
   },
   {
     "type": "note",
