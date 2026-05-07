@@ -2677,16 +2677,16 @@ body.preview-embed .app-shell {
   position: absolute;
   inset: 0;
   background: url("assets/student_photos/Master Class Student Talking 5.jpg") center/cover;
-  opacity: 0.18;
-  filter: saturate(0.85);
+  opacity: 0.62;
+  filter: saturate(0.92);
   z-index: 0;
 }
 .close-c-single .close-c-shade {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(250, 246, 232, 0.55), rgba(240, 234, 216, 0.78)),
-    radial-gradient(ellipse 70% 50% at 50% 95%, rgba(20, 25, 33, 0.06), transparent 70%);
+    linear-gradient(180deg, rgba(250, 246, 232, 0.30), rgba(240, 234, 216, 0.48)),
+    radial-gradient(ellipse 70% 50% at 50% 95%, rgba(20, 25, 33, 0.08), transparent 70%);
   z-index: 1;
   pointer-events: none;
 }
@@ -2701,9 +2701,26 @@ body.preview-embed .app-shell {
 .close-c-logo {
   width: 220px;
   height: auto;
-  margin: 0 0 22px;
+  margin: 0;
   object-fit: contain;
+  display: block;
+}
+.close-c-logo-link {
   align-self: flex-start;
+  margin: 0 0 22px;
+  display: inline-block;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: opacity 180ms ease, transform 180ms cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.close-c-logo-link:hover,
+.close-c-logo-link:focus-visible {
+  opacity: 0.78;
+  transform: translateY(-1px);
+}
+.close-c-logo-link:focus-visible {
+  outline: 2px solid var(--orange-red);
+  outline-offset: 4px;
 }
 .close-c-title {
   margin: 0 0 8px;
@@ -2727,7 +2744,7 @@ body.preview-embed .app-shell {
   gap: 14px;
 }
 .close-c-cell {
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.92);
   border: 1px solid rgba(30, 37, 48, 0.10);
   border-radius: 14px;
   padding: 18px 18px 16px;
@@ -2736,6 +2753,44 @@ body.preview-embed .app-shell {
   flex-direction: column;
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
+  box-shadow: 0 2px 6px rgba(20, 25, 33, 0.05), 0 8px 18px rgba(20, 25, 33, 0.06);
+  transition: transform 180ms cubic-bezier(0.2, 0.7, 0.3, 1),
+              box-shadow 180ms ease,
+              border-color 180ms ease;
+}
+/* Clickable card variant -- the whole <a> is the hit target. Keep the
+   inner spans color-inheriting so the existing typography rules apply
+   without underline noise. */
+a.close-c-cell.is-clickable {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+a.close-c-cell.is-clickable:hover,
+a.close-c-cell.is-clickable:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(20, 25, 33, 0.08), 0 16px 32px rgba(20, 25, 33, 0.14);
+  border-color: rgba(30, 37, 48, 0.18);
+}
+a.close-c-cell.is-clickable:focus-visible {
+  outline: 2px solid var(--orange-red);
+  outline-offset: 3px;
+}
+a.close-c-cell.is-clickable:active {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(20, 25, 33, 0.06), 0 8px 16px rgba(20, 25, 33, 0.10);
+}
+a.close-c-cell.is-clickable .close-c-link {
+  transition: transform 180ms cubic-bezier(0.2, 0.7, 0.3, 1),
+              border-color 120ms ease;
+  display: inline-block;
+}
+a.close-c-cell.is-clickable:hover .close-c-link {
+  transform: translateX(3px);
+  border-bottom-color: currentColor;
+}
+a.close-c-cell.is-clickable.close-c-cell-featured:hover {
+  box-shadow: 0 4px 10px rgba(200, 72, 38, 0.18), 0 16px 36px rgba(200, 72, 38, 0.42);
 }
 .close-c-cell-eyebrow {
   font-family: "DM Mono", monospace;
@@ -2787,13 +2842,16 @@ body.preview-embed .app-shell {
   padding-top: 14px;
   border-top: 1px solid rgba(30, 37, 48, 0.10);
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 18px;
   font-family: "DM Mono", monospace;
   font-size: 10.5px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: rgba(30, 37, 48, 0.66);
+}
+.close-c-meta:has(span + span) {
+  justify-content: space-between;
 }
 
 /* 3D curl-along-spine animation. Replaces the flat linear transition
@@ -3727,24 +3785,25 @@ function renderClose(index) {
     const featured = cell.featured ? " close-c-cell-featured" : "";
     const isExternal = url && !url.startsWith("mailto:") && !url.startsWith("#");
     const linkAttrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : '';
-    const linkEl = url
-      ? `<a class="close-c-link" href="${url}"${linkAttrs}>${linkLabel}</a>`
-      : "";
-    return `
-      <article class="close-c-cell${featured}">
+    // Whole card is the click target -- the entire <a> is the affordance.
+    // The "Open ->" label remains inside as a visual cue.
+    const innerHtml = `
         ${eyebrow ? `<div class="close-c-cell-eyebrow">${eyebrow}</div>` : ""}
         ${ctitle ? `<h3 class="close-c-cell-title">${ctitle}</h3>` : ""}
         ${copy ? `<p class="close-c-cell-copy">${copy}</p>` : ""}
-        ${linkEl}
-      </article>
+        ${url ? `<span class="close-c-link" aria-hidden="true">${linkLabel}</span>` : ""}
     `;
+    if (url) {
+      return `<a class="close-c-cell${featured} is-clickable" href="${url}"${linkAttrs}>${innerHtml}</a>`;
+    }
+    return `<article class="close-c-cell${featured}">${innerHtml}</article>`;
   };
   return `
     <div class="page close-c-single">
       <div class="close-c-photo" aria-hidden="true"></div>
       <div class="close-c-shade" aria-hidden="true"></div>
       <div class="close-c-content">
-        <img class="close-c-logo" src="assets/branding/foundry-logo-orange.png" alt="The Candler Foundry">
+        <a class="close-c-logo-link" href="https://candlerfoundry.emory.edu/" target="_blank" rel="noopener noreferrer" aria-label="Visit candlerfoundry.emory.edu"><img class="close-c-logo" src="assets/branding/foundry-logo-orange.png" alt="The Candler Foundry"></a>
         ${entry.title ? `<h2 class="close-c-title">${entry.title}</h2>` : ""}
         ${entry.subtitle ? `<p class="close-c-subtitle">${entry.subtitle}</p>` : ""}
         <div class="close-c-grid">
@@ -4467,15 +4526,33 @@ function goTo(index) {
     return;
   }
   if (isAnimating) return;
-  isAnimating = true;
-  playFlipSound();
 
+  // Resolve the in/out pages BEFORE entering the animating state. The
+  // legacy left/right curl animation requires both fromSpread and
+  // toSpread to expose a .page-left + .page-right pair. Single-page
+  // entries (the cover and back cover) only emit a single .page, so
+  // querying for .page-right or .page-left returns null. Two cases
+  // also short-circuit to a snap: editor preview (preview-embed mode
+  // wants instant feedback when the user clicks a page tab in the
+  // editor, not a 1.2s flip), and any from/to combination involving a
+  // single-page entry.
   const dir = index > currentIndex ? "fwd" : "bwd";
   const spreads = Array.from(bookStage.querySelectorAll(".spread"));
   const fromSpread = spreads[currentIndex];
   const toSpread = spreads[index];
-  const outPage = fromSpread.querySelector(dir === "fwd" ? ".page-right" : ".page-left");
-  const inPage = toSpread.querySelector(dir === "fwd" ? ".page-left" : ".page-right");
+  const outPage = fromSpread && fromSpread.querySelector(dir === "fwd" ? ".page-right" : ".page-left");
+  const inPage = toSpread && toSpread.querySelector(dir === "fwd" ? ".page-left" : ".page-right");
+
+  if (isPreviewEmbed || !outPage || !inPage) {
+    currentIndex = index;
+    updateBook(false);
+    prevButton.disabled = index === 0;
+    nextButton.disabled = index === BOOK.length - 1;
+    return;
+  }
+
+  isAnimating = true;
+  playFlipSound();
 
   spreads.forEach((spread) => {
     spread.className = "spread";

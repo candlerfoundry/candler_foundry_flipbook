@@ -869,39 +869,39 @@ window.FLIPBOOK_CONTENT = [
     "leftValueLine": "Theology for all who are curious.",
     "leftSubline": "The Candler Foundry \u00b7 Atlanta \u00b7 2026",
     "title": "Ready to get started?",
-    "subtitle": "Pick the door that fits \u2014 we\u2019ll meet you there.",
+    "subtitle": "So are we \u2014 and we\u2019re here to help!",
     "cells": [
       {
         "eyebrow": "Visit",
         "title": "Our website",
-        "copy": "Programs, courses, and the latest from the Foundry.",
+        "copy": "Check out our latest courses, resources, and other offerings.",
         "linkLabel": "Open \u2192",
         "linkUrl": "https://candlerfoundry.emory.edu/"
       },
       {
         "eyebrow": "Contact",
         "title": "Get in touch",
-        "copy": "Partner-church planning, press, or anything else \u2014 just write.",
+        "copy": "Want to plan a course? Have a question? Give us a shout!",
         "linkLabel": "Email \u2192",
         "linkUrl": "mailto:candlerfoundry@emory.edu"
       },
       {
         "eyebrow": "Newsletter",
         "title": "Stay in the loop",
-        "copy": "A short, occasional note about new courses and gatherings.",
+        "copy": "Receive updates, discounts, and free resources.",
         "linkLabel": "Subscribe \u2192",
         "linkUrl": "https://mailchi.mp/c260323fc0e1/candler_foundry"
       },
       {
         "eyebrow": "Support",
         "title": "Support our work",
-        "copy": "Open these courses to every learner who wants to come.",
+        "copy": "Help bring our courses to churches and learners everywhere.",
         "linkLabel": "Donate \u2192",
         "linkUrl": "https://giving.emory.edu/products/the-candler-foundry-theoed",
         "featured": true
       }
     ],
-    "metaLeft": "candlerfoundry@emory.edu",
+    "metaLeft": "",
     "metaRight": "candlerfoundry.emory.edu"
   }
 ];
