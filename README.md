@@ -15,6 +15,7 @@ The editor writes drafts to the browser's `localStorage`, so typing into `admin.
 2. The browser POSTs the edited content to `/.netlify/functions/save-content`.
 3. The serverless function commits `content.js` to the `main` branch of this repo via the GitHub Contents API.
 4. Netlify detects the push and redeploys the static site (~30&ndash;60 seconds).
+5. On a successful publish, the editor automatically clears the `localStorage` draft and re-baselines its internal "what was loaded" pointer to the just-published payload, so Git becomes the single source of truth for the next reload of either `/admin` or the live viewer.
 
 A `Download content.js` button is kept as a manual fallback &mdash; useful if the Netlify function is ever misconfigured.
 
@@ -32,7 +33,7 @@ There are **two paths** for changes to land on the live site, and they can both 
 
 1. **Always `git pull` before you start local work.** The web editor may have committed new copy since your last pull, and your local clone won't know. If you edit on stale files and push, you'll hit "rejected: fetch first" and need to resolve a merge.
 2. **Only edit `content.js` through the web editor, not by hand.** The editor is the source of truth for copy. Hand-edits to `content.js` can collide with a concurrent Publish and get clobbered. (Structural changes to the `content.js` schema &mdash; adding or removing fields &mdash; are the exception; those need a code change anyway.)
-3. **After pulling a `content.js` that was changed while you had the editor open, click "Discard saved draft".** The editor's draft lives in your browser's `localStorage` and takes precedence over the bundled file. If the two diverge (e.g. a teammate published while you were drafting), your draft will shadow the freshly deployed `content.js` until you discard it. **Hard refresh does not clear `localStorage`** &mdash; only the **Discard saved draft** button does (or an incognito window, or DevTools &rarr; Application &rarr; Storage &rarr; Clear site data).
+3. **`localStorage` shadowing is mostly self-managing now, but is still real in two cases.** A successful Publish auto-clears the editor's draft, so the common "I published, then opened /admin and saw old stuff" loop no longer happens. Two edge cases remain: (a) `/admin` is open in another tab while a publish lands, or while a teammate publishes &mdash; that other tab still holds the pre-publish draft until it reloads, and (b) you intentionally walked away from `/admin` mid-edit and are returning later. In both cases the **Discard saved draft** button (or an incognito window, or DevTools &rarr; Application &rarr; Storage &rarr; Clear site data) is still the fix. **Hard refresh does not clear `localStorage`.**
 4. **Netlify redeploys automatically** on every push to `main` &mdash; whether the push came from you or from the web editor. The live site is typically updated within 30&ndash;60 seconds of the commit landing.
 
 ### Typical developer loop
@@ -157,7 +158,7 @@ Local files can drift from the repo state for a few reasons specific to this mac
 3. **Pull the current state of any file you intend to edit** from `https://raw.githubusercontent.com/candlerfoundry/candler_foundry_flipbook/main/<path>` rather than reading local; locals may be stale or truncated.
 4. **Edit in /tmp or in-memory**, write a Python script (or similar) that performs the edits.
 5. **Commit via the Git Data API** using the seven-step pattern above.
-6. **Update local mirror** by writing the same content to `C:\Scripts\Flipbook\<path>` so Emily can browse the new files locally; not required for correctness.
+6. **Update the local mirror** by writing the same content to `C:\Scripts\Flipbook\<path>` so Emily can browse the new files locally. This is a convenience, not a verification step &mdash; the source of truth for the next edit pass is always GitHub raw, never the local file (see Local file truncation under Known issues for why).
 7. **Tell Emily the commit SHA and the GitHub URL** so she can verify in her browser and trust the change.
 
 ## Architecture notes
@@ -186,6 +187,19 @@ Each spread's left page renders a **3D flip card** for the featured instructor:
 ### Letterbox scaling (responsive layout)
 
 The book renders at fixed **design dimensions of 1500&times;780** inside a `.book-scaler` element. JS computes `scale = min(stage.offsetWidth / 1500, stage.offsetHeight / 780)` and applies it via `--book-scale` on `.book-scaler`. **Important:** use `offsetWidth`/`offsetHeight` (layout box), not `getBoundingClientRect` (rendered box) &mdash; the editor's preview iframe applies its own ancestor `transform: scale`, and `getBoundingClientRect` would compound the two and double-shrink the book. There's no `Math.min(..., 1)` cap; the book scales up beyond 1.0 on big monitors.
+
+### Render path divergence: live vs editor preview (important)
+
+The viewer (`index.html`) has **two render paths** that share the same content but differ in DOM wrapping:
+
+- **Live (StPageFlip path):** `index.html` loaded normally. Each entry is wrapped as `.spf-page > .spf-page-clip > .page`. The library runs `transform-style: preserve-3d` on the outer wrappers; `.spf-page-clip` is the layer where `overflow: hidden` actually works.
+- **Editor preview (legacy path):** `index.html?preview=1`. Forces the legacy spread renderer, where each entry is wrapped as `.spread > .page`. No StPageFlip, no inner `.spf-page-clip`.
+
+This matters because **CSS rules scoped to `.spf-page-clip` apply on live but not in the editor preview**, and the reverse is also possible. The most consequential example we've hit: `.spf-page-clip .page { background: var(--ivory); }` is a deliberate opaque base for the StPageFlip flip-bleed workaround, but its `background:` shorthand also resets `background-image: none`. So a per-page rule like `.note-left { background: ...url(vignette.png)..., ... }` paints in the editor (no override) and is silently masked on live (StPageFlip override wins). The result was a "ghost" decoration that only Emily ever saw, only inside `/admin`, for months.
+
+**Debugging rule:** if a graphic is showing in the editor preview but not on live (or vice versa), the first thing to check is whether the rule is scoped to `.spf-page-clip .page` somewhere. Don't assume it's a stale `localStorage` draft until you've ruled out a render-mode CSS divergence. They share `content.js` and `index.html`, but the wrapper structure is different.
+
+If you need a rule to apply to both render paths, target the inner `.page` (and its modifier classes like `.note-left`, `.feature-left`) directly, and avoid the `background:` shorthand on `.page`-level selectors that have a `.spf-page-clip` parent in StPageFlip mode.
 
 ### Master spread cascade (important — read before changing layout code)
 
@@ -235,6 +249,15 @@ Defaults are wired into `createDefaultSpreadLayout()`. New layout fields fall th
 
 **Clamp pattern:** all `normalizeContent` clamps for layout fields use `Number.isFinite(v)` rather than `Number(v) || default` &mdash; this matters because `Number(0) || 10` evaluates to `10` (since `0` is falsy), which silently rewrites a legitimate 0 to the default. We hit this when `imageY: 0` got persistently rewritten to `10` during slider testing.
 
+### Editor layout: density and responsive
+
+`admin.html` is a two-column layout: editor pane on the left, preview iframe on the right. Two breakpoints govern responsive behavior:
+
+- **&le; 1100px** &mdash; the columns stack. The editor panel is capped at `max-height: 55vh` with internal scroll; the preview iframe is `50vh` (min 360px). This was tightened from 1220px so 1120&ndash;1219px laptops keep the side-by-side view, and the stacked view caps each pane so both stay visible without scrolling the whole page.
+- **&le; 720px** &mdash; phones. `.page-list` collapses to one column, `.field-grid` and `.range-row` collapse to one column, and the editor / iframe heights tighten to `60vh / 56vh`.
+
+The editor pane went through a density pass (April 2026) that shrunk most font-sizes, paddings, and gaps by ~20&ndash;25% on the editor side only. The preview iframe is unaffected. If you add new editor controls, follow the existing scale (e.g., `font-size: 0.78rem` for control labels, `padding: 8px 10px` for inputs, `min-height: 32px` for buttons).
+
 ### Netlify Function: `save-content`
 
 Located at `netlify/functions/save-content.js`. POSTed by the **Publish to live site** button in `admin.html` with `{content: <FLIPBOOK_CONTENT array>, message?: <commit message>}`. Reads four env vars (`GITHUB_TOKEN`, `GITHUB_OWNER`, `GITHUB_REPO`, `GITHUB_BRANCH`), looks up the existing `content.js` SHA, and PUTs the new content via the **Contents** API (single-file commit, distinct from the Claude path which uses the lower-level **Git Data** API for multi-file commits). Optional `EDITOR_TOKEN` env var enables a shared-secret gate that requires an `x-editor-token` header.
@@ -245,15 +268,27 @@ Located at `netlify/functions/save-content.js`. POSTed by the **Publish to live 
 
 When Claude writes a large file to the mount, the resulting file on the Windows side is occasionally truncated mid-statement, ending up the same byte size as Claude's LF-only write rather than the CRLF-converted size that Windows Git would produce. We've hit this on `index.html`, `admin.html`, `content.js`, and `README.md`. Confirmed via canary test that nothing on the Windows side is rewriting files in the background &mdash; it's a transient mount/sync interaction at the moment of write. The recovery path is always the same: pull the file fresh from GitHub, re-apply edits, push via the API. The Path C (Claude API) workflow is robust to this because it sources from GitHub, not local.
 
-### Editor `localStorage` shadowing
+### Editor `localStorage` shadowing (mostly resolved)
 
-`admin.html` loads `content.js` as the bundled baseline, then overlays any draft saved in `localStorage`. If the deployed `content.js` changes (e.g., schema migration, or someone else publishes), the editor will keep showing the in-browser draft until **Discard saved draft** is clicked, an incognito window is used, or DevTools clears site data. Hard refresh does **not** clear `localStorage`. Add a brief `Discard saved draft` reminder when shipping any schema change.
+`admin.html` loads `content.js` as the bundled baseline, then overlays any draft saved in the `flipbook-content-v1` `localStorage` key. Historically, this caused painful "I published but the editor still shows old content" loops. As of the publish-clears-draft change, a successful **Publish to live site** automatically `removeItem`s the draft and re-baselines `bundledData` to the just-published payload, so Git becomes the source of truth at the end of every publish.
+
+Edge cases that still need a manual **Discard saved draft** (or an incognito window, or DevTools &rarr; Application &rarr; Storage &rarr; Clear site data):
+
+- A second `/admin` tab is open during a publish &mdash; the second tab still holds the pre-publish draft until it reloads.
+- A teammate publishes while you're mid-edit in `/admin` &mdash; your in-progress draft will shadow their published content until you discard.
+- You return to `/admin` after walking away mid-edit and want to start from the live published state.
+
+Hard refresh does **not** clear `localStorage`.
 
 ### Class-name drift between sliders and rendered DOM
 
 The left page went through an "Option-2" redesign that swapped many class names: `.feature-image-card` &rarr; `.featured-hero`, `.feature-course-label` &rarr; `.featured-eyebrow`, `.faculty-avatar-large` &rarr; `.featured-instructor-avatar`, `.faculty-name` &rarr; `.featured-instructor-name`, `.faculty-blurb` &rarr; `.featured-instructor-bio-link`. Old CSS rules still exist for the legacy classes, and several of them carry CSS-variable consumers (`var(--image-y, ...)`, `var(--course-label-font-size, ...)`, etc.) but their selectors don't match anything in the rendered DOM anymore. When wiring a new editor slider, look at the **live** rendered class with DevTools, not at the CSS rules &mdash; a `var()` reference in a stylesheet doesn't mean the variable reaches the page.
 
 Same situation on the right page: `.section-title` (legacy, `display: none`) consumed `--right-heading-size`/`--right-heading-width`, but the live `.section-genre` had hardcoded values until those vars were retargeted onto it.
+
+### Render-path-only CSS bugs
+
+Because the editor preview uses the legacy spread renderer and live uses StPageFlip, CSS rules that match `.spf-page-clip .page` (or any selector that depends on the StPageFlip wrapper structure) will silently apply on one path and not the other. Symptom: "this graphic shows in the editor but not on live" or vice versa. See [Render path divergence](#render-path-divergence-live-vs-editor-preview-important) under Architecture notes for the diagnostic procedure. We hit this once in May 2026 with a `.note-left` background-image that only ever rendered inside `/admin` because the StPageFlip path's `background: var(--ivory)` reset masked it on live.
 
 ### `Dr. ian McFarland` typo
 
