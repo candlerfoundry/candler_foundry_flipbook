@@ -81,7 +81,7 @@ a {
 .topbar h1 {
   margin: 0 0 6px;
   font-family: "DM Serif Display", serif;
-  font-size: clamp(2rem, 3vw, 2.8rem);
+  font-size: clamp(1.5rem, 2.25vw, 2.1rem);
   font-weight: 400;
 }
 
@@ -115,8 +115,8 @@ a {
 
 .workspace {
   display: grid;
-  grid-template-columns: minmax(420px, 560px) minmax(0, 1fr);
-  gap: 16px;
+  grid-template-columns: minmax(360px, 480px) minmax(0, 1fr);
+  gap: 12px;
   align-items: start;
 }
 
@@ -135,7 +135,7 @@ a {
 }
 
 .panel-head {
-  padding: 18px 20px 14px;
+  padding: 13px 15px 11px;
   border-bottom: 1px solid rgba(30, 37, 48, 0.08);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(246, 242, 235, 0.82));
 }
@@ -143,30 +143,33 @@ a {
 .panel-head strong,
 .section-label {
   font-family: "DM Mono", monospace;
-  font-size: 0.72rem;
+  font-size: 0.6rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--orange-red);
 }
 
 .panel-head p {
-  margin: 6px 0 0;
+  margin: 5px 0 0;
   color: rgba(30, 37, 48, 0.72);
-  line-height: 1.55;
+  line-height: 1.5;
+  font-size: 0.78rem;
 }
 
 .toolbar {
   display: flex;
-  gap: 10px;
+  gap: 7px;
   flex-wrap: wrap;
-  padding: 14px 20px;
+  padding: 10px 15px;
   border-bottom: 1px solid rgba(30, 37, 48, 0.08);
   background: rgba(255, 255, 255, 0.72);
 }
 
 .toolbar .action {
-  min-height: 42px;
-  border-radius: 14px;
+  min-height: 32px;
+  padding: 0 12px;
+  font-size: 0.82rem;
+  border-radius: 11px;
   border: 0;
   background: var(--navy);
   color: var(--ivory);
@@ -179,18 +182,18 @@ a {
 
 .stack {
   overflow: auto;
-  padding: 16px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 13px;
 }
 
 .page-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  height: 320px;
-  max-height: 320px;
+  gap: 7px;
+  height: 248px;
+  max-height: 248px;
   overflow: auto;
   padding-right: 6px;
   align-content: start;
@@ -199,12 +202,12 @@ a {
 .page-picker {
   width: 100%;
   border: 0;
-  padding: 10px 12px;
-  border-radius: 20px;
+  padding: 7px 9px;
+  border-radius: 16px;
   display: grid;
-  grid-template-columns: 54px minmax(0, 1fr);
+  grid-template-columns: 42px minmax(0, 1fr);
   align-items: center;
-  gap: 12px;
+  gap: 9px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 242, 235, 0.9));
   cursor: pointer;
   text-align: left;
@@ -221,8 +224,8 @@ a {
 }
 
 .page-index-pill {
-  min-height: 38px;
-  padding: 0 10px;
+  min-height: 28px;
+  padding: 0 8px;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
@@ -230,21 +233,21 @@ a {
   background: linear-gradient(180deg, rgba(200, 72, 38, 0.98), rgba(160, 50, 23, 0.96));
   color: var(--ivory);
   font-family: "DM Mono", monospace;
-  font-size: 0.74rem;
+  font-size: 0.62rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
 .page-title-pill {
-  min-height: 38px;
-  padding: 0 16px;
+  min-height: 28px;
+  padding: 0 12px;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
   background: rgba(242, 244, 247, 0.96);
   color: var(--navy);
   font-family: "DM Serif Display", serif;
-  font-size: 0.9rem;
+  font-size: 0.78rem;
   line-height: 1.15;
   white-space: nowrap;
   overflow: hidden;
@@ -253,9 +256,9 @@ a {
 
 .active-page-editor {
   display: grid;
-  gap: 14px;
-  padding: 18px;
-  border-radius: 22px;
+  gap: 10px;
+  padding: 13px;
+  border-radius: 18px;
   background: rgba(255, 255, 255, 0.88);
   border: 1px solid rgba(30, 37, 48, 0.08);
   box-shadow: 0 18px 34px rgba(0, 0, 0, 0.08);
@@ -263,14 +266,14 @@ a {
 
 .active-page-header {
   display: grid;
-  gap: 8px;
-  padding-bottom: 14px;
+  gap: 6px;
+  padding-bottom: 10px;
   border-bottom: 1px solid rgba(30, 37, 48, 0.08);
 }
 
 .active-page-header strong {
   font-family: "DM Mono", monospace;
-  font-size: 0.72rem;
+  font-size: 0.6rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--orange-red);
@@ -279,15 +282,15 @@ a {
 .active-page-header h2 {
   margin: 0;
   font-family: "DM Serif Display", serif;
-  font-size: 1.5rem;
+  font-size: 1.18rem;
   font-weight: 400;
 }
 
 .node {
   display: grid;
-  gap: 14px;
-  padding: 16px;
-  border-radius: 18px;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 14px;
   background: rgba(255, 255, 255, 0.72);
   border: 1px solid rgba(30, 37, 48, 0.08);
 }
@@ -300,12 +303,12 @@ a {
 
 .node h2 {
   font-family: "DM Serif Display", serif;
-  font-size: 1.45rem;
+  font-size: 1.13rem;
   font-weight: 400;
 }
 
 .node h3 {
-  font-size: 1rem;
+  font-size: 0.82rem;
 }
 
 .node-toolbar {
@@ -317,7 +320,8 @@ a {
 .node-toolbar button {
   border: 0;
   border-radius: 999px;
-  padding: 8px 12px;
+  padding: 6px 9px;
+  font-size: 0.78rem;
   background: rgba(30, 37, 48, 0.08);
   color: var(--navy);
   cursor: pointer;
@@ -330,19 +334,19 @@ a {
 
 .field {
   display: grid;
-  gap: 6px;
+  gap: 4px;
 }
 
 .field-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 9px;
 }
 
 .field label,
 .array-label {
   font-family: "DM Mono", monospace;
-  font-size: 0.7rem;
+  font-size: 0.58rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: rgba(122, 107, 90, 0.92);
@@ -354,14 +358,15 @@ select,
 textarea {
   width: 100%;
   border: 1px solid rgba(30, 37, 48, 0.14);
-  border-radius: 12px;
-  padding: 12px 14px;
+  border-radius: 10px;
+  padding: 8px 10px;
   background: #fffdf8;
   color: var(--navy);
+  font-size: 0.85rem;
 }
 
 textarea {
-  min-height: 110px;
+  min-height: 84px;
   resize: vertical;
   line-height: 1.55;
 }
@@ -373,24 +378,25 @@ input[type="range"] {
 
 .range-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 96px;
-  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) 76px;
+  gap: 8px;
   align-items: center;
 }
 
 .range-value {
-  min-height: 42px;
+  min-height: 32px;
   border: 1px solid rgba(30, 37, 48, 0.14);
-  border-radius: 12px;
-  padding: 0 12px;
+  border-radius: 10px;
+  padding: 0 9px;
+  font-size: 0.82rem;
   background: #fffdf8;
 }
 
 .editor-section {
   display: grid;
-  gap: 12px;
-  padding: 14px;
-  border-radius: 16px;
+  gap: 9px;
+  padding: 11px;
+  border-radius: 13px;
   background: rgba(246, 242, 235, 0.78);
   border: 1px solid rgba(30, 37, 48, 0.08);
 }
@@ -438,17 +444,17 @@ input[type="range"] {
 
 .editor-section h3 {
   font-family: "DM Serif Display", serif;
-  font-size: 1.2rem;
+  font-size: 0.96rem;
   font-weight: 400;
 }
 
 .editor-section h4 {
-  font-size: 0.98rem;
+  font-size: 0.82rem;
 }
 
 .section-copy {
   margin: 0;
-  font-size: 0.92rem;
+  font-size: 0.78rem;
   line-height: 1.55;
   color: rgba(30, 37, 48, 0.72);
 }
@@ -532,23 +538,46 @@ input[type="range"] {
   color: rgba(30, 37, 48, 0.72);
 }
 
-@media (max-width: 1220px) {
+@media (max-width: 1100px) {
+  /* Stacked layout for narrower screens. The editor fits within ~55vh
+     and scrolls inside its own panel; the preview takes ~50vh below.
+     Both panes stay visible on a typical laptop without giant page
+     scrolls. Tightened from 1220px so 1120-1219px laptops keep the
+     side-by-side view. */
   .workspace {
     grid-template-columns: 1fr;
   }
 
-  .editor-panel,
+  .editor-panel {
+    min-height: auto;
+    max-height: 55vh;
+  }
+
   .preview-panel {
     min-height: auto;
     max-height: none;
   }
 
   .preview-shell iframe {
-    height: 72vh;
+    height: 50vh;
+    min-height: 360px;
   }
 }
 
 @media (max-width: 720px) {
+  .editor-panel {
+    max-height: 60vh;
+  }
+
+  .preview-shell iframe {
+    height: 56vh;
+    min-height: 320px;
+  }
+}
+
+@media (max-width: 720px) {
+  /* Single-column page picker + form fields on phones. Stacked
+     editor/preview heights are set in the 720px block above. */
   .page-list {
     grid-template-columns: 1fr;
   }
@@ -577,7 +606,7 @@ input[type="range"] {
     <section class="panel editor-panel">
       <div class="panel-head">
         <strong id="save-state">Local editor ready</strong>
-        <p>Typing updates the live preview immediately. Draft saves stay in this browser. Click <strong>Publish to live site</strong> to commit <code>content.js</code> to GitHub &mdash; Netlify will redeploy the flipbook within a minute. The <code>Download content.js</code> button is kept as a manual fallback.</p>
+        <p>Typing updates the live preview immediately. Drafts stay in this browser. Click <strong>Publish to live site</strong> to commit <code>content.js</code> to GitHub &mdash; Netlify rebuilds within a minute, and your draft is automatically cleared so Git stays the source of truth on the next reload.</p>
       </div>
       <div class="toolbar">
         <button class="action" id="save-button" type="button">Save draft</button>
@@ -1996,8 +2025,25 @@ publishButton.addEventListener("click", async () => {
     } else {
       const sha = data.commit && data.commit.sha ? data.commit.sha.slice(0, 7) : "";
       saveState.textContent = sha
-        ? `Published (commit ${sha}). Netlify is rebuilding.`
-        : "Published. Netlify is rebuilding.";
+        ? `Published (commit ${sha}). Netlify is rebuilding. Draft cleared.`
+        : "Published. Netlify is rebuilding. Draft cleared.";
+    }
+
+    // After a successful Publish, clear the localStorage draft and
+    // re-baseline `bundledData` so Git becomes the single source of truth.
+    // Without this, a stale draft can shadow the freshly-published
+    // content.js on the next reload (the editor and the live viewer both
+    // prefer localStorage over the bundled file). Re-baselining
+    // bundledData also means "Reset editor" reverts to the just-published
+    // state, not to the pre-publish state.
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      bundledData = JSON.parse(JSON.stringify(workingData));
+      lastSerializedState = JSON.stringify(workingData);
+      undoStack = [];
+      updateUndoButtonState();
+    } catch (_) {
+      // Non-fatal -- the publish itself succeeded.
     }
   } catch (err) {
     saveState.textContent = `Publish failed: ${err.message}`;

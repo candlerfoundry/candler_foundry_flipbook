@@ -925,9 +925,15 @@ button.meta-chip {
 }
 
 .note-left {
+  /* Cream gradient only. Previously also layered a
+     foundry-vignette-reader-presenter.png decoration that was being
+     painted over by `.spf-page-clip .page { background: var(--ivory); }`
+     on the live (StPageFlip) path -- so it only ever rendered in the
+     editor preview's legacy renderer, creating a confusing
+     editor-vs-live divergence. The vignette PNG itself is kept in
+     assets/branding/ in case we want to reintroduce it intentionally
+     later. */
   background:
-    linear-gradient(180deg, rgba(250, 250, 242, 0.18), transparent 20%),
-    url("assets/branding/foundry-vignette-reader-presenter.png") right -38px bottom 40px / 44% auto no-repeat,
     linear-gradient(180deg, #efe5cf, #fbf8ef 86%);
 }
 
