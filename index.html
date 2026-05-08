@@ -2693,7 +2693,7 @@ body.preview-embed .app-shell {
 .close-c-content {
   position: relative;
   z-index: 2;
-  padding: 50px 56px 40px;
+  padding: 50px 90px 40px 56px;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -2704,6 +2704,7 @@ body.preview-embed .app-shell {
   margin: 0;
   object-fit: contain;
   display: block;
+  opacity: 0.9;
 }
 .close-c-logo-link {
   align-self: flex-start;
@@ -2723,17 +2724,21 @@ body.preview-embed .app-shell {
   outline-offset: 4px;
 }
 .close-c-title {
-  margin: 0 0 8px;
+  /* margin-top pushes the entire content block (title -> meta) down
+     ~15% of the 780-design-px page so more of the photo behind shows. */
+  margin: 115px 0 8px;
   font-family: "DM Serif Display", serif;
   font-weight: 400;
-  font-size: clamp(2rem, 3vw, 2.9rem);
+  /* +10% from clamp(2rem, 3vw, 2.9rem) */
+  font-size: clamp(2.2rem, 3.3vw, 3.19rem);
   line-height: 1.0;
   color: var(--navy);
 }
 .close-c-subtitle {
   margin: 0 0 22px;
   font-family: "DM Sans", sans-serif;
-  font-size: 13.5px;
+  /* +10% from 13.5px */
+  font-size: 14.85px;
   line-height: 1.55;
   color: rgba(30, 37, 48, 0.72);
   max-width: 36ch;
@@ -2744,16 +2749,22 @@ body.preview-embed .app-shell {
   gap: 14px;
 }
 .close-c-cell {
-  background: rgba(255, 255, 255, 0.92);
+  /* ~7% more transparent than previous 0.92 baseline */
+  background: rgba(255, 255, 255, 0.85);
   border: 1px solid rgba(30, 37, 48, 0.10);
   border-radius: 14px;
   padding: 18px 18px 16px;
   min-height: 152px;
   display: flex;
   flex-direction: column;
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-  box-shadow: 0 2px 6px rgba(20, 25, 33, 0.05), 0 8px 18px rgba(20, 25, 33, 0.06);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  /* Three-tier shadow stack: tight contact shadow + mid + soft cast
+     shadow combine to make the cards feel like real elevated paper. */
+  box-shadow:
+    0 1px 2px rgba(20, 25, 33, 0.08),
+    0 6px 14px rgba(20, 25, 33, 0.10),
+    0 22px 40px rgba(20, 25, 33, 0.16);
   transition: transform 180ms cubic-bezier(0.2, 0.7, 0.3, 1),
               box-shadow 180ms ease,
               border-color 180ms ease;
@@ -2768,9 +2779,12 @@ a.close-c-cell.is-clickable {
 }
 a.close-c-cell.is-clickable:hover,
 a.close-c-cell.is-clickable:focus-visible {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 10px rgba(20, 25, 33, 0.08), 0 16px 32px rgba(20, 25, 33, 0.14);
-  border-color: rgba(30, 37, 48, 0.18);
+  transform: translateY(-4px);
+  box-shadow:
+    0 2px 4px rgba(20, 25, 33, 0.10),
+    0 10px 20px rgba(20, 25, 33, 0.14),
+    0 30px 56px rgba(20, 25, 33, 0.22);
+  border-color: rgba(30, 37, 48, 0.20);
 }
 a.close-c-cell.is-clickable:focus-visible {
   outline: 2px solid var(--orange-red);
@@ -2778,7 +2792,10 @@ a.close-c-cell.is-clickable:focus-visible {
 }
 a.close-c-cell.is-clickable:active {
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(20, 25, 33, 0.06), 0 8px 16px rgba(20, 25, 33, 0.10);
+  box-shadow:
+    0 1px 2px rgba(20, 25, 33, 0.06),
+    0 4px 10px rgba(20, 25, 33, 0.10),
+    0 12px 22px rgba(20, 25, 33, 0.14);
 }
 a.close-c-cell.is-clickable .close-c-link {
   transition: transform 180ms cubic-bezier(0.2, 0.7, 0.3, 1),
@@ -2790,7 +2807,10 @@ a.close-c-cell.is-clickable:hover .close-c-link {
   border-bottom-color: currentColor;
 }
 a.close-c-cell.is-clickable.close-c-cell-featured:hover {
-  box-shadow: 0 4px 10px rgba(200, 72, 38, 0.18), 0 16px 36px rgba(200, 72, 38, 0.42);
+  box-shadow:
+    0 2px 4px rgba(200, 72, 38, 0.20),
+    0 10px 22px rgba(200, 72, 38, 0.28),
+    0 30px 60px rgba(200, 72, 38, 0.46);
 }
 .close-c-cell-eyebrow {
   font-family: "DM Mono", monospace;
@@ -2831,7 +2851,10 @@ a.close-c-cell.is-clickable.close-c-cell-featured:hover {
   background: linear-gradient(180deg, var(--orange-red), #b53b1c);
   border-color: transparent;
   color: #fff;
-  box-shadow: 0 12px 28px rgba(200, 72, 38, 0.32);
+  box-shadow:
+    0 1px 2px rgba(200, 72, 38, 0.22),
+    0 8px 18px rgba(200, 72, 38, 0.28),
+    0 24px 44px rgba(200, 72, 38, 0.36);
 }
 .close-c-cell-featured .close-c-cell-eyebrow { color: rgba(255, 255, 255, 0.78); }
 .close-c-cell-featured .close-c-cell-title { color: #fff; }
@@ -2845,13 +2868,47 @@ a.close-c-cell.is-clickable.close-c-cell-featured:hover {
   justify-content: flex-end;
   gap: 18px;
   font-family: "DM Mono", monospace;
-  font-size: 10.5px;
+  /* +10% from 10.5px */
+  font-size: 11.55px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: rgba(30, 37, 48, 0.66);
 }
 .close-c-meta:has(span + span) {
   justify-content: space-between;
+}
+.close-c-meta-link {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 120ms ease, color 120ms ease;
+}
+.close-c-meta-link:hover,
+.close-c-meta-link:focus-visible {
+  border-bottom-color: currentColor;
+  color: var(--orange-red);
+  outline: none;
+}
+
+
+/* Right-edge spiral binding -- mirrors the front cover. The PNG has a
+   solid white background and the dark spiral coils on the right edge;
+   mix-blend-mode: multiply lets the white drop out so only the coils
+   composite over the photo + cream. Image AR (1500/1560) matches the
+   page AR (750/780) exactly, so a full-bleed inset:0 placement keeps
+   the rings hugging the right edge at any scale. */
+.close-c-single .close-c-spiral {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  mix-blend-mode: multiply;
+  object-fit: cover;
+  object-position: right center;
 }
 
 /* 3D curl-along-spine animation. Replaces the flat linear transition
@@ -3798,10 +3855,15 @@ function renderClose(index) {
     }
     return `<article class="close-c-cell${featured}">${innerHtml}</article>`;
   };
+  // metaRight is treated as a clickable URL pointing at the Candler
+  // Foundry homepage; if the data ever needs to display a non-URL
+  // string, drop the wrapping <a> here.
+  const metaRightHref = "https://candlerfoundry.emory.edu/";
   return `
     <div class="page close-c-single">
       <div class="close-c-photo" aria-hidden="true"></div>
       <div class="close-c-shade" aria-hidden="true"></div>
+      <img class="close-c-spiral" src="assets/branding/Flipbook%20Back%20Cover%20Spiral.png" alt="" aria-hidden="true" draggable="false">
       <div class="close-c-content">
         <a class="close-c-logo-link" href="https://candlerfoundry.emory.edu/" target="_blank" rel="noopener noreferrer" aria-label="Visit candlerfoundry.emory.edu"><img class="close-c-logo" src="assets/branding/foundry-logo-orange.png" alt="The Candler Foundry"></a>
         ${entry.title ? `<h2 class="close-c-title">${entry.title}</h2>` : ""}
@@ -3811,7 +3873,7 @@ function renderClose(index) {
         </div>
         <div class="close-c-meta">
           ${entry.metaLeft ? `<span>${entry.metaLeft}</span>` : ""}
-          ${entry.metaRight ? `<span>${entry.metaRight}</span>` : ""}
+          ${entry.metaRight ? `<span><a class="close-c-meta-link" href="${metaRightHref}" target="_blank" rel="noopener noreferrer">${entry.metaRight}</a></span>` : ""}
         </div>
       </div>
       <div class="paper-grain"></div>
