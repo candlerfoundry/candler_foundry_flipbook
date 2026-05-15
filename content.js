@@ -11,7 +11,7 @@ window.FLIPBOOK_CONTENT = [
     "leftEyebrow": "",
     "title": "Theology.",
     "bannerAccent": "For All.",
-    "copy": "Through our Courses in the Community program, The Foundry brings the best of Candler's scholarship to living rooms and fellowship halls around the world. Taught by Candler faculty and other scholars, our courses make theological learning easy and affordable for curious learners everywhere.",
+    "copy": "Through its Courses in the Community program, The Foundry brings the best of Candler's scholarship to living rooms and fellowship halls around the world. Taught by Candler faculty and other scholars, our courses make theological learning easy and affordable for curious learners everywhere.",
     "points": [
       {
         "tag": "Path 1 · Open",
