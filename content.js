@@ -11,7 +11,7 @@ window.FLIPBOOK_CONTENT = [
     "leftEyebrow": "",
     "title": "Theology.",
     "bannerAccent": "For All.",
-    "copy": "The Foundry's Courses in the Community program brings the best of Candler to living rooms and fellowship halls around the world. Taught by Candler faculty and other scholars, our courses make theological learning easy and affordable for curious learners everywhere.",
+    "copy": "Through our Courses in the Community program, The Foundry brings the best of Candler's scholarship to living rooms and fellowship halls around the world. Taught by Candler faculty and other scholars, our courses make theological learning easy and affordable for curious learners everywhere.",
     "points": [
       {
         "tag": "Path 1 · Open",
@@ -44,7 +44,7 @@ window.FLIPBOOK_CONTENT = [
       "title": "Lies My Pastor Told Me",
       "instructor": "Dr. Brent Strawn",
       "image": "assets/graphics/lies-my-pastor-told-me.jpg",
-      "lede": "Brent Strawn — author of \"Lies My Preacher Told Me\" — challenges common misconceptions about the Old Testament. If you've ever questioned its relevance, wrestled with its laws or violence, or wondered why it's still part of the Christian Bible, this course is for you.",
+      "lede": "Brent Strawn — author of \"Lies My Preacher Told Me\" — challenges common misconceptions about the Old Testament. If you've ever questioned its relevance, wrestled with its laws or violence, or wondered how it applies to our lives today, this course is for you.",
       "quote": "The Old Testament becomes far more interesting once we let go of what we thought we knew about it.",
       "facultyBio": "Dr. Brent Strawn is Professor of Old Testament and Professor of Law at Duke University. He is the author of \"Lies My Preacher Told Me: An Honest Look at the Old Testament\" and has published widely on the Hebrew Bible, biblical theology, and the use of Scripture in modern faith communities."
     },
@@ -301,7 +301,7 @@ window.FLIPBOOK_CONTENT = [
       "title": "Paul's Vision of the Church",
       "instructor": "Dr. Luke Timothy Johnson",
       "image": "assets/graphics/pauls-vision-of-the-church.jpg",
-      "lede": "Explore the historical context, structure, and spiritual life of Paul's churches. This course examines Paul's metaphors for community, his call to edification and holiness, and his vision for what it means to belong together as the body of Christ.",
+      "lede": "Would Paul recognize our modern church? How did Paul deal with churches in conflict? In this course, we examine these questions, and explore Paul's understanding of community, his approach to conflict, and his vision for what it means to belong together as the body of Christ.",
       "quote": "Paul writes about the church as a household, a temple, a body — never an institution.",
       "facultyBio": "Dr. Luke Timothy Johnson is the Robert W. Woodruff Distinguished Professor Emeritus of New Testament and Christian Origins at Candler School of Theology. A leading interpreter of the New Testament, he has written extensively on Paul, the Gospels, and early Christian community.",
       "instructorUrl": "https://candlerfoundry.emory.edu/instructors/dr-luke-timothy-johnson"
@@ -438,7 +438,7 @@ window.FLIPBOOK_CONTENT = [
       "onDemandUrl": "https://candlerfoundry.emory.edu/foundry-gift",
       "instructor": "Dr. Ryan Bonfiglio",
       "image": "assets/graphics/sabbath-as-rest-and-resistance.png",
-      "lede": "What if rest is more than a luxury — what if it's a faithful refusal? In this course, Ryan Bonfiglio looks at the biblical practice of Sabbath as both a gift of grace and an act of resistance against a culture of unending production.",
+      "lede": "This course explores the biblical concept of Sabbath and what it means to embrace God’s rest in the midst of our busy lives and restless world. Together, we will discover Sabbath as a  life-giving invitation to think differently about our priorities, the pace of our lives, and what it means to be created in the image of a God who rests.",
       "quote": "Sabbath is the gentle rebellion built into the rhythm of creation.",
       "facultyBio": "Dr. Ryan Bonfiglio is the Executive Director of The Candler Foundry and an Associate Professor in the Practice of Old Testament. His work focuses on biblical interpretation, theological education for the church, and how the Old Testament continues to speak in modern life. He teaches widely on Hebrew language, Old Testament theology, and biblical metaphors, and has led numerous Foundry courses including Hebrew Insights, Sabbath as Rest and Resistance, and Seeking Shalom.",
       "instructorUrl": "https://candlerfoundry.emory.edu/instructors/ryan-bonfiglio"
@@ -698,7 +698,7 @@ window.FLIPBOOK_CONTENT = [
       "title": "Black Theology and Faith",
       "instructor": "Dr. Noel Erskine",
       "image": "assets/graphics/black-theology-and-faith.jpg",
-      "lede": "What does faith look like when shaped by struggle, hope, and justice? Dr. Noel Erskine introduces key themes of Black theology — liberation, reconciliation, and baptism — and explores how faith flourishes across cultures. Open to all.",
+      "lede": "What does faith look like when shaped by struggle, hope, and justice? Dr. Noel Erskine introduces key themes of Black theology — liberation, reconciliation, and baptism — and explores how faith flourishes across cultures. ",
       "quote": "Theology lives in the daily work of liberation and the long memory of grace.",
       "facultyBio": "Dr. Noel Erskine is Professor of Theology and Ethics at Candler School of Theology. His scholarship focuses on Black theology, liberation, reconciliation, and the development of Christian thought across African and Afro-Caribbean cultures.",
       "instructorUrl": "https://candlerfoundry.emory.edu/instructors/dr-noel-erskine"
@@ -827,7 +827,7 @@ window.FLIPBOOK_CONTENT = [
       "title": "Let's Talk About Christian Nationalism",
       "instructor": "Dr. Dominic Erdozain",
       "image": "assets/graphics/lets-talk-about-christian-nationalism.jpg",
-      "lede": "As America approaches its 250th anniversary, this course examines patriotism, nationalism, and Christian faith in a polarizing time. Dominic Erdozain offers new ways to think about democracy, nationhood, and a peace-centered response.",
+      "lede": "Should Christians be patriots? What's the difference between patriotism and nationalism? In this course, we explore these questions and consider new ways to think about democracy, nationhood, and a peace-centered approach to civic life.",
       "quote": "Patriotism without humility is nationalism with a sermon.",
       "facultyBio": "Dr. Dominic Erdozain is a historian of religion whose work explores the intersection of Christianity, politics, and culture. He writes and teaches on the questions of patriotism, nationalism, and democratic life in light of Christian faith."
     },
